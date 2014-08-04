@@ -26,6 +26,10 @@ class LinterESLint extends Linter
     if config
       @cmd += " --config #{config}"
 
+    rulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
+    if rulesDir
+      @cmd += " --rulesdir #{rulesDir}"
+
     atom.config.observe 'linter-eslint.eslintExecutablePath', =>
       @executablePath = atom.config.get 'linter-eslint.eslintExecutablePath'
 
