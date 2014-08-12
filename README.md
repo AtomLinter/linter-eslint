@@ -1,7 +1,7 @@
 linter-eslint
 =========================
 
-This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides an interface to [eslint](http://http://eslint.org). It will be used with files that have the “JavaScript” syntax.
+This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides an interface to [eslint](http://eslint.org). It will be used with files that have the “JavaScript” syntax.
 
 ## Installation
 Linter package must be installed in order to use this plugin. If Linter is not installed, please follow the instructions [here](https://github.com/AtomLinter/Linter).
