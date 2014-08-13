@@ -37,3 +37,6 @@ Please note that modifications should follow these coding guidelines:
 - Vertical whitespace helps readability, don’t be afraid to use it.
 
 Thank you for helping out!
+
+## Donation
+[![Share the love!](https://chewbacco-stuff.s3.amazonaws.com/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KXUYS4ARNHCN8)
