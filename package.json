@@ -4,7 +4,7 @@
   "linter-package": true,
   "activationEvents": [],
   "version": "0.0.2",
-  "description": "Lint JavScript on the fly, using ESLint",
+  "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
   "engines": {
