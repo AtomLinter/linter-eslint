@@ -7,9 +7,22 @@ class LinterESLint extends Linter
   # list/tuple of strings. Names should be all lowercase.
   @syntax: ['source.js']
 
-  # A string, list, tuple or callable that returns a string, list or tuple,
+  # A string, list, tuple,
   # containing the command line (with arguments) used to lint.
-  cmd: 'eslint'
+  Object.defineProperty(this.prototype, 'cmd', {
+    get: ->
+      cmd = 'eslint'
+
+      config = findFile(@cwd, ['.eslintrc']) or @defaultEslintConfig
+
+      if config
+        cmd += " --config #{config}"
+
+      if @rulesDir
+        cmd += " --rulesdir #{@rulesDir}"
+
+      cmd
+  })
 
   linterName: 'eslint'
 
@@ -22,18 +35,18 @@ class LinterESLint extends Linter
   constructor: (editor) ->
     super(editor)
 
-    config = findFile(@cwd, ['.eslintrc'])
-    if config
-      @cmd += " --config #{config}"
+    atom.config.observe 'linter-eslint.eslintRulesDir', (newDir) =>
+      @rulesDir = newDir
 
-    rulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
-    if rulesDir
-      @cmd += " --rulesdir #{rulesDir}"
+    atom.config.observe 'linter-eslint.eslintExecutablePath', (newPath) =>
+      @executablePath = newPath
 
-    atom.config.observe 'linter-eslint.eslintExecutablePath', =>
-      @executablePath = atom.config.get 'linter-eslint.eslintExecutablePath'
+    atom.config.observe 'linter-eslint.defaultEslintConfig', (newDefaultConfig) =>
+      @defaultEslintConfig = newDefaultConfig
 
   destroy: ->
     atom.config.unobserve 'linter-eslint.eslintExecutablePath'
+    atom.config.unobserve 'linter-eslint.defaultEslintConfig'
+    atom.config.unobserve 'linter-eslint.eslintRulesDir'
 
 module.exports = LinterESLint
