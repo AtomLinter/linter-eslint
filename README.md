@@ -22,6 +22,8 @@ You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your
 
 **Note**: This plugin finds the nearest .eslintrc file and uses the `--config` command line argument to use that file. If no config file is found, it uses the `defaultEslintConfig` setting instead.
 
+The `eslintRulesDir` is relative to the working directory (project root).
+
 ## Contributing
 If you would like to contribute enhancements or fixes, please do the following:
 

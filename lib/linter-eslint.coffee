@@ -15,11 +15,14 @@ class LinterESLint extends Linter
 
       config = findFile(@cwd, ['.eslintrc']) or @defaultEslintConfig
 
+      # Relative to project root
+      rulesDir = findFile(@cwd, [@rulesDir], false, 0) if @rulesDir
+
       if config
         cmd += " --config #{config}"
 
-      if @rulesDir
-        cmd += " --rulesdir #{@rulesDir}"
+      if rulesDir
+        cmd += " --rulesdir #{rulesDir}"
 
       cmd
   })
