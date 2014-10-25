@@ -15,12 +15,8 @@ $ apm install linter-eslint
 You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your Config in Atom menu):
 ```
 'linter-eslint':
-  'eslintExecutablePath': null #eslint path. run 'which eslint' to find the path
-  'eslintRulesDir': null
-  'defaultEslintConfig': null
+  'eslintRulesDir': ''
 ```
-
-**Note**: This plugin finds the nearest .eslintrc file and uses the `--config` command line argument to use that file. If no config file is found, it uses the `defaultEslintConfig` setting instead.
 
 The `eslintRulesDir` is relative to the working directory (project root).
 
