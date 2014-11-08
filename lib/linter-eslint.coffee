@@ -37,7 +37,7 @@ class LinterESLint extends Linter
     engine = new CLIEngine(options)
 
     # check if ignored
-    if engine.isPathIgnored(ralativeToIgnorePath)
+    if options.ignorePath and engine.isPathIgnored(ralativeToIgnorePath)
       return callback([])
 
     config = engine.getConfigForFile(origPath)
