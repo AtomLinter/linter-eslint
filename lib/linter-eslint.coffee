@@ -24,11 +24,26 @@ class LinterESLint extends Linter
 
     rulesDir = findFile(@cwd, [@rulesDir], false, 0) if @rulesDir
 
+    # find nearest .eslintignore
+    options.ignorePath = findFile(origPath, '.eslintignore')
+    # compute relative path to .eslintignore directory
+    ralativeToIgnorePath = origPath.replace(path.dirname(options.ignorePath) + '/', '') if options.ignorePath
+
+    # find rules directory
     if rulesDir && fs.existsSync(rulesDir)
       options.rulePaths = [rulesDir]
 
-    config = new CLIEngine(options).getConfigForFile(origPath)
+    # init eslint CLIEngine (cli engine is used for getting linter config and test ignored files)
+    engine = new CLIEngine(options)
+
+    # check if ignored
+    if engine.isPathIgnored(ralativeToIgnorePath)
+      return callback([])
+
+    config = engine.getConfigForFile(origPath)
+
     result = linter.verify @editor.getText(), config
+
     messages = result.map (m) =>
       @createMessage {
         line: m.line,
