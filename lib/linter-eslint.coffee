@@ -41,6 +41,16 @@ class LinterESLint extends Linter
       return callback([])
 
     config = engine.getConfigForFile(origPath)
+    
+    # Currently, linter-eslinter does not support eslint plugins. To not cause
+    # any "Definition for rule ... was not found." errors, we remove any plugin
+    # based rules from the config.
+    #
+    # More information: https://github.com/AtomLinter/linter-eslint/issues/16
+    if config.plugins?.length
+      isPluginRule = new RegExp("^(#{config.plugins.join('|')})/")
+      Object.keys(config.rules).forEach (key) ->
+        delete config.rules[key] if isPluginRule.test(key)
 
     result = linter.verify @editor.getText(), config
 
