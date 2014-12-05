@@ -33,6 +33,11 @@ class LinterESLint extends Linter
     if rulesDir && fs.existsSync(rulesDir)
       options.rulePaths = [rulesDir]
 
+    # set file extensions to be linted
+    options.extensions = @extensions
+
+    console.log 'eslint opts', options
+
     # init eslint CLIEngine (cli engine is used for getting linter config and test ignored files)
     engine = new CLIEngine(options)
 
@@ -41,7 +46,7 @@ class LinterESLint extends Linter
       return callback([])
 
     config = engine.getConfigForFile(origPath)
-    
+
     # Currently, linter-eslinter does not support eslint plugins. To not cause
     # any "Definition for rule ... was not found." errors, we remove any plugin
     # based rules from the config.
@@ -71,7 +76,11 @@ class LinterESLint extends Linter
     atom.config.observe 'linter-eslint.eslintRulesDir', (newDir) =>
       @rulesDir = newDir
 
+    atom.config.observe 'linter-eslint.eslintExtensions', (newExts) =>
+      @extensions = newExts
+
   destroy: ->
     atom.config.unobserve 'linter-eslint.eslintRulesDir'
+    atom.config.unobserve 'linter-eslint.eslintExtensions'
 
 module.exports = LinterESLint
