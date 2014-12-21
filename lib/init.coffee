@@ -5,6 +5,9 @@ module.exports =
     eslintRulesDir:
       type: 'string'
       default: ''
+    disableWhenNoEslintrcFileInPath:
+      type: 'boolean'
+      default: false
 
   activate: ->
     console.log 'activate linter-eslint'

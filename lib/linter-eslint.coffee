@@ -15,12 +15,19 @@ class LinterESLint extends Linter
   # list/tuple of strings. Names should be all lowercase.
   @syntax: ['source.js']
 
+  @disableWhenNoEslintrcFileInPath = false
+
   linterName: 'eslint'
 
   lintFile: (filePath, callback) ->
     filename = path.basename filePath
     origPath = path.join @cwd, filename
     options = {}
+
+    eslintrc = findFile(origPath, '.eslintrc')
+
+    if not eslintrc and @disableWhenNoEslintrcFileInPath
+      return
 
     rulesDir = findFile(@cwd, [@rulesDir], false, 0) if @rulesDir
 
@@ -41,7 +48,7 @@ class LinterESLint extends Linter
       return callback([])
 
     config = engine.getConfigForFile(origPath)
-    
+
     # Currently, linter-eslinter does not support eslint plugins. To not cause
     # any "Definition for rule ... was not found." errors, we remove any plugin
     # based rules from the config.
@@ -70,6 +77,9 @@ class LinterESLint extends Linter
 
     atom.config.observe 'linter-eslint.eslintRulesDir', (newDir) =>
       @rulesDir = newDir
+
+    atom.config.observe 'linter-eslint.disableWhenNoEslintrcFileInPath', (skipNonEslint) =>
+      @disableWhenNoEslintrcFileInPath = skipNonEslint
 
   destroy: ->
     atom.config.unobserve 'linter-eslint.eslintRulesDir'

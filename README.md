@@ -12,13 +12,17 @@ $ apm install linter-eslint
 ```
 
 ## Settings
-You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your Config in Atom menu):
+You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your Config in Atom menu) or in Preferences:
+
 ```
 'linter-eslint':
-  'eslintRulesDir': ''
+  'eslintRulesDir': 'mydir'
+  'disableWhenNoEslintrcFileInPath': true  
 ```
 
 The `eslintRulesDir` is relative to the working directory (project root).
+`disableWhenNoEslintrcFileInPath` allows disabling linter-eslint when there is no `.eslintrc` file in the path.
+
 
 ## Contributing
 If you would like to contribute enhancements or fixes, please do the following:
