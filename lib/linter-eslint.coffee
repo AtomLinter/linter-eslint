@@ -1,87 +1,55 @@
-linterPath = atom.packages.getLoadedPackage('linter').path
+linterPath = atom.packages.getLoadedPackage("linter").path
 Linter = require "#{linterPath}/lib/linter"
-findFile = require "#{linterPath}/lib/util"
+{findFile, warn} = require "#{linterPath}/lib/utils"
 
-path = require "path"
-fs = require "fs"
-
-eslint = require "eslint"
-linter = eslint.linter
-CLIEngine = eslint.CLIEngine
-
-
-class LinterESLint extends Linter
+class Lintereslint extends Linter
   # The syntax that the linter handles. May be a string or
   # list/tuple of strings. Names should be all lowercase.
   @syntax: ['source.js']
 
-  @disableWhenNoEslintrcFileInPath = false
+  # A string, list, tuple or callable that returns a string, list or tuple,
+  # containing the command line (with arguments) used to lint.
+  @cmd: ['eslint', '--format', 'compact']
 
   linterName: 'eslint'
 
-  lintFile: (filePath, callback) ->
-    filename = path.basename filePath
-    origPath = path.join @cwd, filename
-    options = {}
+  # A regex pattern used to extract information from the executable's output.
+  regex:
+    # capture line and col
+    '.+?: line (?<line>[0-9]+), col (?<col>[0-9]+), ' +
+    # capture error, warning and code
+    '((?<error>Error)|(?<warning>Warning)) - ' +
+    # capture message
+    '(?<message>.+)'
 
-    eslintrc = findFile(origPath, '.eslintrc')
-
-    if not eslintrc and @disableWhenNoEslintrcFileInPath
-      return
-
-    rulesDir = findFile(@cwd, [@rulesDir], false, 0) if @rulesDir
-
-    # find nearest .eslintignore
-    options.ignorePath = findFile(origPath, '.eslintignore')
-    # compute relative path to .eslintignore directory
-    ralativeToIgnorePath = origPath.replace(path.dirname(options.ignorePath) + '/', '') if options.ignorePath
-
-    # find rules directory
-    if rulesDir && fs.existsSync(rulesDir)
-      options.rulePaths = [rulesDir]
-
-    # init eslint CLIEngine (cli engine is used for getting linter config and test ignored files)
-    engine = new CLIEngine(options)
-
-    # check if ignored
-    if options.ignorePath and engine.isPathIgnored(ralativeToIgnorePath)
-      return callback([])
-
-    config = engine.getConfigForFile(origPath)
-
-    # Currently, linter-eslinter does not support eslint plugins. To not cause
-    # any "Definition for rule ... was not found." errors, we remove any plugin
-    # based rules from the config.
-    #
-    # More information: https://github.com/AtomLinter/linter-eslint/issues/16
-    if config.plugins?.length
-      isPluginRule = new RegExp("^(#{config.plugins.join('|')})/")
-      Object.keys(config.rules).forEach (key) ->
-        delete config.rules[key] if isPluginRule.test(key)
-
-    result = linter.verify @editor.getText(), config
-
-    messages = result.map (m) =>
-      @createMessage {
-        line: m.line,
-        col: m.column,
-        error: m.severity is 2,
-        warning: m.severity is 1,
-        message: "#{m.message} (#{m.ruleId})"
-      }
-
-    callback(messages)
+  isNodeExecutable: yes
 
   constructor: (editor) ->
-    super(editor)
+    super editor
 
-    atom.config.observe 'linter-eslint.eslintRulesDir', (newDir) =>
-      @rulesDir = newDir
+    atom.config.observe 'linter-eslint.eslintExecutablePath', (value) =>
+      @executablePath = "#{value}"
 
-    atom.config.observe 'linter-eslint.disableWhenNoEslintrcFileInPath', (skipNonEslint) =>
-      @disableWhenNoEslintrcFileInPath = skipNonEslint
+  lintFile: (filePath, callback) ->
+    @cmd = @constructor.cmd
+
+    # config path (and possible disable on non-existing filepath)
+    config = findFile @cwd, ['.eslintrc']
+    disableWhenNoEslintrcFileInPath = atom.config.get 'linter-eslint.disableWhenNoEslintrcFileInPath'
+    if config
+      @cmd = @cmd.concat ['--config', config]
+    else if disableWhenNoEslintrcFileInPath
+      return
+
+    # custom eslint rules directory
+    eslintRulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
+    if eslintRulesDir
+      path = findFile @cwd, [eslintRulesDir]
+      @cmd = @cmd.concat ['--rulesdir', path]
+
+    super filePath, callback
 
   destroy: ->
-    atom.config.unobserve 'linter-eslint.eslintRulesDir'
+    atom.config.unobserve 'linter-eslint.eslintExecutablePath'
 
-module.exports = LinterESLint
+module.exports = Lintereslint
