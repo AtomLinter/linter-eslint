@@ -11,6 +11,6 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "eslint": "^0.10.1"
+    "eslint": "^0.12.0"
   }
 }
