@@ -2,12 +2,16 @@ path = require 'path'
 
 module.exports =
   config:
-    eslintRulesDir:
+    eslintExecutablePath:
       type: 'string'
-      default: ''
+      default: path.join __dirname, '..', 'node_modules', 'eslint', 'bin'
     disableWhenNoEslintrcFileInPath:
       type: 'boolean'
       default: false
+    eslintRulesDir:
+      description: 'Relative to working directory'
+      type: 'string'
+      default: ''
 
   activate: ->
     console.log 'activate linter-eslint'
