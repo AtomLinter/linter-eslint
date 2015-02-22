@@ -1,14 +1,10 @@
 linterPath = atom.packages.getLoadedPackage('linter').path
 Linter = require "#{linterPath}/lib/linter"
 findFile = require "#{linterPath}/lib/util"
+resolve = require('resolve').sync
 
 path = require "path"
 fs = require "fs"
-
-eslint = require "eslint"
-linter = eslint.linter
-CLIEngine = eslint.CLIEngine
-
 
 class LinterESLint extends Linter
   # The syntax that the linter handles. May be a string or
@@ -19,10 +15,21 @@ class LinterESLint extends Linter
 
   linterName: 'eslint'
 
+  _requireEsLint: (filePath) ->
+    try
+      eslintPath = resolve('eslint', {
+        basedir: path.dirname(filePath)
+      })
+      return require(eslintPath)
+    # Fall back to the version packaged in linster-eslint
+    return require('eslint')
+
   lintFile: (filePath, callback) ->
+
     filename = path.basename filePath
     origPath = path.join @cwd, filename
     options = {}
+    { linter, CLIEngine } = @_requireEsLint(origPath)
 
     eslintrc = findFile(origPath, '.eslintrc')
 
