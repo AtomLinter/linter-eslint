@@ -11,6 +11,10 @@ Linter package must be installed in order to use this plugin. If Linter is not i
 $ apm install linter-eslint
 ```
 
+linter-eslint will look for a version of eslint local to your project and use it if it's available. If none is found it will fall back to the version it ships with.
+
+Lets say you depend on a specific version of eslint, maybe it has unreleased features, maybe it's just newer than what linter-eslint ships with. If `your-project/node_modules/eslint` exists linter-eslint will try to use that.
+
 ## Settings
 You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your Config in Atom menu) or in Preferences:
 
