@@ -69,12 +69,16 @@ class LinterESLint extends Linter
     result = linter.verify @editor.getText(), config
 
     messages = result.map (m) =>
+      message = m.message
+      if m.ruleId?
+        message += " (#{m.ruleId})"
+
       @createMessage {
         line: m.line,
         col: m.column,
         error: m.severity is 2,
         warning: m.severity is 1,
-        message: "#{m.message} (#{m.ruleId})"
+        message: message
       }
 
     callback(messages)
