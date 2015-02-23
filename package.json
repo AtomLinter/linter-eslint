@@ -3,7 +3,7 @@
   "main": "./lib/init",
   "linter-package": true,
   "activationEvents": [],
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
