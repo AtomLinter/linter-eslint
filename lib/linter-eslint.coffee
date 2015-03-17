@@ -41,7 +41,7 @@ class LinterESLint extends Linter
     # find nearest .eslintignore
     options.ignorePath = findFile(origPath, '.eslintignore')
     # compute relative path to .eslintignore directory
-    ralativeToIgnorePath = origPath.replace(path.dirname(options.ignorePath) + '/', '') if options.ignorePath
+    ralativeToIgnorePath = origPath.replace(path.dirname(options.ignorePath) + path.sep, '') if options.ignorePath
 
     # find rules directory
     if rulesDir && fs.existsSync(rulesDir)
