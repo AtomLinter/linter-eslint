@@ -56,15 +56,16 @@ class LinterESLint extends Linter
 
     config = engine.getConfigForFile(origPath)
 
-    # Currently, linter-eslinter does not support eslint plugins. To not cause
-    # any "Definition for rule ... was not found." errors, we remove any plugin
-    # based rules from the config.
+    # This sidesteps a chicken and egg problem:
+    # CLIEngine contains loadPlugins() that is not exposed, so we can't call it
+    # directly. The plugins need to be passed into CLIEngine, but we don't know
+    # which plugins are loaded until after we load CLIEngine.
     #
-    # More information: https://github.com/AtomLinter/linter-eslint/issues/16
+    # If you are loading plugins this will replace the existing engine with a
+    # new engine where we can pass in the set of plugins for it to load.
     if config.plugins?.length
-      isPluginRule = new RegExp("^(#{config.plugins.join('|')})/")
-      Object.keys(config.rules).forEach (key) ->
-        delete config.rules[key] if isPluginRule.test(key)
+      options.plugins = config.plugins
+      engine = new CLIEngine(options)
 
     result = linter.verify @editor.getText(), config
 
