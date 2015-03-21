@@ -16,11 +16,14 @@ class LinterESLint extends Linter
   linterName: 'eslint'
 
   _requireEsLint: (filePath) ->
+    @localEslint = false
     try
       eslintPath = resolve('eslint', {
         basedir: path.dirname(filePath)
       })
-      return require(eslintPath)
+      eslint = require(eslintPath)
+      @localEslint = true
+      return eslint
     # Fall back to the version packaged in linster-eslint
     return require('eslint')
 
@@ -64,10 +67,25 @@ class LinterESLint extends Linter
     # If you are loading plugins this will replace the existing engine with a
     # new engine where we can pass in the set of plugins for it to load.
     if config.plugins?.length
-      options.plugins = config.plugins
-      engine = new CLIEngine(options)
+      if @localEslint
+        options.plugins = config.plugins
+        engine = new CLIEngine(options)
+      else
+        isPluginRule = new RegExp("^(#{config.plugins.join('|')})/")
+        Object.keys(config.rules).forEach (key) ->
+          delete config.rules[key] if isPluginRule.test(key)
 
     result = linter.verify @editor.getText(), config
+
+    if config.plugins?.length and not @localEslint
+      result.push({
+        line: 1
+        col: 0
+        error: false
+        warning: true
+        message: "`npm install eslint` in your project to enable plugins:
+        #{config.plugins.join(', ')} (linter-eslint)"
+      })
 
     messages = result.map (m) =>
       message = m.message
