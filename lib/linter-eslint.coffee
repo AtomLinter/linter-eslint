@@ -80,9 +80,8 @@ class LinterESLint extends Linter
     if config.plugins?.length and not @localEslint
       result.push({
         line: 1
-        col: 0
-        error: false
-        warning: true
+        column: 0
+        severity: 1
         message: "`npm install eslint` in your project to enable plugins:
         #{config.plugins.join(', ')} (linter-eslint)"
       })
