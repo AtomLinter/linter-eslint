@@ -104,13 +104,13 @@ class LinterESLint extends Linter
   constructor: (editor) ->
     super(editor)
 
-    atom.config.observe 'linter-eslint.eslintRulesDir', (newDir) =>
+    @rulesDirListener = atom.config.observe 'linter-eslint.eslintRulesDir', (newDir) =>
       @rulesDir = newDir
 
     atom.config.observe 'linter-eslint.disableWhenNoEslintrcFileInPath', (skipNonEslint) =>
       @disableWhenNoEslintrcFileInPath = skipNonEslint
 
   destroy: ->
-    atom.config.unobserve 'linter-eslint.eslintRulesDir'
+    @rulesDirListener.dispose()
 
 module.exports = LinterESLint
