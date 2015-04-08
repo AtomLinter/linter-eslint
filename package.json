@@ -11,7 +11,7 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "eslint": "^0.17.1",
+    "eslint": "^0.18.0",
     "resolve": "^1.1.5"
   }
 }
