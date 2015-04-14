@@ -2,6 +2,7 @@ linterPath = atom.packages.getLoadedPackage('linter').path
 Linter = require "#{linterPath}/lib/linter"
 findFile = require "#{linterPath}/lib/util"
 resolve = require('resolve').sync
+{allowUnsafeNewFunction} = require 'loophole'
 
 path = require "path"
 fs = require "fs"
@@ -75,7 +76,12 @@ class LinterESLint extends Linter
         Object.keys(config.rules).forEach (key) ->
           delete config.rules[key] if isPluginRule.test(key)
 
-    result = linter.verify @editor.getText(), config
+    # wrap `eslint()` into `allowUnsafeNewFunction`
+    # https://discuss.atom.io/t/--template-causes-unsafe-eval-error/9310
+    # https://github.com/babel/babel/blob/master/src/acorn/src/identifier.js#L46
+    result = null
+    allowUnsafeNewFunction =>
+      result = linter.verify @editor.getText(), config
 
     if config.plugins?.length and not @localEslint
       result.push({
