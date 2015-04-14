@@ -2,7 +2,7 @@
   "name": "linter-eslint",
   "main": "./lib/init",
   "linter-package": true,
-  "activationEvents": [],
+  "activationCommands": [],
   "version": "0.5.1",
   "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
