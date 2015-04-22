@@ -15,10 +15,24 @@ linter-eslint will look for a version of eslint local to your project and use it
 
 Lets say you depend on a specific version of eslint, maybe it has unreleased features, maybe it's just newer than what linter-eslint ships with. If `your-project/node_modules/eslint` exists linter-eslint will try to use that.
 
+## Use with `babel-eslint`
+
+In order to use [babel-eslint](https://github.com/babel/babel-eslint) parser you need to install locally on your project `eslint` and `babel-eslint`
+
+* `$ npm install --save-dev eslint babel-eslint`
+
+And add a `.eslintrc` in your project directory with parser set to `babel-eslint`
+
+```json
+{
+  "parser": "babel-eslint"
+}
+```
+
 ## Settings
 You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your Config in Atom menu) or in Preferences:
 
-```
+```coffee
 'linter-eslint':
   'eslintRulesDir': 'mydir'
   'disableWhenNoEslintrcFileInPath': true  
