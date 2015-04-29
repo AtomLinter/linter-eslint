@@ -20,7 +20,8 @@ class LinterESLint extends Linter
   _findGlobalNpmDir: () ->
     exec 'npm config get prefix', (code, stdout, stderr) =>
       if not stderr
-        dir = stdout.replace(/[\n\r\t]/g, '') + '/lib/node_modules'
+        cleanPath = stdout.replace(/[\n\r\t]/g, '')
+        dir = path.join(cleanPath, 'lib', 'node_modules')
         fs.exists dir, (exists) =>
           if exists
             @npmPath = dir
