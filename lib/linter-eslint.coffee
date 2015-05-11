@@ -78,17 +78,34 @@ class LinterESLint extends Linter
 
     config = engine.getConfigForFile(origPath)
 
-    # This sidesteps a chicken and egg problem:
-    # CLIEngine contains loadPlugins() that is not exposed, so we can't call it
-    # directly. The plugins need to be passed into CLIEngine, but we don't know
-    # which plugins are loaded until after we load CLIEngine.
-    #
-    # If you are loading plugins this will replace the existing engine with a
-    # new engine where we can pass in the set of plugins for it to load.
+    notFullyCompatible = false
+    notFoundPlugins = []
     if config.plugins?.length
       if @localEslint
-        options.plugins = config.plugins
-        engine = new CLIEngine(options)
+        unless engine.addPlugin
+          # we have an old version `eslint@0.20` or less
+          notFullyCompatible = true
+          # This sidesteps a chicken and egg problem:
+          # CLIEngine contains loadPlugins() that is not exposed, so we can't call it
+          # directly. The plugins need to be passed into CLIEngine, but we don't know
+          # which plugins are loaded until after we load CLIEngine.
+          #
+          # If you are loading plugins this will replace the existing engine with a
+          # new engine where we can pass in the set of plugins for it to load.
+          options.plugins = config.plugins
+          engine = new CLIEngine(options)
+        else
+          # we have `eslint@0.21`+
+          config.plugins.forEach (pluginName) ->
+            npmPluginName = 'eslint-plugin-' + pluginName
+            try
+              pluginPath = resolve(npmPluginName, {
+                basedir: path.dirname(origPath)
+              })
+              pluginObject = require(pluginPath)
+              engine.addPlugin(npmPluginName, pluginObject)
+            catch
+              notFoundPlugins.push(npmPluginName)
       else
         isPluginRule = new RegExp("^(#{config.plugins.join('|')})/")
         Object.keys(config.rules).forEach (key) ->
@@ -97,9 +114,18 @@ class LinterESLint extends Linter
     # wrap `eslint()` into `allowUnsafeNewFunction`
     # https://discuss.atom.io/t/--template-causes-unsafe-eval-error/9310
     # https://github.com/babel/babel/blob/master/src/acorn/src/identifier.js#L46
-    result = null
-    allowUnsafeNewFunction =>
-      result = linter.verify @editor.getText(), config
+    result = []
+    if notFoundPlugins.length
+      result.push({
+        line: 1
+        column: 0
+        severity: 1
+        message: "`npm install #{notFoundPlugins.join(' ')}`
+        in your project (linter-eslint)"
+      })
+    else
+      allowUnsafeNewFunction =>
+        result = linter.verify @editor.getText(), config
 
     if config.plugins?.length and not @localEslint
       result.push({
@@ -108,6 +134,15 @@ class LinterESLint extends Linter
         severity: 1
         message: "`npm install eslint` in your project to enable plugins:
         #{config.plugins.join(', ')} (linter-eslint)"
+      })
+
+    if notFullyCompatible
+      result.push({
+        line: 1
+        column: 0
+        severity: 1
+        message: "You are using the version of eslint@0.20 or less.
+        You have to update eslint to 0.21+ or downgrade linter-eslint"
       })
 
     messages = result.map (m) =>
