@@ -29,6 +29,8 @@ And add a `.eslintrc` in your project directory with parser set to `babel-eslint
 }
 ```
 
+Alternatively, you can enable `useGlobalEslint` option and install eslint and babel-eslint globally using `npm i -g eslint babel-eslint`.
+
 ## Settings
 You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your Config in Atom menu) or in Preferences:
 
@@ -36,10 +38,12 @@ You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your
 'linter-eslint':
   'eslintRulesDir': 'mydir'
   'disableWhenNoEslintrcFileInPath': true  
+  'useGlobalEslint': true
 ```
 
 The `eslintRulesDir` is relative to the working directory (project root).
 `disableWhenNoEslintrcFileInPath` allows disabling linter-eslint when there is no `.eslintrc` file in the path.
+`useGlobalEslint` allows using globally installed eslint and plugins for it.
 
 
 ## Contributing
