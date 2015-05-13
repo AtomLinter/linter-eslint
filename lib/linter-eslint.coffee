@@ -3,6 +3,7 @@ Linter = require "#{linterPath}/lib/linter"
 findFile = require "#{linterPath}/lib/util"
 resolve = require('resolve').sync
 {allowUnsafeNewFunction} = require 'loophole'
+{exec} = require 'child_process'
 
 path = require "path"
 fs = require "fs"
@@ -16,6 +17,15 @@ class LinterESLint extends Linter
 
   linterName: 'eslint'
 
+  _findGlobalNpmDir: () ->
+    exec 'npm config get prefix', (code, stdout, stderr) =>
+      if not stderr
+        cleanPath = stdout.replace(/[\n\r\t]/g, '')
+        dir = path.join(cleanPath, 'lib', 'node_modules')
+        fs.exists dir, (exists) =>
+          if exists
+            @npmPath = dir
+
   _requireEsLint: (filePath) ->
     @localEslint = false
     try
@@ -25,6 +35,15 @@ class LinterESLint extends Linter
       eslint = require(eslintPath)
       @localEslint = true
       return eslint
+    catch
+      if @useGlobalEslint
+        try
+          eslintPath = resolve('eslint', {
+            basedir: @npmPath
+          })
+          eslint = require(eslintPath)
+          @localEslint = true
+          return eslint
     # Fall back to the version packaged in linter-eslint
     return require('eslint')
 
@@ -150,6 +169,11 @@ class LinterESLint extends Linter
 
     atom.config.observe 'linter-eslint.disableWhenNoEslintrcFileInPath', (skipNonEslint) =>
       @disableWhenNoEslintrcFileInPath = skipNonEslint
+
+    atom.config.observe 'linter-eslint.useGlobalEslint', (useGlobal) =>
+      @useGlobalEslint = useGlobal
+      if @useGlobalEslint
+        @_findGlobalNpmDir()
 
   destroy: ->
     @rulesDirListener.dispose()
