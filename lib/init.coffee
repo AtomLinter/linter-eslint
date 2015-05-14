@@ -8,6 +8,9 @@ module.exports =
     disableWhenNoEslintrcFileInPath:
       type: 'boolean'
       default: false
+    useGlobalEslint:
+      type: 'boolean'
+      default: false
 
   activate: ->
     console.log 'activate linter-eslint'
