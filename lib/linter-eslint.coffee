@@ -97,11 +97,12 @@ class LinterESLint extends Linter
           engine = new CLIEngine(options)
         else
           # we have `eslint@0.21`+
+          basePath = if @useGlobalEslint then @npmPath else origPath
           config.plugins.forEach (pluginName) ->
             npmPluginName = 'eslint-plugin-' + pluginName
             try
               pluginPath = resolve(npmPluginName, {
-                basedir: path.dirname(origPath)
+                basedir: path.dirname(basePath)
               })
               pluginObject = require(pluginPath)
               engine.addPlugin(npmPluginName, pluginObject)
