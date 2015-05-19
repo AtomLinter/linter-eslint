@@ -48,7 +48,6 @@ class LinterESLint extends Linter
     return require('eslint')
 
   lintFile: (filePath, callback) ->
-
     filename = path.basename filePath
     origPath = path.join @cwd, filename
     options = {}
@@ -57,7 +56,7 @@ class LinterESLint extends Linter
     eslintrc = findFile(origPath, '.eslintrc')
 
     if not eslintrc and @disableWhenNoEslintrcFileInPath
-      return
+      return callback([])
 
     rulesDir = findFile(@cwd, [@rulesDir], false, 0) if @rulesDir
 
@@ -113,9 +112,6 @@ class LinterESLint extends Linter
         Object.keys(config.rules).forEach (key) ->
           delete config.rules[key] if isPluginRule.test(key)
 
-    # wrap `eslint()` into `allowUnsafeNewFunction`
-    # https://discuss.atom.io/t/--template-causes-unsafe-eval-error/9310
-    # https://github.com/babel/babel/blob/master/src/acorn/src/identifier.js#L46
     result = []
     if notFoundPlugins.length
       result.push({
@@ -126,6 +122,9 @@ class LinterESLint extends Linter
         in your project (linter-eslint)"
       })
     else
+      # wrap `eslint()` into `allowUnsafeNewFunction`
+      # https://discuss.atom.io/t/--template-causes-unsafe-eval-error/9310
+      # https://github.com/babel/babel/blob/master/src/acorn/src/identifier.js#L46
       allowUnsafeNewFunction =>
         result = linter.verify @editor.getText(), config
 
