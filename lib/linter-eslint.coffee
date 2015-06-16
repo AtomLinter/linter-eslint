@@ -76,7 +76,9 @@ class LinterESLint extends Linter
     if options.ignorePath and engine.isPathIgnored(ralativeToIgnorePath)
       return callback([])
 
-    config = engine.getConfigForFile(origPath)
+    config = {}
+    allowUnsafeNewFunction =>
+      config = engine.getConfigForFile(origPath)
 
     notFullyCompatible = false
     notFoundPlugins = []
