@@ -100,7 +100,16 @@ class LinterESLint extends Linter
           # we have `eslint@0.21`+
           basePath = if @useGlobalEslint then @npmPath else origPath
           config.plugins.forEach (pluginName) ->
-            npmPluginName = 'eslint-plugin-' + pluginName
+            namespace = ''
+            if pluginName[0] is '@'
+              [ namespace, pluginName ] = pluginName.split('/')
+              namespace += '/'
+
+            if pluginName[..13] is 'eslint-plugin-'
+              npmPluginName = namespace + pluginName
+            else
+              npmPluginName = namespace + 'eslint-plugin-' + pluginName
+
             try
               pluginPath = resolve(npmPluginName, {
                 basedir: path.dirname(basePath)
