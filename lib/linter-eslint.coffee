@@ -137,7 +137,7 @@ class LinterESLint extends Linter
       # https://discuss.atom.io/t/--template-causes-unsafe-eval-error/9310
       # https://github.com/babel/babel/blob/master/src/acorn/src/identifier.js#L46
       allowUnsafeNewFunction =>
-        result = linter.verify @editor.getText(), config
+        result = linter.verify @editor.getText(), config, @editor.getPath()
 
     if config.plugins?.length and not @localEslint
       result.push({
