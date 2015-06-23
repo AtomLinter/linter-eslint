@@ -17,7 +17,7 @@
   "providedServices": {
     "linter": {
       "versions": {
-        "0.3.0": "provideLinter"
+        "1.0.0": "provideLinter"
       }
     }
   }
