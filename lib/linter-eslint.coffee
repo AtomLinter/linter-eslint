@@ -5,7 +5,8 @@ path = require 'path'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
-findFile = require '../utils/find-file'
+linterPath = atom.packages.getLoadedPackage('linter').path
+findFile = require "#{linterPath}/lib/util"
 
 module.exports =
   config:
