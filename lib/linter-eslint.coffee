@@ -54,7 +54,7 @@ module.exports =
 
         # Add rulePaths option
         rulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
-        rulesDir = findFile @cwd, [@rulesDir], false, 0 if rulesDir
+        rulesDir = findFile @cwd, [rulesDir], false, 0 if rulesDir
 
         if rulesDir and fs.existsSync rulesDir
           options.rulePaths = [rulesDir]
