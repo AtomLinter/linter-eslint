@@ -57,13 +57,13 @@ module.exports =
         rulesDir = findFile @cwd, [@rulesDir], false, 0 if rulesDir
 
         if rulesDir and fs.existsSync rulesDir
-            options.rulePaths = [rulesDir]
+          options.rulePaths = [rulesDir]
 
         # `linter` and `CLIEngine` comes from `eslint` module
         {linter, CLIEngine} = @_requireEsLint origPath
 
         if filePath
-          engine = new CLIEngine options
+          engine = new CLIEngine(options)
 
           # Fixes `eslint@0.23.0`
           config = {}
@@ -83,7 +83,7 @@ module.exports =
                 .forEach this._loadPlugin.bind this, engine, origPath
             else
               options.plugins = config.plugins
-              engine = new CLIEngine options
+              engine = new CLIEngine(options)
 
           try
             results = []
@@ -153,7 +153,7 @@ module.exports =
     # Fall back to the version packaged in linter-eslint
     return require('eslint')
 
-  _findGlobalNpmDir: () ->
+  _findGlobalNpmDir: ->
     exec 'npm config get prefix', (code, stdout, stderr) =>
       if not stderr
         cleanPath = stdout.replace(/[\n\r\t]/g, '')
