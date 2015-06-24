@@ -72,6 +72,7 @@ module.exports =
 
           # Check for ignore path files from `.eslintignore`
           if options.ignorePath
+            relative = origPath.replace "#{path.dirname options.ignorePath}#{path.sep}", ''
             return [] if engine.isPathIgnored relative or engine.isPathIgnored "#{relative}/"
 
           # We have plugins to load
