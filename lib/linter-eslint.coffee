@@ -26,7 +26,7 @@ module.exports =
 
     # Load global eslint path
     @useGlobalEslint = atom.config.get 'linter-eslint.useGlobalEslint'
-    if @useGlobalEslint then @_findGlobalNpmDir()
+    if @useGlobalEslint then @findGlobalNPMdir()
 
   deactivate: ->
     @subscriptions.dispose()
@@ -60,7 +60,7 @@ module.exports =
           options.rulePaths = [rulesDir]
 
         # `linter` and `CLIEngine` comes from `eslint` module
-        {linter, CLIEngine} = @_requireEsLint origPath
+        {linter, CLIEngine} = @requireESLint origPath
 
         if filePath
           engine = new CLIEngine(options)
@@ -80,8 +80,7 @@ module.exports =
 
             # `eslint >= 0.21.0`
             if engine.addPlugin
-              config.plugins
-                .forEach this._loadPlugin.bind this, engine, origPath
+              config.plugins.forEach(@loadPLugi.bind(this, engine, origPath))
             else
               options.plugins = config.plugins
               engine = new CLIEngine(options)
@@ -123,7 +122,7 @@ module.exports =
               }
             ]
 
-  _loadPlugin: (engine, basedir, pluginName) ->
+  loadPLugifindGlobalNPM: (engine, basedir, pluginName) ->
     try
       pluginName = pluginName.replace 'eslint-plugin-', ''
       pluginPath = sync "eslint-plugin-#{pluginName}", {basedir}
@@ -137,7 +136,7 @@ module.exports =
 
       atom.notifications.addError "[Linter-ESLint] plugin #{pluginName} not found", {dismissable: true}
 
-  _requireEsLint: (filePath) ->
+  requireESLint: (filePath) ->
     @localEslint = false
     try
       eslintPath = sync 'eslint', {basedir: path.dirname(filePath)}
@@ -154,7 +153,7 @@ module.exports =
     # Fall back to the version packaged in linter-eslint
     return require('eslint')
 
-  _findGlobalNpmDir: ->
+  findGlobalNPMdir: ->
     exec 'npm config get prefix', (code, stdout, stderr) =>
       if not stderr
         cleanPath = stdout.replace(/[\n\r\t]/g, '')
