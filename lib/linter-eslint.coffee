@@ -33,7 +33,7 @@ module.exports =
 
   provideLinter: ->
     provider =
-      grammarScopes: ['source.js', 'source.js.jsx', 'source.babel']
+      grammarScopes: ['source.js', 'source.js.jsx', 'source.babel', 'source.js-semantic']
       scope: 'file'
       lintOnFly: true
       lint: (TextEditor) =>
