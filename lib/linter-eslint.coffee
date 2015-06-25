@@ -90,7 +90,7 @@ module.exports =
             results = []
             allowUnsafeNewFunction ->
               results = linter
-                .verify TextEditor.getText(), config
+                .verify TextEditor.getText(), config, filePath
                 .map ({message, line, severity}) ->
 
                   # Calculate range to make the error whole line
