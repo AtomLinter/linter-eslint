@@ -5,7 +5,11 @@ path = require 'path'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
-linterPath = atom.packages.getLoadedPackage('linter').path
+linterPackage = atom.packages.getLoadedPackage 'linter'
+unless linterPackage
+  return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
+
+linterPath = linterPackage.path
 findFile = require "#{linterPath}/lib/util"
 
 module.exports =
