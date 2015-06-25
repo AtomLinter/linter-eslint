@@ -23,6 +23,9 @@ module.exports =
     useGlobalEslint:
       type: 'boolean'
       default: false
+    showRuleIdInMessage:
+      type: 'boolean'
+      default: false
 
   activate: ->
     console.log 'activate linter-eslint'
@@ -60,6 +63,9 @@ module.exports =
         rulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
         rulesDir = findFile(origPath, [rulesDir], false, 0) if rulesDir
 
+        # Add showRuleId option
+        showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
+
         if rulesDir and fs.existsSync rulesDir
           options.rulePaths = [rulesDir]
 
@@ -95,8 +101,7 @@ module.exports =
             allowUnsafeNewFunction ->
               results = linter
                 .verify TextEditor.getText(), config, filePath
-                .map ({message, line, severity}) ->
-
+                .map ({message, line, severity, ruleId}) ->
                   # Calculate range to make the error whole line
                   # without the indentation at begining of line
                   indentLevel = TextEditor.indentationForBufferRow line - 1
@@ -104,12 +109,20 @@ module.exports =
                   endCol = TextEditor.getBuffer().lineLengthForRow line - 1
                   range = [[line - 1, startCol], [line - 1, endCol]]
 
-                  {
-                    type: if severity is 1 then 'warning' else 'error'
-                    text: message
-                    filePath: filePath
-                    range: range
-                  }
+                  if showRuleId
+                    {
+                      type: if severity is 1 then 'warning' else 'error'
+                      html: '<span class="badge badge-flexible">' + ruleId + '</span> ' + message
+                      filePath: filePath
+                      range: range
+                    }
+                  else
+                    {
+                      type: if severity is 1 then 'warning' else 'error'
+                      text: message
+                      filePath: filePath
+                      range: range
+                    }
 
             results
 
