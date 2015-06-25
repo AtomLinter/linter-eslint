@@ -80,7 +80,8 @@ module.exports =
 
             # `eslint >= 0.21.0`
             if engine.addPlugin
-              config.plugins.forEach(@loadPlugin.bind(this, engine, origPath))
+              pluginPath = if @useGlobalEslint then @npmPath else origPath
+              config.plugins.forEach(@loadPlugin.bind(this, engine, pluginPath))
             else
               options.plugins = config.plugins
               engine = new CLIEngine(options)
