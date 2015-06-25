@@ -44,13 +44,13 @@ module.exports =
         #
         # Return empty array if no `.eslintrc` && `onlyConfig`
         onlyConfig = atom.config.get 'linter-eslint.disableWhenNoEslintrcFileInPath'
-        eslintConfig = findFile origPath, '.eslintrc'
+        eslintConfig = findFile filePath, '.eslintrc'
 
         return [] if onlyConfig and !eslintConfig
 
         # find nearest .eslintignore
         options = {}
-        options.ignorePath = findFile origPath, '.eslintignore'
+        options.ignorePath = findFile filePath, '.eslintignore'
 
         # Add rulePaths option
         rulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
@@ -60,7 +60,7 @@ module.exports =
           options.rulePaths = [rulesDir]
 
         # `linter` and `CLIEngine` comes from `eslint` module
-        {linter, CLIEngine} = @requireESLint origPath
+        {linter, CLIEngine} = @requireESLint filePath
 
         if filePath
           engine = new CLIEngine(options)
@@ -68,7 +68,7 @@ module.exports =
           # Fixes `eslint@0.23.0`
           config = {}
           allowUnsafeNewFunction ->
-            config = engine.getConfigForFile origPath
+            config = engine.getConfigForFile filePath
 
           # Check for ignore path files from `.eslintignore`
           if options.ignorePath
