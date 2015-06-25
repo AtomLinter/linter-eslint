@@ -38,12 +38,14 @@ You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your
 'linter-eslint':
   'eslintRulesDir': 'mydir'
   'disableWhenNoEslintrcFileInPath': true  
-  'useGlobalEslint': true
+  'useGlobalEslint': true,
+  'showRuleIdInMessage': true
 ```
 
 The `eslintRulesDir` is relative to the working directory (project root).
 `disableWhenNoEslintrcFileInPath` allows disabling linter-eslint when there is no `.eslintrc` file in the path.
 `useGlobalEslint` allows using globally installed eslint and plugins for it.
+Setting `showRuleIdInMessage` to `true` will append the eslint ruleId to warning/error messages.
 
 
 ## Contributing
