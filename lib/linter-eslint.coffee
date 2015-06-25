@@ -54,7 +54,7 @@ module.exports =
 
         # Add rulePaths option
         rulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
-        rulesDir = findFile(path.dirname(filePath), [rulesDir], false, 0) if rulesDir
+        rulesDir = findFile(origPath, [rulesDir], false, 0) if rulesDir
 
         if rulesDir and fs.existsSync rulesDir
           options.rulePaths = [rulesDir]
@@ -80,7 +80,7 @@ module.exports =
 
             # `eslint >= 0.21.0`
             if engine.addPlugin
-              config.plugins.forEach(@loadPLugi.bind(this, engine, origPath))
+              config.plugins.forEach(@loadPlugin.bind(this, engine, origPath))
             else
               options.plugins = config.plugins
               engine = new CLIEngine(options)
@@ -122,7 +122,7 @@ module.exports =
               }
             ]
 
-  loadPLugifindGlobalNPM: (engine, basedir, pluginName) ->
+  loadPlugin: (engine, basedir, pluginName) ->
     try
       pluginName = pluginName.replace 'eslint-plugin-', ''
       pluginPath = sync "eslint-plugin-#{pluginName}", {basedir}
