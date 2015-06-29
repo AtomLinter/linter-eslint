@@ -162,7 +162,7 @@ module.exports =
           pluginPath = sync npmPluginName, {basedir: @npmPath}
           plugin = require pluginPath
 
-          return engin.addPlugin pluginName, pluginPath
+          return engine.addPlugin pluginName, plugin
 
     console.warn "[Linter-ESLint] error loading plugin"
     console.warn error.message
