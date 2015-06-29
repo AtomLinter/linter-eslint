@@ -141,16 +141,25 @@ module.exports =
             ]
 
   loadPlugin: (engine, filePath, pluginName) ->
-    pluginName = pluginName.replace 'eslint-plugin-', ''
+    # Support private modules for plugins
+    # they starts with `@`
+    namespace = ''
+    if pluginName[0] is '@'
+      [namespace, pluginName] = pluginName.split '/'
+      namespace += '/'
+
+    npmPluginName = pluginName.replace 'eslint-plugin-', ''
+    npmPluginName = "#{namespace}eslint-plugin-#{npmPluginName}"
+
     try
-      pluginPath = sync "eslint-plugin-#{pluginName}", {dirname: path.dirname(filePath)}
+      pluginPath = sync npmPluginName, {basedir: path.dirname(filePath)}
       plugin = require pluginPath
 
       return engine.addPlugin pluginName, plugin
     catch error
       if @useGlobalEslint
         try
-          pluginPath = sync "eslint-plugin-#{pluginName}", {basedir: @npmPath}
+          pluginPath = sync npmPluginName, {basedir: @npmPath}
           plugin = require pluginPath
 
           return engin.addPlugin pluginName, pluginPath
