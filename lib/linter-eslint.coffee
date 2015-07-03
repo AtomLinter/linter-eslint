@@ -45,7 +45,7 @@ module.exports =
       lintOnFly: true
       lint: (TextEditor) =>
         filePath = TextEditor.getPath()
-        origPath = if filePath then path.dirname filePath else ''
+        dirname = if filePath then path.dirname filePath else ''
 
         # Check for `onlyConfig`
         #
@@ -61,7 +61,7 @@ module.exports =
 
         # Add rulePaths option
         rulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
-        rulesDir = findFile(origPath, [rulesDir], false, 0) if rulesDir
+        rulesDir = findFile(dirname, [rulesDir], false, 0) if rulesDir
 
         # Add showRuleId option
         showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
@@ -82,7 +82,7 @@ module.exports =
 
           # Check for ignore path files from `.eslintignore`
           if options.ignorePath
-            relative = origPath.replace "#{path.dirname options.ignorePath}#{path.sep}", ''
+            relative = filePath.replace "#{path.dirname options.ignorePath}#{path.sep}", ''
             return [] if engine.isPathIgnored relative or engine.isPathIgnored "#{relative}/"
 
           # We have plugins to load
