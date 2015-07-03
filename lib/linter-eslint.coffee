@@ -134,7 +134,7 @@ module.exports =
             [
               {
                 type: 'error'
-                text: 'error while linting file, open console for more informations'
+                text: 'error while linting file, open the console for more information'
                 file: filePath
                 range: [[0, 0], [0, 0]]
               }
