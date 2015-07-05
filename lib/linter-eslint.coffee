@@ -1,7 +1,7 @@
-fs = require 'fs'
 path = require 'path'
 {sync} = require 'resolve'
-{exec} = require 'child_process'
+{execSync} = require 'child_process'
+{statSync} = require 'fs'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
@@ -188,10 +188,11 @@ module.exports =
     return require('eslint')
 
   findGlobalNPMdir: ->
-    exec 'npm config get prefix', (code, stdout, stderr) =>
-      if not stderr
-        cleanPath = stdout.replace(/[\n\r\t]/g, '')
-        dir = path.join(cleanPath, 'lib', 'node_modules')
-        fs.exists dir, (exists) =>
-          if exists
-            @npmPath = dir
+    globalNodeDir = execSync 'npm config get prefix', {encoding: 'utf8'}
+    globalNodeDir = globalNodeDir.replace /[\n\r\t]/g, ''
+    globalNpmPath = path.join globalNodeDir, 'lib', 'node_modules'
+
+    if statSync(globalNpmPath).isDirectory()
+      @npmPath = globalNpmPath
+    else
+      atom.notifications.addError '[Linter-ESLint] global npm path not found, use local ESLint', {dismissable: true}
