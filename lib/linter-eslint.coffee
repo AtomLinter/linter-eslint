@@ -20,12 +20,15 @@ module.exports =
     disableWhenNoEslintrcFileInPath:
       type: 'boolean'
       default: false
+      description: 'Disable linter when no `.eslintrc` is found in project'
     useGlobalEslint:
       type: 'boolean'
       default: false
+      description: 'Use globaly installed `eslint`'
     showRuleIdInMessage:
       type: 'boolean'
-      default: false
+      default: true
+      description: 'Show the `eslint` rule before error'
     globalNodePath:
       type: 'string'
       default: ''
