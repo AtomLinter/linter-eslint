@@ -180,7 +180,7 @@ module.exports =
       eslint = require eslintPath
       @localEslint = true
       return eslint
-    catch
+    catch error
       if @useGlobalEslint
         try
           eslintPath = sync 'eslint', {basedir: @npmPath}
@@ -188,6 +188,9 @@ module.exports =
           @localEslint = true
           return eslint
       else
+        console.warn '[Linter-ESLint] local `eslint` not found'
+        console.warn error
+
         atom.notifications.addError '
           [Linter-ESLint] `eslint` binary not found localy, falling back to packaged one.
           Plugins won\'t be loaded and linting will possibly not work.
@@ -207,7 +210,13 @@ module.exports =
         globalNodePath = execSync 'npm config get prefix', {encoding: 'utf8'}
         globalNodePath = globalNodePath.replace /[\n\r\t]/g, ''
 
-      globalNpmPath = path.join globalNodePath, 'lib', 'node_modules'
+      # Windows specific
+      # (see: https://github.com/AtomLinter/linter-eslint/issues/138#issuecomment-118666827)
+      globalNpmPath = path.join globalNodePath, 'node_modules'
+
+      # Other OS, `node_modules` path will be in `./lib/node_modules`
+      unless statsSync(globalNpmPath).isDirectory()
+        globalNpmPath = path.join(globalNodePath, 'lib', 'node_nodules')
 
       if statSync(globalNpmPath).isDirectory()
         @useGlobalEslint = true
