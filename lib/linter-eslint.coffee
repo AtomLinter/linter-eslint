@@ -218,8 +218,10 @@ module.exports =
       globalNpmPath = path.join globalNodePath, 'node_modules'
 
       # Other OS, `node_modules` path will be in `./lib/node_modules`
-      unless statsSync(globalNpmPath).isDirectory()
-        globalNpmPath = path.join(globalNodePath, 'lib', 'node_nodules')
+      try
+        statSync(globalNpmPath).isDirectory()
+      catch
+        globalNpmPath = path.join globalNodePath, 'lib', 'node_modules'
 
       if statSync(globalNpmPath).isDirectory()
         @useGlobalEslint = true
