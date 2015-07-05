@@ -26,14 +26,17 @@ module.exports =
     showRuleIdInMessage:
       type: 'boolean'
       default: false
+    globalNodePath:
+      type: 'string'
+      default: ''
+      description: 'Run `$ npm config get prefix` to find it'
 
   activate: ->
     console.log 'activate linter-eslint'
     @subscriptions = new CompositeDisposable
 
     # Load global eslint path
-    @useGlobalEslint = atom.config.get 'linter-eslint.useGlobalEslint'
-    if @useGlobalEslint then @findGlobalNPMdir()
+    if atom.config.get('linter-eslint.useGlobalEslint') then @findGlobalNPMdir()
 
   deactivate: ->
     @subscriptions.dispose()
@@ -184,15 +187,38 @@ module.exports =
           eslint = require eslintPath
           @localEslint = true
           return eslint
+      else
+        atom.notifications.addError '
+          [Linter-ESLint] `eslint` binary not found localy, falling back to packaged one.
+          Plugins won\'t be loaded and linting will possibly not work.
+          (Try `Use Global ESLint` option, or install localy `eslint` to your project.)',
+          {dismissable: true}
+
     # Fall back to the version packaged in linter-eslint
     return require('eslint')
 
   findGlobalNPMdir: ->
-    globalNodeDir = execSync 'npm config get prefix', {encoding: 'utf8'}
-    globalNodeDir = globalNodeDir.replace /[\n\r\t]/g, ''
-    globalNpmPath = path.join globalNodeDir, 'lib', 'node_modules'
+    try
+      # Get global node dir from options
+      globalNodePath = atom.config.get 'linter-eslint.globalNodePath'
 
-    if statSync(globalNpmPath).isDirectory()
-      @npmPath = globalNpmPath
-    else
-      atom.notifications.addError '[Linter-ESLint] global npm path not found, use local ESLint', {dismissable: true}
+      # If none, try to find it
+      unless globalNodePath
+        globalNodePath = execSync 'npm config get prefix', {encoding: 'utf8'}
+        globalNodePath = globalNodePath.replace /[\n\r\t]/g, ''
+
+      globalNpmPath = path.join globalNodePath, 'lib', 'node_modules'
+
+      if statSync(globalNpmPath).isDirectory()
+        @useGlobalEslint = true
+        @npmPath = globalNpmPath
+
+    catch error
+      console.warn '[Linter-ESlint] error loading global eslint'
+      console.warn error
+
+      atom.notifications.addError '
+        [Linter-ESLint] Global node modules path not found, using packaged ESlint.
+        Plugins won\'t be loaded and linting will possibly not work.
+        (Try to set `Global node path` if not set)',
+        {dismissable: true}
