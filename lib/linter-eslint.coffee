@@ -1,7 +1,7 @@
 path = require 'path'
 {sync} = require 'resolve'
 {execSync} = require 'child_process'
-{statSync, existsSync} = require 'fs'
+{statSync} = require 'fs'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
@@ -72,7 +72,7 @@ module.exports =
         # Add showRuleId option
         showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
 
-        if rulesDir and existsSync rulesDir
+        if rulesDir and statSync(rulesDir).isDirectory()
           options.rulePaths = [rulesDir]
 
         # `linter` and `CLIEngine` comes from `eslint` module
