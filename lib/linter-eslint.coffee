@@ -72,8 +72,13 @@ module.exports =
         # Add showRuleId option
         showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
 
-        if rulesDir and fs.existsSync rulesDir
-          options.rulePaths = [rulesDir]
+        if rulesDir
+          try
+            if statSync(rulesDir).isDirectory()
+              options.rulePaths = [rulesDir]
+          catch error
+            console.warn '[Linter-ESLint] ESlint rules direcotory does not exist in your fs'
+            console.warn error.message
 
         # `linter` and `CLIEngine` comes from `eslint` module
         {linter, CLIEngine} = @requireESLint filePath
