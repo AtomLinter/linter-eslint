@@ -8,6 +8,9 @@
   "engines": {
     "atom": ">0.50.0"
   },
+  "scripts": {
+    "lint": "eslint lib"
+  },
   "dependencies": {
     "atom-linter": "^1.0.2",
     "eslint": "^0.24.0",
