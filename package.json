@@ -15,7 +15,8 @@
     "atom-linter": "^1.0.2",
     "eslint": "^0.24.0",
     "eslint-json": "^1.0.0",
-    "npm-which": "^2.0.0"
+    "npm-which": "^2.0.0",
+    "resolve": "^1.1.6"
   },
   "providedServices": {
     "linter": {
