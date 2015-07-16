@@ -24,7 +24,7 @@ module.exports =
     useGlobalEslint:
       type: 'boolean'
       default: false
-      description: 'Use globaly installed `eslint`'
+      description: 'Use globally installed `eslint`'
     showRuleIdInMessage:
       type: 'boolean'
       default: true
@@ -77,7 +77,7 @@ module.exports =
             if statSync(rulesDir).isDirectory()
               options.rulePaths = [rulesDir]
           catch error
-            console.warn '[Linter-ESLint] ESlint rules direcotory does not exist in your fs'
+            console.warn '[Linter-ESLint] ESlint rules directory does not exist in your fs'
             console.warn error.message
 
         # `linter` and `CLIEngine` comes from `eslint` module
@@ -200,9 +200,9 @@ module.exports =
         console.warn error
 
         atom.notifications.addError '
-          [Linter-ESLint] `eslint` binary not found localy, falling back to packaged one.
+          [Linter-ESLint] `eslint` binary not found locally, falling back to packaged one.
           Plugins won\'t be loaded and linting will possibly not work.
-          (Try `Use Global ESLint` option, or install localy `eslint` to your project.)',
+          (Try `Use Global ESLint` option, or install locally `eslint` to your project.)',
           {dismissable: true}
 
     # Fall back to the version packaged in linter-eslint
