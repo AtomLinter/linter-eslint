@@ -57,7 +57,7 @@ module.exports =
         onlyConfig = atom.config.get 'linter-eslint.disableWhenNoEslintrcFileInPath'
         eslintConfig = findFile filePath, '.eslintrc'
 
-        return [] if onlyConfig and !eslintConfig
+        return [] if onlyConfig and not eslintConfig
 
         # find nearest .eslintignore
         options = {}
