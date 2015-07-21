@@ -2,15 +2,13 @@ path = require 'path'
 {sync} = require 'resolve'
 {execSync} = require 'child_process'
 {statSync} = require 'fs'
+{findFile} = require 'atom-linter'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
 linterPackage = atom.packages.getLoadedPackage 'linter'
 unless linterPackage
   return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
-
-linterPath = linterPackage.path
-findFile = require "#{linterPath}/lib/util"
 
 module.exports =
   config:
