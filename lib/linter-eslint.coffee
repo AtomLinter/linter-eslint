@@ -182,8 +182,7 @@ module.exports =
   requireESLint: (filePath) ->
     @localEslint = false
     try
-      eslintPath = sync 'eslint', {basedir: path.dirname(filePath)}
-      eslint = require eslintPath
+      eslint = @requireLocalESLint filePath
       @localEslint = true
       return eslint
     catch error
@@ -205,6 +204,18 @@ module.exports =
 
     # Fall back to the version packaged in linter-eslint
     return require('eslint')
+
+  requireLocalESLint: (filePath) ->
+    # Traverse up the directory hierarchy until the root
+    currentPath = filePath
+    until currentPath is path.dirname currentPath
+      currentPath = path.dirname currentPath
+      try
+        eslintPath = sync 'eslint', {basedir: currentPath}
+      catch
+        continue
+      return require eslintPath
+    throw new Error "Could not find `eslint` locally installed in #{ path.dirname filePath } or any parent directories"
 
   findGlobalNPMdir: ->
     try
