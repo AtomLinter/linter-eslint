@@ -189,7 +189,7 @@ module.exports =
       if @useGlobalEslint
         try
           eslintPath = sync 'eslint', {basedir: @npmPath}
-          eslint = require eslintPath
+          eslint = allowUnsafeNewFunction -> require eslintPath
           @localEslint = true
           return eslint
       else
@@ -214,7 +214,7 @@ module.exports =
         eslintPath = sync 'eslint', {basedir: currentPath}
       catch
         continue
-      return require eslintPath
+      return allowUnsafeNewFunction -> require eslintPath
     throw new Error "Could not find `eslint` locally installed in #{ path.dirname filePath } or any parent directories"
 
   findGlobalNPMdir: ->
