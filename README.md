@@ -17,7 +17,7 @@ Lets say you depend on a specific version of `eslint`, maybe it has unreleased f
 
 You have two options:
 
-* Install localy to your project `eslint` and the plugin
+* Install locally to your project `eslint` and the plugin
   * `$ npm i --save-dev eslint [eslint-plugins]`
 
 
