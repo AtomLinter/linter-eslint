@@ -12,7 +12,7 @@
   "dependencies": {
     "atom-linter": "^2.0.1",
     "eslint": "^0.24.0",
-    "loophole": "^1.0.0",
+    "loophole": "^1.1.0",
     "resolve": "^1.1.5"
   },
   "providedServices": {
