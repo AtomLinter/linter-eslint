@@ -6,10 +6,6 @@ path = require 'path'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
-linterPackage = atom.packages.getLoadedPackage 'linter'
-unless linterPackage
-  return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
-
 module.exports =
   config:
     eslintRulesDir:
@@ -33,7 +29,8 @@ module.exports =
       description: 'Run `$ npm config get prefix` to find it'
 
   activate: ->
-    console.log 'activate linter-eslint'
+    unless atom.packages.isPackageActive 'linter'
+      return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
     @subscriptions = new CompositeDisposable
 
     # Load global eslint path
