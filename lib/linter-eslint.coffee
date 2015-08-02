@@ -14,8 +14,8 @@ module.exports =
       description: 'Path to your `eslint` bin'
 
   activate: ->
-    #unless atom.packages.getActivePackage 'linter'
-    #  return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
+    unless atom.packages.getLoadedPackage 'linter'
+      return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
     @subscriptions = new CompositeDisposable()
     @subscriptions.add atom.config.observe('linter-eslint.useGlobalEslint', (value) =>
       @useGlobalEslint = value
