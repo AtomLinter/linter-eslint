@@ -46,7 +46,7 @@ module.exports =
       lintOnFly: true
       lint: (TextEditor) =>
         filePath = TextEditor.getPath()
-        dirname = if filePath then path.dirname filePath else ''
+        dirname = path.dirname(filePath)
 
         # Check for `onlyConfig`
         #
