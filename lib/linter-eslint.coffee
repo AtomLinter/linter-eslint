@@ -1,32 +1,17 @@
 path = require 'path'
-{sync} = require 'resolve'
-{execSync} = require 'child_process'
-{statSync} = require 'fs'
-{findFile} = require 'atom-linter'
+{execNode} = require 'atom-linter'
 {CompositeDisposable} = require 'atom'
-{allowUnsafeNewFunction} = require 'loophole'
 
 module.exports =
   config:
-    eslintRulesDir:
+    eslintPath:
       type: 'string'
-      default: ''
-    disableWhenNoEslintrcFileInPath:
-      type: 'boolean'
-      default: false
-      description: 'Disable linter when no `.eslintrc` is found in project'
-    useGlobalEslint:
-      type: 'boolean'
-      default: false
+      default: 'eslint'
       description: 'Use globally installed `eslint`'
     showRuleIdInMessage:
       type: 'boolean'
       default: true
       description: 'Show the `eslint` rule before error'
-    globalNodePath:
-      type: 'string'
-      default: ''
-      description: 'Run `$ npm config get prefix` to find it'
 
   activate: ->
     unless atom.packages.isPackageActive 'linter'
@@ -48,205 +33,53 @@ module.exports =
         filePath = TextEditor.getPath()
         dirname = path.dirname(filePath)
 
-        # Check for `onlyConfig`
-        #
-        # Return empty array if no `.eslintrc` && `onlyConfig`
-        onlyConfig = atom.config.get 'linter-eslint.disableWhenNoEslintrcFileInPath'
-        eslintConfig = findFile filePath, '.eslintrc'
-
-        return [] if onlyConfig and not eslintConfig
-
-        # find nearest .eslintignore
-        options = {}
-        options.ignorePath = findFile filePath, '.eslintignore'
-
-        # Add rulePaths option
-        rulesDir = atom.config.get 'linter-eslint.eslintRulesDir'
-        rulesDir = findFile(dirname, [rulesDir], false, 0) if rulesDir
-
         # Add showRuleId option
         showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
 
-        if rulesDir
-          try
-            if statSync(rulesDir).isDirectory()
-              options.rulePaths = [rulesDir]
-          catch error
-            console.warn '[Linter-ESLint] ESlint rules directory does not exist in your fs'
-            console.warn error.message
 
-        # `linter` and `CLIEngine` comes from `eslint` module
-        {linter, CLIEngine} = @requireESLint filePath
-
-        if filePath
-          engine = new CLIEngine(options)
-
-          # Fixes `eslint@0.23.0`
-          config = {}
+        ###
+        try
+          results = []
           allowUnsafeNewFunction ->
-            config = engine.getConfigForFile filePath
+            results = linter
+              .verify TextEditor.getText(), config, filePath
+              .map ({message, line, severity, ruleId}) ->
 
-          # Check for ignore path files from `.eslintignore`
-          if options.ignorePath
-            relative = filePath.replace "#{path.dirname options.ignorePath}#{path.sep}", ''
-            return [] if engine.isPathIgnored relative or engine.isPathIgnored "#{relative}/"
+                # Calculate range to make the error whole line
+                # without the indentation at begining of line
+                indentLevel = TextEditor.indentationForBufferRow line - 1
+                startCol = TextEditor.getTabLength() * indentLevel
+                endCol = TextEditor.getBuffer().lineLengthForRow line - 1
+                range = [[line - 1, startCol], [line - 1, endCol]]
 
-          # We have plugins to load
-          if config.plugins
+                if showRuleId
+                  {
+                    type: if severity is 1 then 'warning' else 'error'
+                    html: '<span class="badge badge-flexible">' + ruleId + '</span> ' + message
+                    filePath: filePath
+                    range: range
+                  }
+                else
+                  {
+                    type: if severity is 1 then 'warning' else 'error'
+                    text: message
+                    filePath: filePath
+                    range: range
+                  }
 
-            # `eslint >= 0.21.0`
-            if engine.addPlugin
-              config.plugins.forEach(@loadPlugin.bind(this, engine, filePath))
-            else
-              options.plugins = config.plugins
-              engine = new CLIEngine(options)
+          results
 
-          try
-            results = []
-            allowUnsafeNewFunction ->
-              results = linter
-                .verify TextEditor.getText(), config, filePath
-                .map ({message, line, severity, ruleId}) ->
+        catch error
+          console.warn '[Linter-ESLint] error while linting file'
+          console.warn error.message
+          console.warn error.stack
 
-                  # Calculate range to make the error whole line
-                  # without the indentation at begining of line
-                  indentLevel = TextEditor.indentationForBufferRow line - 1
-                  startCol = TextEditor.getTabLength() * indentLevel
-                  endCol = TextEditor.getBuffer().lineLengthForRow line - 1
-                  range = [[line - 1, startCol], [line - 1, endCol]]
-
-                  if showRuleId
-                    {
-                      type: if severity is 1 then 'warning' else 'error'
-                      html: '<span class="badge badge-flexible">' + ruleId + '</span> ' + message
-                      filePath: filePath
-                      range: range
-                    }
-                  else
-                    {
-                      type: if severity is 1 then 'warning' else 'error'
-                      text: message
-                      filePath: filePath
-                      range: range
-                    }
-
-            results
-
-          catch error
-            console.warn '[Linter-ESLint] error while linting file'
-            console.warn error.message
-            console.warn error.stack
-
-            [
-              {
-                type: 'error'
-                text: 'error while linting file, open the console for more information'
-                file: filePath
-                range: [[0, 0], [0, 0]]
-              }
-            ]
-
-  loadPlugin: (engine, filePath, pluginName) ->
-    # Support private modules for plugins
-    # they starts with `@`
-    namespace = ''
-    if pluginName[0] is '@'
-      [namespace, pluginName] = pluginName.split '/'
-      namespace += '/'
-
-    npmPluginName = pluginName.replace 'eslint-plugin-', ''
-    npmPluginName = "#{namespace}eslint-plugin-#{npmPluginName}"
-
-    try
-      pluginPath = sync npmPluginName, {basedir: path.dirname(filePath)}
-      plugin = require pluginPath
-
-      return engine.addPlugin pluginName, plugin
-    catch error
-      if @useGlobalEslint
-        try
-          pluginPath = sync npmPluginName, {basedir: @npmPath}
-          plugin = require pluginPath
-
-          return engine.addPlugin pluginName, plugin
-
-    console.warn "[Linter-ESLint] error loading plugin"
-    console.warn error.message
-    console.warn error.stack
-
-    atom.notifications.addError "[Linter-ESLint] plugin #{pluginName} not found", {dismissable: true}
-
-  requireESLint: (filePath) ->
-    @localEslint = false
-    try
-      eslint = @requireLocalESLint filePath
-      @localEslint = true
-      return eslint
-    catch error
-      if @useGlobalEslint
-        try
-          eslintPath = sync 'eslint', {basedir: @npmPath}
-          eslint = allowUnsafeNewFunction -> require eslintPath
-          @localEslint = true
-          return eslint
-      else
-        unless @warnNotFound
-          console.warn '[Linter-ESLint] local `eslint` not found'
-          console.warn error
-
-          atom.notifications.addError '
-            [Linter-ESLint] `eslint` binary not found locally, falling back to packaged one.
-            Plugins won\'t be loaded and linting will possibly not work.
-            (Try `Use Global ESLint` option, or install locally `eslint` to your project.)',
-            {dismissable: true}
-
-          @warnNotFound = true
-
-    # Fall back to the version packaged in linter-eslint
-    return require('eslint')
-
-  requireLocalESLint: (filePath) ->
-    # Traverse up the directory hierarchy until the root
-    currentPath = filePath
-    until currentPath is path.dirname currentPath
-      currentPath = path.dirname currentPath
-      try
-        eslintPath = sync 'eslint', {basedir: currentPath}
-      catch
-        continue
-      return allowUnsafeNewFunction -> require eslintPath
-    throw new Error "Could not find `eslint` locally installed in #{ path.dirname filePath } or any parent directories"
-
-  findGlobalNPMdir: ->
-    try
-      # Get global node dir from options
-      globalNodePath = atom.config.get 'linter-eslint.globalNodePath'
-
-      # If none, try to find it
-      unless globalNodePath
-        globalNodePath = execSync 'npm config get prefix', {encoding: 'utf8'}
-        globalNodePath = globalNodePath.replace /[\n\r\t]/g, ''
-
-      # Windows specific
-      # (see: https://github.com/AtomLinter/linter-eslint/issues/138#issuecomment-118666827)
-      globalNpmPath = path.join globalNodePath, 'node_modules'
-
-      # Other OS, `node_modules` path will be in `./lib/node_modules`
-      try
-        statSync(globalNpmPath).isDirectory()
-      catch
-        globalNpmPath = path.join globalNodePath, 'lib', 'node_modules'
-
-      if statSync(globalNpmPath).isDirectory()
-        @useGlobalEslint = true
-        @npmPath = globalNpmPath
-
-    catch error
-      console.warn '[Linter-ESlint] error loading global eslint'
-      console.warn error
-
-      atom.notifications.addError '
-        [Linter-ESLint] Global node modules path not found, using packaged ESlint.
-        Plugins won\'t be loaded and linting will possibly not work.
-        (Try to set `Global node path` if not set)',
-        {dismissable: true}
+          [
+            {
+              type: 'error'
+              text: 'error while linting file, open the console for more information'
+              file: filePath
+              range: [[0, 0], [0, 0]]
+            }
+          ]
+      ###
