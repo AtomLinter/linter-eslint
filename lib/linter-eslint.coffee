@@ -1,5 +1,5 @@
 path = require 'path'
-{execNode} = require 'atom-linter'
+helpers = require 'atom-linter'
 {CompositeDisposable} = require 'atom'
 
 module.exports =
@@ -18,8 +18,8 @@ module.exports =
       description: 'Show the `eslint` rule before error'
 
   activate: ->
-    unless atom.packages.isPackageActive 'linter'
-      return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
+    #unless atom.packages.getActivePackage 'linter'
+    #  return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
     @subscriptions = new CompositeDisposable()
     @subscriptions.add atom.config.observe('linter-eslint.useGlobalEslint', (value) =>
       @useGlobalEslint = value
@@ -36,6 +36,7 @@ module.exports =
     return path.join(__dirname, '..', 'node_modules', 'eslint', 'bin', 'eslint.js')
 
   provideLinter: ->
+    jsonFormat = require('eslint-json')
     provider =
       grammarScopes: ['source.js', 'source.js.jsx', 'source.babel', 'source.js-semantic']
       scope: 'file'
@@ -45,7 +46,14 @@ module.exports =
 
         # Add showRuleId option
         showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
-        return execNode(@getEsLintPath())
+        return helpers.execNode(
+          @getEsLintPath(),
+          ['--format', jsonFormat, '--stdin-filename', filePath, '--stdin'],
+          stdin: TextEditor.getText(), stream: 'stdout'
+        ).then((contents) ->
+          console.log(contents)
+          return []
+        )
 
         ###
         try
@@ -76,20 +84,4 @@ module.exports =
                     filePath: filePath
                     range: range
                   }
-
-          results
-
-        catch error
-          console.warn '[Linter-ESLint] error while linting file'
-          console.warn error.message
-          console.warn error.stack
-
-          [
-            {
-              type: 'error'
-              text: 'error while linting file, open the console for more information'
-              file: filePath
-              range: [[0, 0], [0, 0]]
-            }
-          ]
       ###
