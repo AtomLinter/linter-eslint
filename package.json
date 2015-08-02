@@ -1,7 +1,6 @@
 {
   "name": "linter-eslint",
   "main": "./lib/linter-eslint",
-  "activationCommands": [],
   "version": "3.0.2",
   "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
@@ -10,10 +9,9 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "atom-linter": "^2.0.1",
+    "atom-linter": "^3.0.0",
     "eslint": "^0.24.0",
-    "loophole": "^1.1.0",
-    "resolve": "^1.1.5"
+    "eslint-json": "^1.0.0"
   },
   "providedServices": {
     "linter": {
