@@ -20,6 +20,20 @@ module.exports =
   activate: ->
     unless atom.packages.isPackageActive 'linter'
       return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
+    @subscriptions = new CompositeDisposable()
+    @subscriptions.add atom.config.observe('linter-eslint.useGlobalEslint', (value) =>
+      @useGlobalEslint = value
+    )
+    @subscriptions.add atom.config.observe('linter-eslint.eslintPath', (value) =>
+      @eslintPath = value
+    )
+
+  deactivate: ->
+    @subscriptions.dispose()
+
+  getEsLintPath: ->
+    return @eslintPath if @useGlobalEslint
+    return path.join(__dirname, '..', 'node_modules', 'eslint', 'bin', 'eslint.js')
 
   provideLinter: ->
     provider =
@@ -31,7 +45,7 @@ module.exports =
 
         # Add showRuleId option
         showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
-        return execNode(atom.config.get 'linter-eslint.eslintPath')
+        return execNode(@getEsLintPath())
 
         ###
         try
