@@ -12,10 +12,6 @@ module.exports =
       type: 'string'
       default: 'eslint'
       description: 'Path to your `eslint` bin'
-    showRuleIdInMessage:
-      type: 'boolean'
-      default: true
-      description: 'Show the `eslint` rule before error'
 
   activate: ->
     #unless atom.packages.getActivePackage 'linter'
@@ -43,45 +39,21 @@ module.exports =
       lintOnFly: true
       lint: (TextEditor) =>
         filePath = TextEditor.getPath()
+        fileDir = path.dirname(filePath)
+        fileName = path.basename(filePath)
 
-        # Add showRuleId option
-        showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
         return helpers.execNode(
           @getEsLintPath(),
-          ['--format', jsonFormat, '--stdin-filename', filePath, '--stdin'],
-          stdin: TextEditor.getText(), stream: 'stdout'
-        ).then((contents) ->
-          console.log(contents)
-          return []
+          ['--format', jsonFormat, '--stdin-filename', fileName, '--no-color', '--stdin'],
+          stdin: TextEditor.getText(), stream: 'stdout', cwd: fileDir
+        ).then(JSON.parse).then((contents) ->
+          return [] unless contents.results and contents.results.length
+          return contents.results[0].messages.map((entry) ->
+            return {
+              type: if entry.severity is 1 then 'Warning' else 'Error'
+              filePath,
+              text: entry.message
+              range: [[entry.line - 1, entry.column - 1], [entry.line - 1, entry.column]]
+            }
+          )
         )
-
-        ###
-        try
-          results = []
-          allowUnsafeNewFunction ->
-            results = linter
-              .verify TextEditor.getText(), config, filePath
-              .map ({message, line, severity, ruleId}) ->
-
-                # Calculate range to make the error whole line
-                # without the indentation at begining of line
-                indentLevel = TextEditor.indentationForBufferRow line - 1
-                startCol = TextEditor.getTabLength() * indentLevel
-                endCol = TextEditor.getBuffer().lineLengthForRow line - 1
-                range = [[line - 1, startCol], [line - 1, endCol]]
-
-                if showRuleId
-                  {
-                    type: if severity is 1 then 'warning' else 'error'
-                    html: '<span class="badge badge-flexible">' + ruleId + '</span> ' + message
-                    filePath: filePath
-                    range: range
-                  }
-                else
-                  {
-                    type: if severity is 1 then 'warning' else 'error'
-                    text: message
-                    filePath: filePath
-                    range: range
-                  }
-      ###
