@@ -4,10 +4,14 @@ path = require 'path'
 
 module.exports =
   config:
+    useGlobalEslint:
+      type: 'boolean',
+      default: false
+      description: 'Use globally installed `eslint`'
     eslintPath:
       type: 'string'
       default: 'eslint'
-      description: 'Use globally installed `eslint`'
+      description: 'Path to your `eslint` bin'
     showRuleIdInMessage:
       type: 'boolean'
       default: true
@@ -16,13 +20,6 @@ module.exports =
   activate: ->
     unless atom.packages.isPackageActive 'linter'
       return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
-    @subscriptions = new CompositeDisposable
-
-    # Load global eslint path
-    if atom.config.get('linter-eslint.useGlobalEslint') then @findGlobalNPMdir()
-
-  deactivate: ->
-    @subscriptions.dispose()
 
   provideLinter: ->
     provider =
@@ -31,11 +28,10 @@ module.exports =
       lintOnFly: true
       lint: (TextEditor) =>
         filePath = TextEditor.getPath()
-        dirname = path.dirname(filePath)
 
         # Add showRuleId option
         showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
-
+        return execNode(atom.config.get 'linter-eslint.eslintPath')
 
         ###
         try
