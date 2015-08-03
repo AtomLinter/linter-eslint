@@ -31,6 +31,15 @@ module.exports =
       type: 'string'
       default: ''
       description: 'Run `$ npm config get prefix` to find it'
+    fileScopes:
+      type: 'string'
+      default: 'source.js,source.js.jsx,source.babel,source.js-semantic',
+      description: 'Lint files with these scopes (passed to atom-linter) (separated by commas)'
+    fileExtensions:
+      type: 'string'
+      default: '.js,.js.jsx,.babel,.js-semantic',
+      description: 'Lint files with these file extensions (separated by commas)'
+
 
   activate: ->
     console.log 'activate linter-eslint'
@@ -44,7 +53,7 @@ module.exports =
 
   provideLinter: ->
     provider =
-      grammarScopes: ['source.js', 'source.js.jsx', 'source.babel', 'source.js-semantic']
+      grammarScopes: atom.config.get('linter-eslint.fileScopes').split(',')
       scope: 'file'
       lintOnFly: true
       lint: (TextEditor) =>
@@ -77,6 +86,9 @@ module.exports =
           catch error
             console.warn '[Linter-ESLint] ESlint rules directory does not exist in your fs'
             console.warn error.message
+
+        # Add file extensions option
+        options.extnensions = atom.config.get('linter-eslint.fileExtensions').split(',')
 
         # `linter` and `CLIEngine` comes from `eslint` module
         {linter, CLIEngine} = @requireESLint filePath
