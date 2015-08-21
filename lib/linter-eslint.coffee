@@ -110,12 +110,17 @@ module.exports =
               results = linter
                 .verify TextEditor.getText(), config, filePath
                 .map ({message, line, severity, ruleId}) ->
-
                   # Calculate range to make the error whole line
                   # without the indentation at begining of line
                   indentLevel = TextEditor.indentationForBufferRow line - 1
-                  startCol = TextEditor.getTabLength() * indentLevel
+                  startOfLine = TextEditor.getTabLength() * indentLevel
+
                   endCol = TextEditor.getBuffer().lineLengthForRow line - 1
+                  startCol = if (column >= endCol) or (column < startOfLine)
+                      startOfLine
+                    else
+                      column
+
                   range = [[line - 1, startCol], [line - 1, endCol]]
 
                   if showRuleId
