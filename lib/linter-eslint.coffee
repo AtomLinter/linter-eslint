@@ -109,14 +109,12 @@ module.exports =
             allowUnsafeNewFunction ->
               results = linter
                 .verify TextEditor.getText(), config, filePath
-                .map ({message, line, severity, ruleId}) ->
+                .map ({message, line, severity, ruleId, column}) ->
 
-                  # Calculate range to make the error whole line
-                  # without the indentation at begining of line
                   indentLevel = TextEditor.indentationForBufferRow line - 1
-                  startCol = TextEditor.getTabLength() * indentLevel
-                  endCol = TextEditor.getBuffer().lineLengthForRow line - 1
-                  range = [[line - 1, startCol], [line - 1, endCol]]
+                  startCol = column || TextEditor.getTabLength() * indentLevel
+                  endOfLine = TextEditor.getBuffer().lineLengthForRow line - 1
+                  range = [[line - 1, startCol], [line - 1, endOfLine]]
 
                   if showRuleId
                     {
