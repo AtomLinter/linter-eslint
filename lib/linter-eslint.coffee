@@ -214,7 +214,12 @@ module.exports =
       try
         eslintPath = sync 'eslint', {basedir: currentPath}
       catch
-        continue
+        try
+          # Support gulp-eslint installations
+          gulpEslintPath = sync 'gulp-eslint', {basedir: currentPath}
+          eslintPath = sync 'eslint', {basedir: path.dirname gulpEslintPath}
+        catch
+          continue
       return allowUnsafeNewFunction -> require eslintPath
     throw new Error "Could not find `eslint` locally installed in #{ path.dirname filePath } or any parent directories"
 
