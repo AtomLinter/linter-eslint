@@ -6,10 +6,6 @@ path = require 'path'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
-linterPackage = atom.packages.getLoadedPackage 'linter'
-unless linterPackage
-  return atom.notifications.addError 'Linter should be installed first, `apm install linter`', dismissable: true
-
 module.exports =
   config:
     eslintRulesDir:
@@ -33,6 +29,7 @@ module.exports =
       description: 'Run `$ npm config get prefix` to find it'
 
   activate: ->
+    require('atom-package-deps').install('linter-eslint')
     console.log 'activate linter-eslint'
     @subscriptions = new CompositeDisposable
 
@@ -112,7 +109,7 @@ module.exports =
                 .map ({message, line, severity, ruleId, column}) ->
 
                   indentLevel = TextEditor.indentationForBufferRow line - 1
-                  startCol = column || TextEditor.getTabLength() * indentLevel
+                  startCol = column or TextEditor.getTabLength() * indentLevel
                   endOfLine = TextEditor.getBuffer().lineLengthForRow line - 1
                   range = [[line - 1, startCol], [line - 1, endOfLine]]
 
