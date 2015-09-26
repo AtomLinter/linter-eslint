@@ -1,17 +1,25 @@
 # linter-eslint
 
-This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides an interface to [eslint](http://eslint.org). It will be used with files that have the “JavaScript” syntax.
+This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides
+an interface to [eslint](http://eslint.org). It will be used with files that
+have the “JavaScript” syntax.
 
 ## Installation
-Linter package must be installed in order to use this plugin. If Linter is not installed, please follow the instructions [here](https://github.com/AtomLinter/Linter).
+```ShellSession
+apm install linter-eslint
+```
 
-### Package installation
+`linter-eslint` will look for a version of `eslint` local to your project and
+use it if it's available. If none is found it will fall back to the version it
+ships with.
 
-* `$ apm install linter-eslint`
+Lets say you depend on a specific version of `eslint`, maybe it has unreleased
+features, maybe it's just newer than what linter-eslint ships with. If
+`your-project/node_modules/eslint` exists `linter-eslint` will be used.
 
-`linter-eslint` will look for a version of `eslint` local to your project and use it if it's available. If none is found it will fall back to the version it ships with.
-
-Lets say you depend on a specific version of `eslint`, maybe it has unreleased features, maybe it's just newer than what linter-eslint ships with. If `your-project/node_modules/eslint` exists `linter-eslint` will be used.
+Note that if you do not have the `linter` package installed it will be installed
+for you. If you are using an alternative `linter-*` consumer feel free to disable
+the `linter` package.
 
 ## Use with plugins
 
@@ -19,7 +27,6 @@ You have two options:
 
 * Install locally to your project `eslint` and the plugin
   * `$ npm i --save-dev eslint [eslint-plugins]`
-
 
 * Install globaly `eslint` and plugins
   * `$ npm i -g eslint [eslint-plugins]`
@@ -30,7 +37,7 @@ You have two options:
 
 You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your Config in Atom menu) or in Preferences:
 
-```coffee
+```cson
 'linter-eslint':
   'eslintRulesDir': 'mydir'
   'disableWhenNoEslintrcFileInPath': true
@@ -50,16 +57,16 @@ You can configure linter-eslint by editing ~/.atom/config.cson (choose Open Your
 
 If you would like to contribute enhancements or fixes, please do the following:
 
-* Fork the plugin repository
-* Hack on a separate topic branch created from the latest `master`
-* Commit and push the topic branch
-* Make a pull request
-* Welcome to the club
+0. Fork the plugin repository
+0. Hack on a separate topic branch created from the latest `master`
+0. Commit and push the topic branch
+0. Make a pull request
+0. Welcome to the club!
 
 Please note that modifications should follow these coding guidelines:
 
 * Indent is 2 spaces
-* Code should pass `coffeelint` linter
+* Code should pass `coffeelint` linter with the provided `coffeelint.json`
 * Vertical whitespace helps readability, don’t be afraid to use it
 
 Thank you for helping out!
