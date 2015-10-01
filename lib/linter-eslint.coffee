@@ -41,6 +41,7 @@ module.exports =
 
   provideLinter: ->
     provider =
+      name: 'ESLint'
       grammarScopes: ['source.js', 'source.js.jsx', 'source.babel', 'source.js-semantic']
       scope: 'file'
       lintOnFly: true
