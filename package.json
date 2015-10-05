@@ -1,17 +1,17 @@
 {
-  "name": "linter-eslint",
-  "main": "./lib/linter-eslint",
+  "name": "linter-nplint",
+  "main": "./lib/linter-nplint",
   "activationCommands": [],
-  "version": "3.1.0",
-  "description": "Lint JavaScript on the fly, using ESLint",
-  "repository": "https://github.com/AtomLinter/linter-eslint.git",
+  "version": "0.1.0",
+  "description": "Lint Package.json on the fly, using npLint",
+  "repository": "https://github.com/mathieudutour/linter-nplint.git",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
   },
   "dependencies": {
     "atom-linter": "^2.0.1",
-    "eslint": "^0.24.0",
+    "nplint": "^0.1.0",
     "loophole": "^1.1.0",
     "resolve": "^1.1.5",
     "atom-package-deps": "^2.1.3"
