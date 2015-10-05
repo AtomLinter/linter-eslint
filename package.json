@@ -2,7 +2,7 @@
   "name": "linter-nplint",
   "main": "./lib/linter-nplint",
   "activationCommands": [],
-  "version": "0.2.0",
+  "version": "0.0.0",
   "description": "Lint Package.json on the fly, using npLint",
   "repository": "https://github.com/mathieudutour/linter-nplint.git",
   "license": "MIT",
