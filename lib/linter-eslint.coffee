@@ -110,7 +110,7 @@ module.exports =
                 .map ({message, line, severity, ruleId, column}) ->
 
                   indentLevel = TextEditor.indentationForBufferRow line - 1
-                  startCol = column or TextEditor.getTabLength() * indentLevel
+                  startCol = (column or TextEditor.getTabLength() * indentLevel) - 1
                   endOfLine = TextEditor.getBuffer().lineLengthForRow line - 1
                   range = [[line - 1, startCol], [line - 1, endOfLine]]
 
