@@ -35,9 +35,11 @@ LinterNplint =
 
       engine = new CLIEngine()
       config = engine.getConfig
+      console.log "[linter-nplint] config: ", config if atom.inDevMode()
 
       try
         linter.verify TextEditor.getText(), config, ({messages}) ->
+          console.log "[linter-nplint] message: ", messages if atom.inDevMode()
           resolve messages.map ({message, line, severity, ruleId, column}) ->
 
             indentLevel = TextEditor.indentationForBufferRow line - 1
