@@ -6,170 +6,76 @@ path = require 'path'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
-module.exports =
-  config:
-    nplintRulesDir:
-      type: 'string'
-      default: ''
-    disableWhenNoNplintrcFileInPath:
-      type: 'boolean'
-      default: false
-      description: 'Disable linter when no `.nplintrc` is found in project'
-    useGlobalNpLint:
-      type: 'boolean'
-      default: false
-      description: 'Use globally installed `nplint`'
-    showRuleIdInMessage:
-      type: 'boolean'
-      default: true
-      description: 'Show the `nplint` rule before error'
-    globalNodePath:
-      type: 'string'
-      default: ''
-      description: 'Run `$ npm config get prefix` to find it'
+LinterNplint =
+  name: 'npLint'
+  grammarScopes: ['source.json']
+  scope: 'file'
+  lintOnFly: false
+  lint: (TextEditor) =>
+    return new Promise (resolve, reject) =>
+      filePath = TextEditor.getPath()
+      filename = if filePath then path.basename filePath else ''
+      console.log "[linter-nplint] skipping #{filePath}" if filename isnt 'package.json' and atom.inDevMode()
+      return resolve([]) if filename isnt 'package.json'
 
-  activate: ->
-    require('atom-package-deps').install('linter-nplint')
-    console.log 'activate linter-nplint'
-    @subscriptions = new CompositeDisposable
+      # Check for `onlyConfig`
+      #
+      # Return empty array if no `.nplintrc` && `onlyConfig`
+      onlyConfig = @config 'disableWhenNoNplintrcFileInPath'
+      nplintConfig = findFile filePath, '.nplintrc'
 
-    # Load global nplint path
-    if atom.config.get('linter-nplint.useGlobalNpLint') then @findGlobalNPMdir()
+      console.log "[linter-nplint] skipping cause not found .nplintrc" if onlyConfig and not nplintConfig and atom.inDevMode()
+      return resolve([]) if onlyConfig and not nplintConfig
 
-  deactivate: ->
-    @subscriptions.dispose()
+      # Add showRuleId option
+      showRuleId = @config 'showRuleIdInMessage'
 
-  provideLinter: ->
-    provider =
-      name: 'npLint'
-      grammarScopes: ['source.json']
-      scope: 'file'
-      lintOnFly: false
-      lint: (TextEditor) =>
-        filePath = TextEditor.getPath()
-        filename = if filePath then path.basename filePath else ''
-        return [] if filename isnt 'package.json'
+      # `linter` and `CLIEngine` comes from `nplint` module
+      {linter, CLIEngine} = @requireNpLint filePath
 
-        dirname = if filePath then path.dirname filePath else ''
+      engine = new CLIEngine()
+      config = engine.getConfig
 
-        # Check for `onlyConfig`
-        #
-        # Return empty array if no `.nplintrc` && `onlyConfig`
-        onlyConfig = atom.config.get 'linter-nplint.disableWhenNoNplintrcFileInPath'
-        nplintConfig = findFile filePath, '.nplintrc'
+      try
+        linter.verify TextEditor.getText(), config, ({messages}) ->
+          resolve messages.map ({message, line, severity, ruleId, column}) ->
 
-        return [] if onlyConfig and not nplintConfig
+            indentLevel = TextEditor.indentationForBufferRow line - 1
+            startCol = column or TextEditor.getTabLength() * indentLevel
+            endOfLine = TextEditor.getBuffer().lineLengthForRow line - 1
+            range = [[line - 1, startCol], [line - 1, endOfLine]]
 
-        # find nearest .nplintignore
-        options = {}
-        options.ignorePath = findFile filePath, '.nplintignore'
+            if showRuleId
+              {
+                type: if severity is 1 then 'warning' else 'error'
+                html: '<span class="badge badge-flexible">' + ruleId + '</span> ' + message
+                filePath: filePath
+                range: range
+              }
+            else
+              {
+                type: if severity is 1 then 'warning' else 'error'
+                text: message
+                filePath: filePath
+                range: range
+              }
 
-        # Add rulePaths option
-        rulesDir = atom.config.get 'linter-nplint.nplintRulesDir'
-        rulesDir = findFile(dirname, [rulesDir], false, 0) if rulesDir
+      catch error
+        console.warn '[Linter-npLint] error while linting file'
+        console.warn error.message
+        console.warn error.stack
 
-        # Add showRuleId option
-        showRuleId = atom.config.get 'linter-nplint.showRuleIdInMessage'
+        resolve [
+          {
+            type: 'error'
+            text: 'error while linting file, open the console for more information'
+            file: filePath
+            range: [[0, 0], [0, 0]]
+          }
+        ]
 
-        if rulesDir
-          try
-            if statSync(rulesDir).isDirectory()
-              options.rulePaths = [rulesDir]
-          catch error
-            console.warn '[Linter-npLint] nplint rules directory does not exist in your fs'
-            console.warn error.message
-
-        # `linter` and `CLIEngine` comes from `nplint` module
-        {linter, CLIEngine} = @requireNpLint filePath
-
-        if filePath
-          engine = new CLIEngine(options)
-
-          config = {}
-          allowUnsafeNewFunction ->
-            config = engine.getConfig
-
-          # Check for ignore path files from `.nplintignore`
-          if options.ignorePath
-            relative = filePath.replace "#{path.dirname options.ignorePath}#{path.sep}", ''
-            return [] if engine.isPathIgnored relative or engine.isPathIgnored "#{relative}/"
-
-          # We have plugins to load
-          if config.plugins
-            config.plugins.forEach(@loadPlugin.bind(this, engine, filePath))
-
-          return new Promise (resolve)->
-            try
-              results = []
-              allowUnsafeNewFunction ->
-                results = linter
-                  .verify TextEditor.getText(), config, ({messages})->
-                    messages.map ({message, line, severity, ruleId, column}) ->
-
-                      indentLevel = TextEditor.indentationForBufferRow line - 1
-                      startCol = column or TextEditor.getTabLength() * indentLevel
-                      endOfLine = TextEditor.getBuffer().lineLengthForRow line - 1
-                      range = [[line - 1, startCol], [line - 1, endOfLine]]
-
-                      if showRuleId
-                        {
-                          type: if severity is 1 then 'warning' else 'error'
-                          html: '<span class="badge badge-flexible">' + ruleId + '</span> ' + message
-                          filePath: filePath
-                          range: range
-                        }
-                      else
-                        {
-                          type: if severity is 1 then 'warning' else 'error'
-                          text: message
-                          filePath: filePath
-                          range: range
-                        }
-                    resolve results
-
-            catch error
-              console.warn '[Linter-npLint] error while linting file'
-              console.warn error.message
-              console.warn error.stack
-
-              resolve [
-                {
-                  type: 'error'
-                  text: 'error while linting file, open the console for more information'
-                  file: filePath
-                  range: [[0, 0], [0, 0]]
-                }
-              ]
-
-  loadPlugin: (engine, filePath, pluginName) ->
-    # Support private modules for plugins
-    # they starts with `@`
-    namespace = ''
-    if pluginName[0] is '@'
-      [namespace, pluginName] = pluginName.split '/'
-      namespace += '/'
-
-    npmPluginName = pluginName.replace 'nplint-plugin-', ''
-    npmPluginName = "#{namespace}nplint-plugin-#{npmPluginName}"
-
-    try
-      pluginPath = sync npmPluginName, {basedir: path.dirname(filePath)}
-      plugin = require pluginPath
-
-      return engine.addPlugin pluginName, plugin
-    catch error
-      if @useGlobalNpLint
-        try
-          pluginPath = sync npmPluginName, {basedir: @npmPath}
-          plugin = require pluginPath
-
-          return engine.addPlugin pluginName, plugin
-
-    console.warn "[Linter-npLint] error loading plugin"
-    console.warn error.message
-    console.warn error.stack
-
-    atom.notifications.addError "[Linter-npLint] plugin #{pluginName} not found", {dismissable: true}
+  config: (key) ->
+    atom.config.get "linter-nplint.#{key}"
 
   requireNpLint: (filePath) ->
     @localNpLint = false
@@ -215,7 +121,7 @@ module.exports =
   findGlobalNPMdir: ->
     try
       # Get global node dir from options
-      globalNodePath = atom.config.get 'linter-nplint.globalNodePath'
+      globalNodePath = @config 'globalNodePath'
 
       # If none, try to find it
       unless globalNodePath
@@ -245,3 +151,5 @@ module.exports =
         Plugins won\'t be loaded and linting will possibly not work.
         (Try to set `Global node path` if not set)',
         {dismissable: true}
+
+module.exports = LinterNplint

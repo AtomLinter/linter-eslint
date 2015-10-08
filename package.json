@@ -1,9 +1,11 @@
 {
   "name": "linter-nplint",
-  "main": "./lib/linter-nplint",
-  "activationCommands": [],
+  "main": "./lib/init",
+  "scripts": {
+    "lint": "coffeelint lib"
+  },
   "version": "0.2.0",
-  "description": "Lint Package.json on the fly, using npLint",
+  "description": "Lint Package.json using npLint",
   "repository": "https://github.com/mathieudutour/linter-nplint.git",
   "license": "MIT",
   "engines": {
@@ -11,9 +13,7 @@
   },
   "dependencies": {
     "atom-linter": "^2.0.1",
-    "nplint": "^0.1.0",
-    "loophole": "^1.1.0",
-    "resolve": "^1.1.5",
+    "nplint": "^0.2.0",
     "atom-package-deps": "^2.1.3"
   },
   "package-deps": [
@@ -25,5 +25,8 @@
         "1.0.0": "provideLinter"
       }
     }
+  },
+  "devDependencies": {
+    "coffeelint": "^1.13.0"
   }
 }
