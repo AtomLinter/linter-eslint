@@ -6,11 +6,14 @@ path = require 'path'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
+config = (key) ->
+  atom.config.get "linter-nplint.#{key}"
+
 LinterNplint =
   name: 'npLint'
   grammarScopes: ['source.json']
   scope: 'file'
-  lintOnFly: false
+  lintOnFly: config 'onTheFly'
   lint: (TextEditor) =>
     return new Promise (resolve, reject) =>
       filePath = TextEditor.getPath()
@@ -21,17 +24,17 @@ LinterNplint =
       # Check for `onlyConfig`
       #
       # Return empty array if no `.nplintrc` && `onlyConfig`
-      onlyConfig = @config 'disableWhenNoNplintrcFileInPath'
+      onlyConfig = config 'disableWhenNoNplintrcFileInPath'
       nplintConfig = findFile filePath, '.nplintrc'
 
       console.log "[linter-nplint] skipping cause not found .nplintrc" if onlyConfig and not nplintConfig and atom.inDevMode()
       return resolve([]) if onlyConfig and not nplintConfig
 
       # Add showRuleId option
-      showRuleId = @config 'showRuleIdInMessage'
+      showRuleId = config 'showRuleIdInMessage'
 
       # `linter` and `CLIEngine` comes from `nplint` module
-      {linter, CLIEngine} = @requireNpLint filePath
+      {linter, CLIEngine} = @requireNplint filePath
 
       engine = new CLIEngine()
       config = engine.getConfig
@@ -76,10 +79,7 @@ LinterNplint =
           }
         ]
 
-  config: (key) ->
-    atom.config.get "linter-nplint.#{key}"
-
-  requireNpLint: (filePath) ->
+  requireNplint: (filePath) ->
     @localNpLint = false
     try
       nplint = @requireLocalNpLint filePath
