@@ -29,6 +29,7 @@
     }
   },
   "devDependencies": {
-    "coffeelint": "^1.13.0"
+    "coffeelint": "^1.13.0",
+    "nplint": "^0.2.0"
   }
 }

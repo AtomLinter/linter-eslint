@@ -1,0 +1,7 @@
+{
+    "rules": {
+        "field-name": 2,
+        "outdated-dependencies": 2,
+        "unused-dependencies": 2
+    }
+}
