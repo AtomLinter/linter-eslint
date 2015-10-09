@@ -81,6 +81,7 @@ LinterNplint =
       {linter, CLIEngine} = requireNplint filePath
 
       engine = new CLIEngine()
+      console.log "[linter-nplint] engine: ", engine if atom.inDevMode()
       config = engine.getConfig()
       console.log "[linter-nplint] config: ", config if atom.inDevMode()
 
