@@ -6,8 +6,52 @@ path = require 'path'
 {CompositeDisposable} = require 'atom'
 {allowUnsafeNewFunction} = require 'loophole'
 
+localNplint = false
+warnNotFound = false
+
 config = (key) ->
   atom.config.get "linter-nplint.#{key}"
+
+requireLocalNpLint = (filePath) ->
+  # Traverse up the directory hierarchy until the root
+  currentPath = filePath
+  until currentPath is path.dirname currentPath
+    currentPath = path.dirname currentPath
+    try
+      nplintPath = sync 'nplint', {basedir: currentPath}
+    catch
+      continue
+    return allowUnsafeNewFunction -> require nplintPath
+  throw new Error "Could not find `nplint` locally installed in #{ path.dirname filePath } or any parent directories"
+
+requireNplint = (filePath) ->
+  localNplint = false
+  try
+    nplint = requireLocalNpLint filePath
+    localNplint = true
+    return nplint
+  catch error
+    # if @useGlobalNpLint
+    #   try
+    #     nplintPath = sync 'nplint', {basedir: @npmPath}
+    #     nplint = allowUnsafeNewFunction -> require nplintPath
+    #     localNplint = true
+    #     return nplint
+    # else
+    unless warnNotFound
+      console.warn '[Linter-npLint] local `nplint` not found'
+      console.warn error
+
+      atom.notifications.addError '
+        [Linter-npLint] `nplint` binary not found locally, falling back to packaged one.
+        Plugins won\'t be loaded and linting will possibly not work.
+        (Try `Use Global npLint` option, or install locally `nplint` to your project.)',
+        {dismissable: true}
+
+      warnNotFound = true
+
+  # Fall back to the version packaged in linter-nplint
+  return require('nplint')
 
 LinterNplint =
   name: 'npLint'
@@ -15,7 +59,7 @@ LinterNplint =
   scope: 'file'
   lintOnFly: config 'onTheFly'
   lint: (TextEditor) =>
-    return new Promise ((resolve, reject) =>
+    return new Promise (resolve, reject) =>
       filePath = TextEditor.getPath()
       filename = if filePath then path.basename filePath else ''
       console.log "[linter-nplint] skipping #{filePath}" if filename isnt 'package.json' and atom.inDevMode()
@@ -34,7 +78,7 @@ LinterNplint =
       showRuleId = config 'showRuleIdInMessage'
 
       # `linter` and `CLIEngine` comes from `nplint` module
-      {linter, CLIEngine} = @requireNplint filePath
+      {linter, CLIEngine} = requireNplint filePath
 
       engine = new CLIEngine()
       config = engine.getConfig
@@ -78,81 +122,39 @@ LinterNplint =
             range: [[0, 0], [0, 0]]
           }
         ]
-    ).bind(this)
 
-  requireNplint: (filePath) ->
-    @localNpLint = false
-    try
-      nplint = @requireLocalNpLint filePath
-      @localNpLint = true
-      return nplint
-    catch error
-      if @useGlobalNpLint
-        try
-          nplintPath = sync 'nplint', {basedir: @npmPath}
-          nplint = allowUnsafeNewFunction -> require nplintPath
-          @localNpLint = true
-          return nplint
-      else
-        unless @warnNotFound
-          console.warn '[Linter-npLint] local `nplint` not found'
-          console.warn error
-
-          atom.notifications.addError '
-            [Linter-npLint] `nplint` binary not found locally, falling back to packaged one.
-            Plugins won\'t be loaded and linting will possibly not work.
-            (Try `Use Global npLint` option, or install locally `nplint` to your project.)',
-            {dismissable: true}
-
-          @warnNotFound = true
-
-    # Fall back to the version packaged in linter-nplint
-    return require('nplint')
-
-  requireLocalNpLint: (filePath) ->
-    # Traverse up the directory hierarchy until the root
-    currentPath = filePath
-    until currentPath is path.dirname currentPath
-      currentPath = path.dirname currentPath
-      try
-        nplintPath = sync 'nplint', {basedir: currentPath}
-      catch
-        continue
-      return allowUnsafeNewFunction -> require nplintPath
-    throw new Error "Could not find `nplint` locally installed in #{ path.dirname filePath } or any parent directories"
-
-  findGlobalNPMdir: ->
-    try
-      # Get global node dir from options
-      globalNodePath = config 'globalNodePath'
-
-      # If none, try to find it
-      unless globalNodePath
-        globalNodePath = execSync 'npm config get prefix', {encoding: 'utf8'}
-        globalNodePath = globalNodePath.replace /[\n\r\t]/g, ''
-
-      # Windows specific
-      # (see: https://github.com/AtomLinter/linter-eslint/issues/138#issuecomment-118666827)
-      globalNpmPath = path.join globalNodePath, 'node_modules'
-
-      # Other OS, `node_modules` path will be in `./lib/node_modules`
-      try
-        statSync(globalNpmPath).isDirectory()
-      catch
-        globalNpmPath = path.join globalNodePath, 'lib', 'node_modules'
-
-      if statSync(globalNpmPath).isDirectory()
-        @useGlobalNpLint = true
-        @npmPath = globalNpmPath
-
-    catch error
-      console.warn '[Linter-nplint] error loading global nplint'
-      console.warn error
-
-      atom.notifications.addError '
-        [Linter-npLint] Global node modules path not found, using packaged nplint.
-        Plugins won\'t be loaded and linting will possibly not work.
-        (Try to set `Global node path` if not set)',
-        {dismissable: true}
+  # findGlobalNPMdir: ->
+  #   try
+  #     # Get global node dir from options
+  #     globalNodePath = config 'globalNodePath'
+  #
+  #     # If none, try to find it
+  #     unless globalNodePath
+  #       globalNodePath = execSync 'npm config get prefix', {encoding: 'utf8'}
+  #       globalNodePath = globalNodePath.replace /[\n\r\t]/g, ''
+  #
+  #     # Windows specific
+  #     # (see: https://github.com/AtomLinter/linter-eslint/issues/138#issuecomment-118666827)
+  #     globalNpmPath = path.join globalNodePath, 'node_modules'
+  #
+  #     # Other OS, `node_modules` path will be in `./lib/node_modules`
+  #     try
+  #       statSync(globalNpmPath).isDirectory()
+  #     catch
+  #       globalNpmPath = path.join globalNodePath, 'lib', 'node_modules'
+  #
+  #     if statSync(globalNpmPath).isDirectory()
+  #       @useGlobalNpLint = true
+  #       @npmPath = globalNpmPath
+    #
+    # catch error
+    #   console.warn '[Linter-nplint] error loading global nplint'
+    #   console.warn error
+    #
+    #   atom.notifications.addError '
+    #     [Linter-npLint] Global node modules path not found, using packaged nplint.
+    #     Plugins won\'t be loaded and linting will possibly not work.
+    #     (Try to set `Global node path` if not set)',
+    #     {dismissable: true}
 
 module.exports = LinterNplint
