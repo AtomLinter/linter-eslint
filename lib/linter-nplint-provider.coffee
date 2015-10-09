@@ -58,8 +58,8 @@ LinterNplint =
   grammarScopes: ['source.json']
   scope: 'file'
   lintOnFly: config 'onTheFly'
-  lint: (TextEditor) =>
-    return new Promise (resolve, reject) =>
+  lint: (TextEditor) ->
+    return new Promise (resolve, reject) ->
       filePath = TextEditor.getPath()
       filename = if filePath then path.basename filePath else ''
       console.log "[linter-nplint] skipping #{filePath}" if filename isnt 'package.json' and atom.inDevMode()
