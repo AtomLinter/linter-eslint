@@ -82,11 +82,11 @@ LinterNplint =
 
       engine = new CLIEngine()
       console.log "[linter-nplint] engine: ", engine if atom.inDevMode()
-      config = engine.getConfig filePath
+      config = allowUnsafeNewFunction => engine.getConfig filePath
       console.log "[linter-nplint] config: ", config if atom.inDevMode()
 
       try
-        linter.verify TextEditor.getText(), config, ({messages}) ->
+        allowUnsafeNewFunction => linter.verify TextEditor.getText(), config, ({messages}) ->
           console.log "[linter-nplint] message: ", messages if atom.inDevMode()
           resolve messages.map ({message, line, severity, ruleId, column}) ->
 
