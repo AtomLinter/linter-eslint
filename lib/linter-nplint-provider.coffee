@@ -123,7 +123,7 @@ LinterNplint =
   findGlobalNPMdir: ->
     try
       # Get global node dir from options
-      globalNodePath = @config 'globalNodePath'
+      globalNodePath = config 'globalNodePath'
 
       # If none, try to find it
       unless globalNodePath
