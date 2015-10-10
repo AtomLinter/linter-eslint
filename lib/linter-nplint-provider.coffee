@@ -4,7 +4,7 @@ path = require 'path'
 {statSync} = require 'fs'
 {findFile} = require 'atom-linter'
 {CompositeDisposable} = require 'atom'
-{allowUnsafeNewFunction} = require 'loophole'
+{allowUnsafeNewFunction, allowUnsafeEval} = require 'loophole'
 
 localNplint = false
 warnNotFound = false
@@ -86,7 +86,7 @@ LinterNplint =
       console.log "[linter-nplint] config: ", config if atom.inDevMode()
 
       try
-        allowUnsafeNewFunction => linter.verify TextEditor.getText(), config, ({messages}) ->
+        allowUnsafeEval => allowUnsafeNewFunction => linter.verify TextEditor.getText(), config, ({messages}) ->
           console.log "[linter-nplint] message: ", messages if atom.inDevMode()
           resolve messages.map ({message, line, severity, ruleId, column}) ->
 
