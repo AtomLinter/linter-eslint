@@ -82,6 +82,8 @@ LinterNplint =
       {linter, CLIEngine} = requireNplint filePath
 
       previousEval = global.eval
+      previousFunction = global.Function
+      global.Function = unsafeFunction
       global.eval = (source) -> vm.runInThisContext(source)
 
       engine = new CLIEngine()
@@ -93,6 +95,7 @@ LinterNplint =
       try
         linter.verify TextEditor.getText(), config, ({messages}) ->
           global.eval = previousEval
+          global.Function = previousFunction
           console.log "[linter-nplint] message: ", messages if atom.inDevMode()
           resolve messages.map ({message, line, severity, ruleId, column}) ->
 
@@ -118,6 +121,7 @@ LinterNplint =
 
       catch error
         global.eval = previousEval
+        global.Function = previousFunction
         console.warn '[Linter-npLint] error while linting file'
         console.warn error.message
         console.warn error.stack
