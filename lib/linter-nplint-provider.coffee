@@ -14,7 +14,7 @@ LinterNplint =
   name: 'npLint'
   grammarScopes: ['source.json']
   scope: 'file'
-  lintOnFly: config 'onTheFly'
+  lintOnFly: atom.config.get "linter-nplint.onTheFly"
   lint: (TextEditor) ->
     config = (key) ->
       atom.config.get "linter-nplint.#{key}"
