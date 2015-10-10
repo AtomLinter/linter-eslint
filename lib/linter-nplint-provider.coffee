@@ -4,7 +4,7 @@ path = require 'path'
 {statSync} = require 'fs'
 {findFile} = require 'atom-linter'
 {CompositeDisposable} = require 'atom'
-{allowUnsafeNewFunction, allowUnsafeEval} = require 'loophole'
+{allowUnsafeNewFunction, unsafeFunction} = require 'loophole'
 
 localNplint = false
 warnNotFound = false
@@ -85,8 +85,16 @@ LinterNplint =
       config = allowUnsafeNewFunction => engine.getConfig filePath
       console.log "[linter-nplint] config: ", config if atom.inDevMode()
 
+
+      previousEval = global.eval
+      previousFunction = global.Function
+
       try
-        allowUnsafeEval => allowUnsafeNewFunction => linter.verify TextEditor.getText(), config, ({messages}) ->
+        global.eval = (source) -> vm.runInThisContext(source)
+        global.Function = unsafeFunction
+        linter.verify TextEditor.getText(), config, ({messages}) ->
+          global.eval = previousEval
+          global.Function = previousFunction
           console.log "[linter-nplint] message: ", messages if atom.inDevMode()
           resolve messages.map ({message, line, severity, ruleId, column}) ->
 
@@ -111,6 +119,8 @@ LinterNplint =
               }
 
       catch error
+        global.eval = previousEval
+        global.Function = previousFunction
         console.warn '[Linter-npLint] error while linting file'
         console.warn error.message
         console.warn error.stack
