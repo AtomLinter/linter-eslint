@@ -10,56 +10,56 @@ vm = require 'vm'
 localNplint = false
 warnNotFound = false
 
-config = (key) ->
-  atom.config.get "linter-nplint.#{key}"
-
-requireLocalNpLint = (filePath) ->
-  # Traverse up the directory hierarchy until the root
-  currentPath = filePath
-  until currentPath is path.dirname currentPath
-    currentPath = path.dirname currentPath
-    try
-      nplintPath = sync 'nplint', {basedir: currentPath}
-    catch
-      continue
-    return allowUnsafeNewFunction -> require nplintPath
-  throw new Error "Could not find `nplint` locally installed in #{ path.dirname filePath } or any parent directories"
-
-requireNplint = (filePath) ->
-  localNplint = false
-  try
-    nplint = requireLocalNpLint filePath
-    localNplint = true
-    return nplint
-  catch error
-    # if @useGlobalNpLint
-    #   try
-    #     nplintPath = sync 'nplint', {basedir: @npmPath}
-    #     nplint = allowUnsafeNewFunction -> require nplintPath
-    #     localNplint = true
-    #     return nplint
-    # else
-    unless warnNotFound
-      console.warn '[Linter-npLint] local `nplint` not found'
-      console.warn error
-
-      atom.notifications.addError '
-        [Linter-npLint] `nplint` binary not found locally, falling back to packaged one.
-        Plugins won\'t be loaded and linting will possibly not work.
-        (Try `Use Global npLint` option, or install locally `nplint` to your project.)',
-        {dismissable: true}
-
-      warnNotFound = true
-
-  # Fall back to the version packaged in linter-nplint
-  return require('nplint')
-
 LinterNplint =
   name: 'npLint'
   grammarScopes: ['source.json']
   scope: 'file'
   lintOnFly: config 'onTheFly'
   lint: (TextEditor) ->
+    config = (key) ->
+      atom.config.get "linter-nplint.#{key}"
+
+    requireLocalNpLint = (filePath) ->
+      # Traverse up the directory hierarchy until the root
+      currentPath = filePath
+      until currentPath is path.dirname currentPath
+        currentPath = path.dirname currentPath
+        try
+          nplintPath = sync 'nplint', {basedir: currentPath}
+        catch
+          continue
+        return allowUnsafeNewFunction -> require nplintPath
+      throw new Error "Could not find `nplint` locally installed in #{ path.dirname filePath } or any parent directories"
+
+    requireNplint = (filePath) ->
+      localNplint = false
+      try
+        nplint = requireLocalNpLint filePath
+        localNplint = true
+        return nplint
+      catch error
+        # if @useGlobalNpLint
+        #   try
+        #     nplintPath = sync 'nplint', {basedir: @npmPath}
+        #     nplint = allowUnsafeNewFunction -> require nplintPath
+        #     localNplint = true
+        #     return nplint
+        # else
+        unless warnNotFound
+          console.warn '[Linter-npLint] local `nplint` not found'
+          console.warn error
+
+          atom.notifications.addError '
+            [Linter-npLint] `nplint` binary not found locally, falling back to packaged one.
+            Plugins won\'t be loaded and linting will possibly not work.
+            (Try `Use Global npLint` option, or install locally `nplint` to your project.)',
+            {dismissable: true}
+
+          warnNotFound = true
+
+      # Fall back to the version packaged in linter-nplint
+      return require('nplint')
+
     return new Promise (resolve, reject) ->
       filePath = TextEditor.getPath()
       filename = if filePath then path.basename filePath else ''
@@ -81,17 +81,16 @@ LinterNplint =
       # `linter` and `CLIEngine` comes from `nplint` module
       {linter, CLIEngine} = requireNplint filePath
 
+      previousEval = global.eval
+      global.eval = (source) -> vm.runInThisContext(source)
+
       engine = new CLIEngine()
       console.log "[linter-nplint] engine: ", engine if atom.inDevMode()
-      config = allowUnsafeNewFunction => engine.getConfig filePath
+      config = engine.getConfig filePath
       config.cwd = path.dirname filePath
       console.log "[linter-nplint] config: ", config if atom.inDevMode()
 
-
-      previousEval = global.eval
-
       try
-        global.eval = (source) -> vm.runInThisContext(source)
         linter.verify TextEditor.getText(), config, ({messages}) ->
           global.eval = previousEval
           console.log "[linter-nplint] message: ", messages if atom.inDevMode()
