@@ -4,7 +4,7 @@ path = require 'path'
 {statSync} = require 'fs'
 {findFile} = require 'atom-linter'
 {CompositeDisposable} = require 'atom'
-{allowUnsafeNewFunction, unsafeFunction} = require 'loophole'
+{allowUnsafeNewFunction, Function} = require 'loophole'
 vm = require 'vm'
 
 localNplint = false
@@ -83,7 +83,7 @@ LinterNplint =
 
       previousEval = global.eval
       previousFunction = global.Function
-      global.Function = unsafeFunction
+      global.Function = Function
       global.eval = (source) -> vm.runInThisContext(source)
 
       engine = new CLIEngine()
