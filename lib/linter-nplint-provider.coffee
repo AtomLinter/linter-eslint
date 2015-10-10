@@ -83,6 +83,7 @@ LinterNplint =
       engine = new CLIEngine()
       console.log "[linter-nplint] engine: ", engine if atom.inDevMode()
       config = allowUnsafeNewFunction => engine.getConfig filePath
+      config.cwd = path.dirname filePath
       console.log "[linter-nplint] config: ", config if atom.inDevMode()
 
 
