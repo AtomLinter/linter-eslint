@@ -4,7 +4,7 @@
   "scripts": {
     "lint": "coffeelint lib"
   },
-  "version": "0.3.23",
+  "version": "0.3.24",
   "description": "Lint Package.json using npLint",
   "repository": "https://github.com/mathieudutour/linter-nplint.git",
   "license": "MIT",
