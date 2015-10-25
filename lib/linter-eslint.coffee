@@ -118,6 +118,7 @@ module.exports =
                     {
                       type: if severity is 1 then 'Warning' else 'Error'
                       html: '<span class="badge badge-flexible">' + ruleId + '</span> ' + message
+                      text: "#{ruleId} - #{message}"
                       filePath: filePath
                       range: range
                     }
