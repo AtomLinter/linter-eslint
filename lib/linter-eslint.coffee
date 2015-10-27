@@ -94,13 +94,8 @@ module.exports =
 
           # We have plugins to load
           if config.plugins
+            config.plugins.forEach(@loadPlugin.bind(this, engine, filePath))
 
-            # `eslint >= 0.21.0`
-            if engine.addPlugin
-              config.plugins.forEach(@loadPlugin.bind(this, engine, filePath))
-            else
-              options.plugins = config.plugins
-              engine = new CLIEngine(options)
 
           try
             results = []
