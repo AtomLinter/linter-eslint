@@ -27,6 +27,10 @@ module.exports =
       type: 'string'
       default: ''
       description: 'Run `$ npm config get prefix` to find it'
+    lintHtmlFiles:
+      type: 'boolean'
+      default: false
+      description: 'Enable lint JavaScript in HTML files'
 
   activate: ->
     require('atom-package-deps').install('linter-eslint')
@@ -36,13 +40,22 @@ module.exports =
     # Load global eslint path
     if atom.config.get('linter-eslint.useGlobalEslint') then @findGlobalNPMdir()
 
+    scopeEmbedded = 'source.js.embedded.html'
+    @scopes = ['source.js', 'source.jsx', 'source.js.jsx', 'source.babel', 'source.js-semantic']
+    @subscriptions.add atom.config.observe 'linter-eslint.lintHtmlFiles',
+      (lintHtmlFiles) =>
+        if lintHtmlFiles
+          @scopes.push(scopeEmbedded) unless scopeEmbedded in @scopes
+        else
+          @scopes.splice(@scopes.indexOf(scopeEmbedded), 1) if scopeEmbedded in @scopes
+
   deactivate: ->
     @subscriptions.dispose()
 
   provideLinter: ->
     provider =
       name: 'ESLint'
-      grammarScopes: ['source.js', 'source.jsx', 'source.js.jsx', 'source.babel', 'source.js-semantic']
+      grammarScopes: @scopes
       scope: 'file'
       lintOnFly: true
       lint: (TextEditor) =>
@@ -67,6 +80,9 @@ module.exports =
 
         # Add showRuleId option
         showRuleId = atom.config.get 'linter-eslint.showRuleIdInMessage'
+
+        # Add lintHtml option
+        lintHtml = atom.config.get 'linter-eslint.lintHtmlFiles'
 
         if rulesDir
           try
@@ -96,12 +112,16 @@ module.exports =
           if config.plugins
             config.plugins.forEach(@loadPlugin.bind(this, engine, filePath))
 
+          if lintHtml
+            if !config.plugins or (config.plugins and 'html' not in config.plugins)
+              engine.addPlugin 'html', require('eslint-plugin-html')
 
           try
             results = []
             allowUnsafeNewFunction ->
-              results = linter
-                .verify TextEditor.getText(), config, filePath
+              report = engine.executeOnText TextEditor.getText(), filePath
+              messages = report.results[0].messages
+              results = messages
                 .map ({message, line, severity, ruleId, column}) ->
 
                   indentLevel = TextEditor.indentationForBufferRow line - 1
