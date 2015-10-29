@@ -238,7 +238,7 @@ module.exports =
 
       # If none, try to find it
       unless globalNodePath
-        globalNodePath = execSync 'npm config get prefix', {encoding: 'utf8'}
+        globalNodePath = execSync 'npm config get prefix', {encoding: 'utf8', stdio: 'pipe'}
         globalNodePath = globalNodePath.replace /[\n\r\t]/g, ''
 
       # Windows specific
