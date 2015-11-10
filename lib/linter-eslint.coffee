@@ -217,7 +217,7 @@ module.exports =
           @warnNotFound = true
 
     # Fall back to the version packaged in linter-eslint
-    return require('eslint')
+    return allowUnsafeNewFunction -> require('eslint')
 
   requireLocalESLint: (filePath) ->
     # Traverse up the directory hierarchy until the root
