@@ -1,6 +1,6 @@
 {
   "name": "linter-eslint",
-  "main": "./lib/linter-eslint",
+  "main": "./lib/main",
   "activationCommands": [],
   "version": "4.0.0",
   "description": "Lint JavaScript on the fly, using ESLint",
