@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "atom-linter": "^3.3.0",
-    "atom-package-deps": "^2.1.3",
+    "atom-package-deps": "^3.0.1",
     "eslint": "^1.7.3",
     "eslint-plugin-html": "^1.0.4",
     "loophole": "^1.1.0",
