@@ -14,10 +14,12 @@
     "atom-package-deps": "^3.0.1",
     "childprocess-promise": "^3.0.0",
     "escape-html": "^1.0.3",
-    "eslint": "^1.9.0"
+    "eslint": "^1.9.0",
+    "eslint-plugin-react": "^3.8.0"
   },
   "devDependencies": {
-    "eslint-config-steelbrain": "latest"
+    "eslint-config-steelbrain": "latest",
+    "eslint-config-airbnb": "latest"
   },
   "package-deps": [
     "linter"
@@ -27,6 +29,15 @@
       "versions": {
         "1.0.0": "provideLinter"
       }
+    }
+  },
+  "eslintConfig": {
+    extends: "steelbrain",
+    rules: {
+      "no-empty": 0
+    },
+    globals: {
+      "atom": true
     }
   }
 }
