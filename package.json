@@ -32,12 +32,12 @@
     }
   },
   "eslintConfig": {
-    extends: "steelbrain",
-    rules: {
+    "extends": "steelbrain",
+    "rules": {
       "no-empty": 0
     },
-    globals: {
-      "atom": true
+    "globals": {
+      "atom": "true"
     }
   }
 }
