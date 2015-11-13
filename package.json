@@ -16,6 +16,9 @@
     "escape-html": "^1.0.3",
     "eslint": "^1.9.0"
   },
+  "devDependencies": {
+    "eslint-config-steelbrain": "latest"
+  },
   "package-deps": [
     "linter"
   ],
