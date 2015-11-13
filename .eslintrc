@@ -2,5 +2,8 @@
   extends: "steelbrain",
   rules: {
     "no-empty": 0
+  },
+  globals: {
+    "atom": true
   }
 }
