@@ -1,6 +1,6 @@
 {
   "name": "linter-eslint",
-  "main": "./lib/linter-eslint",
+  "main": "./lib/main",
   "activationCommands": [],
   "version": "4.0.0",
   "description": "Lint JavaScript on the fly, using ESLint",
@@ -10,12 +10,16 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "atom-linter": "^3.3.0",
-    "atom-package-deps": "^2.1.3",
-    "eslint": "^1.7.3",
-    "eslint-plugin-html": "^1.0.4",
-    "loophole": "^1.1.0",
-    "resolve": "^1.1.5"
+    "atom-linter": "^3.3.2",
+    "atom-package-deps": "^3.0.1",
+    "childprocess-promise": "^3.0.0",
+    "escape-html": "^1.0.3",
+    "eslint": "^1.9.0"
+  },
+  "devDependencies": {
+    "eslint-plugin-react": "^3.8.0",
+    "eslint-config-steelbrain": "latest",
+    "eslint-config-airbnb": "latest"
   },
   "package-deps": [
     "linter"
@@ -25,6 +29,15 @@
       "versions": {
         "1.0.0": "provideLinter"
       }
+    }
+  },
+  "eslintConfig": {
+    "extends": "steelbrain",
+    "rules": {
+      "no-empty": 0
+    },
+    "globals": {
+      "atom": "true"
     }
   }
 }
