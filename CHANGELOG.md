@@ -1,4 +1,4 @@
-### Upcoming
+### v5.0.1
 
 * Shows a nice notification if the worker process crashed for some reason
 
