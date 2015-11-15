@@ -1,3 +1,7 @@
+### Upcoming
+
+* Fix a bug where column would be incorrect sometimes
+
 ### v5.1.0
 
 * Improved error verbosity
