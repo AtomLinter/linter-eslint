@@ -1,6 +1,7 @@
 ### Upcoming
 
 * Improved error verbosity
+* Show a nice error notification if `npm get prefix` fails
 
 ### v5.0.2
 
