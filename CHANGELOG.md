@@ -1,3 +1,7 @@
+### Upcoming
+
+* Improved error verbosity
+
 ### v5.0.2
 
 * Support local ESLint installation
