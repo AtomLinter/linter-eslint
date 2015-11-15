@@ -2,6 +2,7 @@
 
 * Improved error verbosity
 * Show a nice error notification if `npm get prefix` fails
+* Re-add `globalNodePath` config
 
 ### v5.0.2
 
