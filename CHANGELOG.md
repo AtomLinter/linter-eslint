@@ -1,6 +1,7 @@
 ### Upcoming
 
-* Support local eslint installation
+* Support local ESLint installation
+* Support global ESLint on Windows
 
 ### v5.0.1
 
