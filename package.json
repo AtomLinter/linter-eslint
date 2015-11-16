@@ -10,7 +10,7 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "atom-linter": "^3.3.2",
+    "atom-linter": "^3.3.4",
     "atom-package-deps": "^3.0.2",
     "childprocess-promise": "^3.0.0",
     "escape-html": "^1.0.3",
