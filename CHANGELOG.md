@@ -1,6 +1,7 @@
 ### Upcoming
 
 * Fix a bug where column would be incorrect sometimes
+* Respawn the worker if it crashes
 
 ### v5.1.0
 
