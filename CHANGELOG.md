@@ -2,6 +2,7 @@
 
 * Fix a bug where column would be incorrect sometimes
 * Respawn the worker if it crashes
+* Re-add `eslintRulesDir` config
 
 ### v5.1.0
 
