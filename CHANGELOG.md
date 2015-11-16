@@ -4,6 +4,7 @@
 * Respawn the worker if it crashes
 * Re-add `eslintRulesDir` config
 * Add support for `.eslintignore`
+* Add `eslintRcPath` config
 
 ### v5.1.0
 
