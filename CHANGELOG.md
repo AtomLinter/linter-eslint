@@ -1,12 +1,15 @@
 ### Upcoming
 
+* Support local and absolute paths for eslintRulesDir
+
+### v5.2.0
+
 * Fix a bug where column would be incorrect sometimes
 * Respawn the worker if it crashes
 * Re-add `eslintRulesDir` config
 * Add support for `.eslintignore`
 * Add `eslintRcPath` config
 * Add `linter-eslint:fix-file` command
-* Support local and absolute paths for eslintRulesDir
 
 ### v5.1.0
 
