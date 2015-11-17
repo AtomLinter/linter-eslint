@@ -6,6 +6,7 @@
 * Add support for `.eslintignore`
 * Add `eslintRcPath` config
 * Add `linter-eslint:fix-file` command
+* Support local and absolute paths for eslintRulesDir
 
 ### v5.1.0
 
