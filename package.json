@@ -14,7 +14,8 @@
     "atom-package-deps": "^3.0.2",
     "childprocess-promise": "^3.0.0",
     "escape-html": "^1.0.3",
-    "eslint": "^1.9.0"
+    "eslint": "^1.9.0",
+    "resolve-env": "^1.0.0"
   },
   "devDependencies": {
     "eslint-plugin-react": "^3.8.0",
