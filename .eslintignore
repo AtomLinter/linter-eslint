@@ -1,1 +1,2 @@
-spec/files/bad.js
+# TODO: Uncomment when --no-ignore is supported in the specs
+#spec/files/bad.js
