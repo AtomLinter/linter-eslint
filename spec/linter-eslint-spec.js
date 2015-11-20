@@ -36,10 +36,6 @@ describe('The eslint provider for Linter', () => {
     });
 
     it('finds at least one message', () => {
-      /* The following doesn't work, throwing a "Error: Pane has been destroyed"
-       *  in the console and not actually running the tests.
-       */
-      // return atom.workspace.open(__dirname + '/files/empty.js').then(editor => {
       return lint(editor).then(messages => {
         expect(messages.length).toEqual(1);
       });
@@ -63,23 +59,22 @@ describe('The eslint provider for Linter', () => {
   });
 
   it('finds nothing wrong with an empty file', () => {
-    return atom.workspace.open(__dirname + '/files/empty.js').then(editor => {
-      return lint(editor).then(messages => {
-        expect(messages.length).toEqual(0);
+    waitsForPromise(() => {
+      return atom.workspace.open(__dirname + '/files/empty.js').then(editor => {
+        return lint(editor).then(messages => {
+          expect(messages.length).toEqual(0);
+        });
       });
-    });
+    })
   });
 
   it('finds nothing wrong with a valid file', () => {
-    return atom.workspace.open(__dirname + '/files/good.js').then(editor => {
-      return lint(editor).then(messages => {
-        expect(messages.length).toEqual(0);
+    waitsForPromise(() => {
+      return atom.workspace.open(__dirname + '/files/good.js').then(editor => {
+        return lint(editor).then(messages => {
+          expect(messages.length).toEqual(0);
+        });
       });
-    });
+    })
   });
-
-  // TODO: Lol...
-  it('purposely fails', () => {
-    return expect(0).toBe(1);
-  })
 });
