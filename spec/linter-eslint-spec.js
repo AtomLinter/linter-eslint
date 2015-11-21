@@ -1,7 +1,6 @@
 'use babel';
 
 describe('The eslint provider for Linter', () => {
-  const setTimeout = require('remote').getGlobal('setTimeout')
   const {spawnWorker} = require('../lib/helpers')
   const worker = spawnWorker()
   const lint = require('../lib/main').provideLinter.call(worker).lint;
