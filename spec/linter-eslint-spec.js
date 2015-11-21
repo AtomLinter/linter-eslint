@@ -26,7 +26,7 @@ describe('The eslint provider for Linter', () => {
 
     it('finds at least one message', () => {
       return lint(editor).then(messages => {
-        expect(messages.length).toEqual(1);
+        expect(messages.length).toBeGreaterThan(0);
       });
     });
 
