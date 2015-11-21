@@ -1,26 +1,17 @@
 'use babel';
 
 describe('The eslint provider for Linter', () => {
-  const lint = require('../lib/main.js').provideLinter().lint;
+  const setTimeout = require('remote').getGlobal('setTimeout')
+  const {spawnWorker} = require('../lib/helpers')
+  const worker = spawnWorker()
+  const lint = require('../lib/main').provideLinter.call(worker).lint;
 
   beforeEach(() => {
     waitsForPromise(() => {
-      atom.packages.activatePackage('linter-eslint');
-      /* We need a way to either force the worker process to spawn, or wait
-       *  on the timeout here, or all the tests fail.
-       */
       return atom.packages.activatePackage('language-javascript').then(() =>
         atom.workspace.open(__dirname + '/files/good.js')
-      );
+      )
     });
-  });
-
-  it('should be in the packages list', () => {
-    return expect(atom.packages.isPackageLoaded('linter-eslint')).toBe(true);
-  });
-
-  it('should be an active package', () => {
-    return expect(atom.packages.isPackageActive('linter-eslint')).toBe(true);
   });
 
   describe('checks bad.js and', () => {
