@@ -1,6 +1,8 @@
 ### Upcoming
 
 * Allow ignoring the `.eslintignore` file
+* Add `disableWhenNoEslintConfig` config (`true` by default) to only disable the linter if no ESLint config is found in a `package.json`
+or `.eslintrc` file.  This replaces the `disableWhenNoEslintrcFileInPath` config.
 
 ### v5.2.1
 
