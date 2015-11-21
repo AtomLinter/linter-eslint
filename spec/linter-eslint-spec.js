@@ -34,10 +34,9 @@ describe('The eslint provider for Linter', () => {
       return lint(editor).then(messages => {
         expect(messages[0].type).toBeDefined();
         expect(messages[0].type).toEqual('Error');
-        expect(messages[0].text).not.toBeDefined();
-        expect(messages[0].html).toBeDefined();
-        expect(messages[0].html).toEqual('<span class="badge badge-flexible">' +
-          'no-undef</span> &quot;foo&quot; is not defined.');
+        expect(messages[0].html).not.toBeDefined();
+        expect(messages[0].text).toBeDefined();
+        expect(messages[0].text).toEqual('"foo" is not defined.');
         expect(messages[0].filePath).toBeDefined();
         expect(messages[0].filePath).toMatch(/.+spec[\\\/]files[\\\/]bad\.js$/);
         expect(messages[0].range).toBeDefined();
