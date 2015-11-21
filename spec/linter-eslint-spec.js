@@ -6,10 +6,11 @@ describe('The eslint provider for Linter', () => {
   const lint = require('../lib/main').provideLinter.call(worker).lint;
 
   beforeEach(() => {
+    atom.config.set('linter-eslint.disableEslintIgnore', true);
     waitsForPromise(() => {
-      return atom.packages.activatePackage('language-javascript').then(() =>
-        atom.workspace.open(__dirname + '/files/good.js')
-      )
+      return atom.packages.activatePackage('language-javascript').then(() => {
+        atom.workspace.open(__dirname + '/files/good.js');
+      });
     });
   });
 

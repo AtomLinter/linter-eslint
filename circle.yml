@@ -9,6 +9,5 @@ dependencies:
 test:
   override:
     - ./node_modules/.bin/eslint lib
-    # TODO: Change to just spec when --no-ignore is supported in the specs
-    - ./node_modules/.bin/eslint spec/linter-eslint-spec.js
+    - ./node_modules/.bin/eslint spec
     - apm test
