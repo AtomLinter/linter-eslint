@@ -1,3 +1,7 @@
+### Upcoming
+
+* Allow ignoring the `.eslintignore` file
+
 ### v5.2.1
 
 * Support local and absolute paths for eslintRulesDir

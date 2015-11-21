@@ -1,0 +1,8 @@
+{
+  "globals": {
+    "waitsForPromise": true
+  },
+  "env": {
+    "jasmine": true
+  }
+}

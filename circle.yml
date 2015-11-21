@@ -9,4 +9,5 @@ dependencies:
 test:
   override:
     - ./node_modules/.bin/eslint lib
+    - ./node_modules/.bin/eslint spec
     - apm test
