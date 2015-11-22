@@ -1,4 +1,8 @@
-### Upcoming
+### v5.5.3
+
+* Fix a typo introduced by last release
+
+### v5.2.2
 
 * Allow ignoring the `.eslintignore` file
 * Add `disableWhenNoEslintConfig` config (`true` by default) to only disable the linter if no ESLint config is found in a `package.json`
