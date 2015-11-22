@@ -2,7 +2,7 @@
   "name": "linter-eslint",
   "main": "./lib/main",
   "activationCommands": [],
-  "version": "5.2.2",
+  "version": "5.2.3",
   "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
