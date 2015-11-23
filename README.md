@@ -1,4 +1,6 @@
 # linter-eslint
+[![Build Status](https://travis-ci.org/AtomLinter/linter-eslint.svg)](https://travis-ci.org/AtomLinter/linter-eslint)
+[![Dependency Status](https://david-dm.org/AtomLinter/linter-eslint.svg)](https://david-dm.org/AtomLinter/linter-eslint)
 
 This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides
 an interface to [eslint](http://eslint.org). It will be used with files that
