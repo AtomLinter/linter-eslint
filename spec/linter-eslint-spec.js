@@ -41,7 +41,7 @@ describe('The eslint provider for Linter', () => {
         expect(messages[0].filePath).toMatch(/.+spec[\\\/]files[\\\/]bad\.js$/);
         expect(messages[0].range).toBeDefined();
         expect(messages[0].range.length).toEqual(2);
-        expect(messages[0].range).toEqual([[0, 0], [0, 8]]);
+        expect(messages[0].range).toEqual([[0, 0], [0, 9]]);
       });
     });
   });
