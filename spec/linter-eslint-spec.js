@@ -65,4 +65,28 @@ describe('The eslint provider for Linter', () => {
       });
     })
   });
+
+  describe('when resolving import paths using eslint-plugin-import', () => {
+    it('correctly resolves imports from parent', () => {
+      waitsForPromise(() => {
+        return atom.workspace.open(`${__dirname}/import-resolution/nested/importing.js`).then(editor => {
+          return lint(editor).then(messages => {
+            expect(messages.length).toEqual(0);
+          })
+        })
+      })
+    })
+  })
+
+  describe('when a file is specified in an .eslintignore file', () => {
+    it('will not give warnings for the file', () => {
+      waitsForPromise(() => {
+        return atom.workspace.open(`${__dirname}/eslintignore/ignored.js`).then(editor => {
+          return lint(editor).then(messages => {
+            expect(messages.length).toEqual(0);
+          })
+        })
+      })
+    })
+  })
 });
