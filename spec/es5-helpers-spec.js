@@ -126,7 +126,27 @@ describe('The es5 linter-eslint helper', () => {
       })
     })
 
+    describe('findEslintDir', () => {
+      it('locates a local installation of eslint', () => {
+        const dir = getFixturePath('local-eslint/lib')
+        const expectedPath = getFixturePath('local-eslint/node_modules/eslint')
+        const params = {
+          fileDir: dir,
+          global: false,
+        }
+        const foundEslintDir = findEslintDir(params);
+        expect(foundEslintDir).toEqual(expectedPath)
+      })
+    })
 
+    describe('getEslintCli', () => {
+      it('locates eslint\'s cli.js in a local installation', () => {
+        const expectedEslintCli = 'located'
+        const path = getFixturePath('local-eslint/node_modules/eslint')
+        const foundEslintCli = getEslintCli(path)
+        expect(foundEslintCli).toEqual(expectedEslintCli)
+      })
+    })
   })
 
   it('teardown', () => {
