@@ -1,4 +1,4 @@
-'use babel';
+'use babel'
 
 import Path from 'path'
 import OS from 'os'
@@ -7,7 +7,7 @@ import {
   determineConfigFile,
   findEslintDir,
   getEslintCli
-} from '../lib/es5-helpers';
+} from '../lib/es5-helpers'
 
 let fixtureDir
 
@@ -134,7 +134,7 @@ describe('The es5 linter-eslint helper', () => {
           fileDir: dir,
           global: false,
         }
-        const foundEslintDir = findEslintDir(params);
+        const foundEslintDir = findEslintDir(params)
         expect(foundEslintDir).toEqual(expectedPath)
       })
     })
@@ -151,6 +151,6 @@ describe('The es5 linter-eslint helper', () => {
 
   it('teardown', () => {
     // Clean up temporary directory
-    rm('-r', fixtureDir);
+    rm('-r', fixtureDir)
   })
 })
