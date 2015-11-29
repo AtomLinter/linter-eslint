@@ -11,13 +11,15 @@ describe('The es5 linter-eslint helper', () => {
 
   /**
    * Returns the path inside of the fixture directory.
-   * @returns {string} The path inside the fixture directory.
+   * @param   {string} path  A UNIX-style path ('/' seperators) relative to the
+   *                         'spec/fixtures' directory.
+   * @returns {string}       The path inside the fixture directory.
    * @private
    */
-  function getFixturePath() {
-    const args = Array.prototype.slice.call(arguments);
-    args.unshift(fixtureDir);
-    return Path.join.apply(Path, args);
+  function getFixturePath(path) {
+    const args = path.split('/')
+    args.unshift(fixtureDir)
+    return Path.join.apply(Path, args)
   }
 
   it('test setup', () => {
