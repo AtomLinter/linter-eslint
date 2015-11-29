@@ -3,12 +3,15 @@
 import Path from 'path'
 import OS from 'os'
 import {mkdir, cp, rm} from 'shelljs'
+import {
+  determineConfigFile,
+  findEslintDir,
+  getEslintCli
+} from '../lib/es5-helpers';
 
 let fixtureDir
 
 describe('The es5 linter-eslint helper', () => {
-  const {determineConfigFile} = require('../lib/es5-helpers');
-
   /**
    * Returns the path inside of the fixture directory.
    * @param   {string} path  A UNIX-style path ('/' seperators) relative to the
