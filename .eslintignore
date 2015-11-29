@@ -1,2 +1,2 @@
-spec/files/bad.js
-spec/eslintignore/ignored.js
+spec/fixtures/files/bad.js
+spec/fixtures/eslintignore/ignored.js
