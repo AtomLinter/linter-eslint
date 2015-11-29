@@ -22,7 +22,8 @@
     "eslint-config-airbnb": "latest",
     "eslint-config-steelbrain": "latest",
     "eslint-plugin-import": "^0.11.0",
-    "eslint-plugin-react": "^3.10.0"
+    "eslint-plugin-react": "^3.10.0",
+    "shelljs": "^0.5.3"
   },
   "package-deps": [
     "linter"
