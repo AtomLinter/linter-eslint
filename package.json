@@ -13,7 +13,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "atom-linter": "^3.3.9",
+    "atom-linter": "^3.4.0",
     "atom-package-deps": "^3.0.5",
     "childprocess-promise": "^3.0.0",
     "escape-html": "^1.0.3",
