@@ -10,7 +10,8 @@
     "atom": ">0.50.0"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "compile": "ucompiler go"
   },
   "dependencies": {
     "atom-linter": "^3.4.0",
@@ -26,7 +27,8 @@
     "eslint-config-steelbrain": "latest",
     "eslint-plugin-import": "^0.11.0",
     "eslint-plugin-react": "^3.10.0",
-    "shelljs": "^0.5.3"
+    "shelljs": "^0.5.3",
+    "babel-preset-steelbrain": "^1.0.0"
   },
   "package-deps": [
     "linter"
