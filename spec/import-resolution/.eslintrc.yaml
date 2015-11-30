@@ -1,0 +1,11 @@
+---
+
+  root: true
+
+  parser: babel-eslint
+
+  plugins:
+    - import
+
+  rules:
+    import/no-unresolved: 2
