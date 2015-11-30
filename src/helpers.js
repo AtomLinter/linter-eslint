@@ -1,7 +1,11 @@
 'use babel'
 
+import Path from 'path'
+import FS from 'fs'
 import ChildProcess from 'child_process'
 import CP from 'childprocess-promise'
+
+export const bundledEslintPath = Path.join(FS.realpathSync(Path.join(__dirname, '..')), 'node_modules', 'eslint')
 
 export function spawnWorker() {
   let shouldLive = true
@@ -33,4 +37,14 @@ export function spawnWorker() {
     killer()
     process.removeListener('exit', killer)
   }}}
+}
+
+export function getCliFromPath(path) {
+  try {
+    return require(Path.join(path, 'lib', 'cli.js'))
+  } catch (e) {
+    if (e.code === 'MODULE_NOT_FOUND') {
+      throw new Error('ESLint not found, Please install or make sure Atom is getting $PATH correctly')
+    } else throw e
+  }
 }
