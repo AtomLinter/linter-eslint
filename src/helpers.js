@@ -66,7 +66,7 @@ let bundledEslintDirectory = null
 
 export function getBundledEslintDirectory() {
   if (bundledEslintDirectory === null) {
-    bundledEslintDirectory = Path.join(FS.realpathSync(Path.join(__dirname, '..')), 'node_modules', 'eslint')
+    bundledEslintDirectory = Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint'))
   }
   return bundledEslintDirectory
 }
