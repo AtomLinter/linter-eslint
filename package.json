@@ -11,7 +11,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "compile": "ucompiler go"
+    "compile": "ucompiler go src"
   },
   "dependencies": {
     "atom-linter": "^3.4.0",
