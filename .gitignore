@@ -1,6 +1,4 @@
-node_modules
+/lib/
+/node_modules/
 *.log
 .idea
-
-# Keep node_modules test fixtures
-!spec/fixtures/local-eslint/node_modules

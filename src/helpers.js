@@ -84,17 +84,15 @@ export function getEslintDirectory(params, modulesPath = null) {
     const prefixPath = getNodePrefixPath()
     if (process.platform === 'win32') {
       return Path.join(params.nodePath || prefixPath, 'node_modules', 'eslint')
-    } else {
-      return Path.join(params.nodePath || prefixPath, 'lib', 'node_modules', 'eslint')
     }
-  } else {
-    const eslintPath = Path.join(modulesPath || getModulesDirectory(params.fileDir), 'eslint')
-    try {
-      FS.accessSync(eslintPath, FS.R_OK)
-      return eslintPath
-    } catch (_) {
-      return getBundledEslintDirectory()
-    }
+    return Path.join(params.nodePath || prefixPath, 'lib', 'node_modules', 'eslint')
+  }
+  const eslintPath = Path.join(modulesPath || getModulesDirectory(params.fileDir), 'eslint')
+  try {
+    FS.accessSync(eslintPath, FS.R_OK)
+    return eslintPath
+  } catch (_) {
+    return getBundledEslintDirectory()
   }
 }
 

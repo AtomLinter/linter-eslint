@@ -10,4 +10,7 @@ notifications:
     on_failure: change
 os: osx
 
-script: 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
+script:
+  - npm i
+  - npm run compile
+  - 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'

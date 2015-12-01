@@ -1,13 +1,15 @@
 dependencies:
-  override:
-    - wget -O atom-amd64.deb https://atom.io/download/deb
+  pre:
     - sudo apt-get update
+    - sudo apt-get install wget
+  post:
+    - wget -O atom-amd64.deb https://atom.io/download/deb
     - sudo dpkg --install atom-amd64.deb || true
     - sudo apt-get -f install -y
-    - atom -v
-    - apm install
 test:
   override:
-    - ./node_modules/.bin/eslint lib
-    - ./node_modules/.bin/eslint spec
+    - npm run lint
+    - npm run compile
+    - atom -v
+    - apm install
     - apm test
