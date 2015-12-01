@@ -2,36 +2,33 @@
 // Note: 'use babel' doesn't work in forked processes
 process.title = 'linter-eslint helper'
 
-const CP = require('childprocess-promise')
-const execFileSync = require('child_process').execFileSync
-const Path = require('path')
+import Path from 'path'
+import {execFileSync} from 'child_process'
+import CP from 'childprocess-promise'
+import resolveEnv from 'resolve-end'
+import * as Helpers from './helpers'
 
-const resolveEnv = require('resolve-env')
-const Helpers = require('./es5-helpers')
-
-const findEslintDir = Helpers.findEslintDir
-const find = Helpers.find
-const determineConfigFile = Helpers.determineConfigFile
-const getEslintCli = Helpers.getEslintCli
 const Communication = new CP()
 
-// closed-over module-scope variables
-let eslintPath = null
-let eslint = null
+let eslint
+let lastEslintDirectory
 
-Communication.on('JOB', function(job) {
-  const params = job.Message
-  const modulesPath = find(params.fileDir, 'node_modules')
-  const eslintignoreDir = Path.dirname(find(params.fileDir, '.eslintignore'))
-  let configFile = null
+Communication.on('JOB', function(Job) {
   global.__LINTER_RESPONSE = []
 
-  // Check for config file and determine whether to bail out
-  configFile = determineConfigFile(params)
+  const params = Job.Message
+  const modulesPath = Helpers.getModulesDirectory(params.fileDir)
+  const ignoreFile = Helpers.getIgnoresFile(params.fileDir)
+  const configFile = Helpers.getEslintConfig(params.fileDir)
+  const eslintDirectory = Helpers.getEslintDirectory(params, modulesPath)
 
   if (params.canDisable && configFile === null) {
-    job.Response = []
-    return
+    return Job.Response = []
+  }
+
+  if (eslintDirectory !== lastEslintDirectory) {
+    lastEslintDirectory = eslintDirectory
+    eslint = Helpers.getEslintFromDirectory(eslintDirectory)
   }
 
   if (modulesPath) {
@@ -39,25 +36,19 @@ Communication.on('JOB', function(job) {
   } else process.env.NODE_PATH = ''
   require('module').Module._initPaths()
 
-  // Determine which eslint instance to use
-  const eslintNewPath = findEslintDir(params)
-  if (eslintNewPath !== eslintPath) {
-    eslint = getEslintCli(eslintNewPath)
-    eslintPath = eslintNewPath
-  }
-
-  job.Response = new Promise(function(resolve) {
+  Job.Response = new Promise(function(resolve) {
     let filePath
-    if (eslintignoreDir) {
-      filePath = Path.relative(eslintignoreDir, params.filePath)
-      process.chdir(eslintignoreDir)
+    if (ignoreFile) {
+      filePath = Path.relative(ignoreFile, params.filePath)
+      process.chdir(ignoreFile)
     } else {
       filePath = Path.basename(params.filePath)
       process.chdir(params.fileDir)
     }
+
     const argv = [
       process.execPath,
-      eslintPath,
+      eslintDirectory,
       '--stdin',
       '--format',
       Path.join(__dirname, 'reporter.js')
@@ -77,6 +68,7 @@ Communication.on('JOB', function(job) {
     }
     argv.push('--stdin-filename', filePath)
     process.argv = argv
+
     eslint.execute(process.argv, params.contents)
     resolve(global.__LINTER_RESPONSE)
   })

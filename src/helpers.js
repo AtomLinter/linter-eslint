@@ -46,7 +46,7 @@ export function getIgnoresFile(fileDir) {
   return Path.dirname(find(fileDir, '.eslintignore'))
 }
 
-export function getCliFromDirectory(path) {
+export function getEslintFromDirectory(path) {
   try {
     return require(Path.join(path, 'lib', 'cli.js'))
   } catch (e) {
