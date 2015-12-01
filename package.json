@@ -23,12 +23,13 @@
   },
   "devDependencies": {
     "babel-eslint": "^4.1.5",
+    "babel-preset-steelbrain": "^1.0.0",
+    "babel-preset-steelbrain-legacy": "^1.0.0",
     "eslint-config-airbnb": "latest",
     "eslint-config-steelbrain": "latest",
     "eslint-plugin-import": "^0.11.0",
     "eslint-plugin-react": "^3.10.0",
-    "shelljs": "^0.5.3",
-    "babel-preset-steelbrain": "^1.0.0"
+    "shelljs": "^0.5.3"
   },
   "package-deps": [
     "linter"
@@ -46,7 +47,10 @@
       "no-empty": 0,
       "no-console": 0,
       "no-new": 0,
-      "semi": [2, "never"]
+      "semi": [
+        2,
+        "never"
+      ]
     },
     "parser": "babel-eslint",
     "globals": {

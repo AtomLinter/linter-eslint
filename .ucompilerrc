@@ -4,7 +4,7 @@
     "path": "src/*.js",
     "outputPath": "lib/{name}.js",
     "babel": {
-      "presets": ["steelbrain"]
+      "presets": ["steelbrain", "steelbrain-legacy"]
     }
   }]
 }
