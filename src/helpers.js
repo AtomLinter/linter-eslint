@@ -4,7 +4,7 @@ import Path from 'path'
 import FS from 'fs'
 import ChildProcess from 'child_process'
 import CP from 'childprocess-promise'
-import {findFile} from 'atom-linter'
+import {findFile as find} from 'atom-linter'
 
 export function spawnWorker() {
   let shouldLive = true
@@ -80,7 +80,7 @@ export function getEslintDirectory(params) {
       return Path.join(params.nodePath || prefixPath, 'lib', 'node_modules', 'eslint')
     }
   } else {
-    const modulesPath = findFile(params.fileDir, 'node_modules')
+    const modulesPath = find(params.fileDir, 'node_modules')
     const eslintPath = Path.join(modulesPath, 'eslint')
     try {
       FS.accessSync(eslintPath, FS.R_OK)
@@ -88,5 +88,25 @@ export function getEslintDirectory(params) {
     } catch (_) {
       return getBundledEslintDirectory()
     }
+  }
+}
+
+export function getEslintConfig(params) {
+  const configFile = find(params.fileDir, ['.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc']) || null
+  if (configFile) {
+    return configFile
+  }
+
+  const packagePath = find(params.fileDir, 'package.json')
+  if (packagePath && Boolean(require(packagePath).eslintConfig)) {
+    return packagePath
+  }
+
+  if (params.canDisable) {
+    return null
+  }
+
+  if (params.configFile) {
+    return params.configFile
   }
 }
