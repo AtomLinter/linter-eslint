@@ -38,6 +38,10 @@ export function spawnWorker() {
   }}}
 }
 
+export function getModulesDirectory(fileDir) {
+  return find(fileDir, 'node_modules')
+}
+
 export function getCliFromDirectory(path) {
   try {
     return require(Path.join(path, 'lib', 'cli.js'))
@@ -71,7 +75,7 @@ export function getBundledEslintDirectory() {
   return bundledEslintDirectory
 }
 
-export function getEslintDirectory(params) {
+export function getEslintDirectory(params, modulesPath) {
   if (params.global) {
     const prefixPath = getNodePrefixPath()
     if (process.platform === 'win32') {
@@ -80,7 +84,6 @@ export function getEslintDirectory(params) {
       return Path.join(params.nodePath || prefixPath, 'lib', 'node_modules', 'eslint')
     }
   } else {
-    const modulesPath = find(params.fileDir, 'node_modules')
     const eslintPath = Path.join(modulesPath, 'eslint')
     try {
       FS.accessSync(eslintPath, FS.R_OK)
