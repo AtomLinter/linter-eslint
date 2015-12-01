@@ -79,7 +79,7 @@ export function getBundledEslintDirectory() {
   return bundledEslintDirectory
 }
 
-export function getEslintDirectory(params, modulesPath) {
+export function getEslintDirectory(params, modulesPath = null) {
   if (params.global) {
     const prefixPath = getNodePrefixPath()
     if (process.platform === 'win32') {
@@ -88,7 +88,7 @@ export function getEslintDirectory(params, modulesPath) {
       return Path.join(params.nodePath || prefixPath, 'lib', 'node_modules', 'eslint')
     }
   } else {
-    const eslintPath = Path.join(modulesPath, 'eslint')
+    const eslintPath = Path.join(modulesPath || getModulesDirectory(params.fileDir), 'eslint')
     try {
       FS.accessSync(eslintPath, FS.R_OK)
       return eslintPath
@@ -116,4 +116,25 @@ export function getEslintConfig(params) {
   if (params.configFile) {
     return params.configFile
   }
+}
+
+let eslint
+let lastEslintDirectory
+let lastModulesPath
+
+export function getEslint(params) {
+  const modulesPath = getModulesDirectory(params.fileDir)
+  const eslintDirectory = getEslintDirectory(params, modulesPath)
+  if (eslintDirectory !== lastEslintDirectory) {
+    lastEslintDirectory = eslintDirectory
+    eslint = getEslintFromDirectory(eslintDirectory)
+  }
+  if (lastModulesPath !== modulesPath) {
+    lastModulesPath = modulesPath
+    if (modulesPath) {
+      process.env.NODE_PATH = modulesPath
+    } else process.env.NODE_PATH = ''
+    require('module').Module._initPaths()
+  }
+  return {eslint, eslintDirectory}
 }

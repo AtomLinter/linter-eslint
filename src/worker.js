@@ -10,31 +10,18 @@ import * as Helpers from './helpers'
 
 const Communication = new CP()
 
-let eslint
-let lastEslintDirectory
-
 Communication.on('JOB', function(Job) {
   global.__LINTER_RESPONSE = []
 
   const params = Job.Message
-  const modulesPath = Helpers.getModulesDirectory(params.fileDir)
   const ignoreFile = Helpers.getIgnoresFile(params.fileDir)
   const configFile = Helpers.getEslintConfig(params.fileDir)
-  const eslintDirectory = Helpers.getEslintDirectory(params, modulesPath)
+  const {eslint, eslintDirectory} = Helpers.getEslint(params)
 
   if (params.canDisable && configFile === null) {
     return Job.Response = []
   }
 
-  if (eslintDirectory !== lastEslintDirectory) {
-    lastEslintDirectory = eslintDirectory
-    eslint = Helpers.getEslintFromDirectory(eslintDirectory)
-  }
-
-  if (modulesPath) {
-    process.env.NODE_PATH = modulesPath
-  } else process.env.NODE_PATH = ''
-  require('module').Module._initPaths()
 
   Job.Response = new Promise(function(resolve) {
     let filePath
@@ -74,28 +61,29 @@ Communication.on('JOB', function(Job) {
   })
 })
 
-Communication.on('FIX', function(fixJob) {
-  const params = fixJob.Message
-  const eslintDir = findEslintDir(params)
-  const configFile = determineConfigFile(params)
-  const eslintBinPath = Path.normalize(Path.join(eslintDir, 'bin', 'eslint.js'))
+Communication.on('FIX', function(Job) {
+  const params = Job.Message
+  const {eslint, eslintDirectory} = Helpers.getEslint(params)
+  const configFile = Helpers.getEslintConfig(params)
 
   const argv = [
+    process.execPath,
+    eslintDirectory,
     params.filePath,
     '--fix'
   ]
   if (configFile !== null) {
     argv.push('--config', resolveEnv(configFile))
   }
+  process.argv = argv
+  process.chdir(params.fileDir)
 
-  fixJob.Response = new Promise(function(resolve, reject) {
-    try {
-      execFileSync(eslintBinPath, argv, {cwd: params.fileDir})
-    } catch (err) {
-      reject('Linter-ESLint: Fix Attempt Completed, Linting Errors Remain')
-    }
-    resolve('Linter-ESLint: Fix Complete')
-  })
+  try {
+    eslint.execute(process.argv)
+  } catch (_) {
+    throw new Error('Linter-ESLint: Fix Attempt Completed, Linting Errors Remain')
+  }
+  return 'Linter-ESLint: Fix Complete'
 })
 
 process.exit = function() { /* Stop eslint from closing the daemon */ }
