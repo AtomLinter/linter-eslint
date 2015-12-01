@@ -42,6 +42,10 @@ export function getModulesDirectory(fileDir) {
   return find(fileDir, 'node_modules')
 }
 
+export function getIgnoresFile(fileDir) {
+  return Path.dirname(find(fileDir, '.eslintignore'))
+}
+
 export function getCliFromDirectory(path) {
   try {
     return require(Path.join(path, 'lib', 'cli.js'))
