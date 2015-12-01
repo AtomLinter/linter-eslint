@@ -3,7 +3,6 @@
 process.title = 'linter-eslint helper'
 
 import Path from 'path'
-import {execFileSync} from 'child_process'
 import CP from 'childprocess-promise'
 import resolveEnv from 'resolve-end'
 import * as Helpers from './helpers'
@@ -19,7 +18,8 @@ Communication.on('JOB', function(Job) {
   const {eslint, eslintDirectory} = Helpers.getEslint(params)
 
   if (params.canDisable && configFile === null) {
-    return Job.Response = []
+    Job.Response = []
+    return Job.Response
   }
 
 

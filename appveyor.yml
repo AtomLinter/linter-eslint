@@ -14,5 +14,7 @@ build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - SET PATH=%LOCALAPPDATA%\atom\bin;%PATH%
   - apm clean
+  - npm i
+  - npm run compile
   - apm install
   - apm test
