@@ -2,7 +2,7 @@
   "name": "linter-eslint",
   "main": "./lib/main",
   "activationCommands": [],
-  "version": "5.2.4",
+  "version": "5.2.5",
   "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
@@ -44,7 +44,10 @@
       "no-empty": 0,
       "no-console": 0,
       "no-new": 0,
-      "semi": [2, "never"]
+      "semi": [
+        2,
+        "never"
+      ]
     },
     "parser": "babel-eslint",
     "globals": {
