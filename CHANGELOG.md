@@ -1,3 +1,9 @@
+### v5.2.5
+
+* Fix file import resolution (#340)
+* Fix a bug detecting `.eslintrc.js` configurations (#343)
+* Fix file now uses the same worker as for linting (#307)
+
 ### v5.2.4
 
 * Update dependencies to bring in some bug fixes
