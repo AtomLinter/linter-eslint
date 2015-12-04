@@ -7,10 +7,13 @@
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=1.0.0"
   },
   "scripts": {
-    "lint": "eslint ."
+    "clean": "rm -rf lib",
+    "lint": "eslint .",
+    "compile": "babel src --out-dir lib",
+    "apm-publish": "npm run clean && npm run compile && apm publish"
   },
   "dependencies": {
     "atom-linter": "^3.4.0",
@@ -21,7 +24,10 @@
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "^4.1.5",
+    "babel-cli": "^6.2.0",
+    "babel-eslint": "^4.1.6",
+    "babel-preset-steelbrain": "^1.0.0",
+    "babel-preset-steelbrain-legacy": "^1.0.0",
     "eslint-config-airbnb": "latest",
     "eslint-config-steelbrain": "latest",
     "eslint-plugin-import": "^0.11.0",

@@ -1,0 +1,10 @@
+{
+  "plugins": ["babel"],
+  "rules": [{
+    "path": "src/*.js",
+    "outputPath": "lib/{name}.js",
+    "babel": {
+      "presets": ["steelbrain", "steelbrain-legacy"]
+    }
+  }]
+}

@@ -7,7 +7,7 @@ import {
   determineConfigFile,
   findEslintDir,
   getEslintCli
-} from '../lib/es5-helpers'
+} from '../lib/helpers'
 
 let fixtureDir
 
