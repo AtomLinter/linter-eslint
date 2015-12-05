@@ -22,8 +22,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^4.1.5",
-    "eslint-config-airbnb": "latest",
-    "eslint-config-steelbrain": "latest",
+    "eslint-config-airbnb": "^1.0.2",
     "eslint-plugin-import": "^0.11.0",
     "eslint-plugin-react": "^3.10.0",
     "shelljs": "^0.5.3"
@@ -39,16 +38,21 @@
     }
   },
   "eslintConfig": {
-    "extends": "steelbrain",
     "rules": {
       "no-empty": 0,
       "no-console": 0,
       "no-new": 0,
+      "no-extra-semi": 1,
+      "semi": 0,
+      "func-names": 0,
+      "strict": [0, "never"],
+      "comma-dangle": 0,
       "semi": [
         2,
         "never"
       ]
     },
+    "extends": "airbnb/base",
     "parser": "babel-eslint",
     "globals": {
       "atom": "true"
