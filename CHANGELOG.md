@@ -1,3 +1,7 @@
+### Upcoming
+
+* Fix file exception on Windows resolution (#353)
+
 ### v5.2.5
 
 * Fix file import resolution (#340)
