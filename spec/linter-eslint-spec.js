@@ -1,7 +1,7 @@
 'use babel'
 
 describe('The eslint provider for Linter', () => {
-  const {spawnWorker} = require('../lib/helpers')
+  const { spawnWorker } = require('../lib/helpers')
   const worker = spawnWorker()
   const lint = require('../lib/main').provideLinter.call(worker).lint
 
