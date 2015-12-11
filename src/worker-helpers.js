@@ -78,7 +78,7 @@ export function getConfigPath(fileDir) {
 }
 
 export function getRelativePath(fileDir, filePath, config) {
-  const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir)
+  const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
 
   if (ignoreFile) {
     const ignoreDir = Path.dirname(ignoreFile)
@@ -118,4 +118,6 @@ export function getArgv(config, filePath, fileDir, configPath) {
     argv.push('--no-ignore')
   }
   argv.push('--stdin-filename', filePath)
+
+  return argv
 }
