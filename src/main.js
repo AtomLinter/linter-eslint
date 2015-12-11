@@ -83,12 +83,10 @@ module.exports = {
           return
         }
 
-        this.worker.request('FIX', {
-          fileDir: fileDir,
-          filePath: filePath,
-          global: atom.config.get('linter-eslint.useGlobalEslint'),
-          nodePath: atom.config.get('linter-eslint.globalNodePath'),
-          configFile: atom.config.get('linter-eslint.eslintrcPath')
+        this.worker.request('job', {
+          type: 'lint',
+          config: atom.config.get('linter-eslint'),
+          filePath: filePath
         }).then(function(response) {
           atom.notifications.addSuccess(response)
         }).catch(function(response) {
@@ -98,17 +96,15 @@ module.exports = {
     }))
 
     const initializeWorker = () => {
-      if (this.active) {
-        const {worker, subscription} = spawnWorker()
-        this.worker = worker
-        this.subscriptions.add(subscription)
-        worker.onDidExit(() => {
-          if (this.active) {
-            atom.notifications.addWarning('[Linter-ESLint] Worker died unexpectedly', {detail: 'Check your console for more info. A new worker will be spawned instantly.', dismissable: true})
-            setTimeout(initializeWorker, 1000)
-          }
-        })
-      }
+      const {worker, subscription} = spawnWorker()
+      this.worker = worker
+      this.subscriptions.add(subscription)
+      worker.onDidExit(() => {
+        if (this.active) {
+          atom.notifications.addWarning('[Linter-ESLint] Worker died unexpectedly', {detail: 'Check your console for more info. A new worker will be spawned instantly.', dismissable: true})
+          setTimeout(initializeWorker, 1000)
+        }
+      })
     }
     initializeWorker()
   },
@@ -129,23 +125,14 @@ module.exports = {
           return Promise.resolve([])
         }
         const filePath = textEditor.getPath()
-        const fileDir = Path.dirname(filePath)
         const showRule = atom.config.get('linter-eslint.showRuleIdInMessage')
 
-        return this.worker.request('JOB', {
-          fileDir: fileDir,
-          filePath: filePath,
+        return this.worker.request('job', {
           contents: text,
-          global: atom.config.get('linter-eslint.useGlobalEslint'),
-          canDisable: atom.config.get('linter-eslint.disableWhenNoEslintConfig'),
-          nodePath: atom.config.get('linter-eslint.globalNodePath'),
-          rulesDir: atom.config.get('linter-eslint.eslintRulesDir'),
-          configFile: atom.config.get('linter-eslint.eslintrcPath'),
-          disableIgnores: atom.config.get('linter-eslint.disableEslintIgnore')
+          type: 'lint',
+          config: atom.config.get('linter-eslint'),
+          filePath: filePath
         }).then(function(response) {
-          if (response.length === 1 && response[0].message === 'File ignored because of your .eslintignore file. Use --no-ignore to override.') {
-            return []
-          }
           return response.map(function({message, line, severity, ruleId, column}) {
             const range = Helpers.rangeFromLineNumber(textEditor, line - 1)
             if (column) {
