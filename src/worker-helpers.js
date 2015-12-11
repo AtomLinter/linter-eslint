@@ -7,7 +7,7 @@ import resolveEnv from 'resolve-env'
 import {findCached} from 'atom-linter'
 
 const Cache = {
-  ESLINT_LOCAL_PATH: Path.normalize(__dirname, '..', 'node_modules', 'eslint'),
+  ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
   NODE_PREFIX_PATH: null,
   LAST_MODULES_PATH: null
 }
@@ -29,10 +29,7 @@ export function getESLintFromDirectory(modulesDir, config) {
       ESLintDirectory = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
   } else {
-    if (modulesDir === null) {
-      throw new Error('Cannot find module `eslint`')
-    }
-    ESLintDirectory = Path.join(modulesDir, 'eslint')
+    ESLintDirectory = Path.join(modulesDir || '', 'eslint')
   }
   try {
     return require(Path.join(ESLintDirectory, 'lib', 'cli.js'))
@@ -40,7 +37,7 @@ export function getESLintFromDirectory(modulesDir, config) {
     if (config.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
       throw new Error('ESLint not found, Please install or make sure Atom is getting $PATH correctly')
     }
-    return require(Cache.ESLINT_LOCAL_PATH)
+    return require(Path.join(Cache.ESLINT_LOCAL_PATH, 'lib', 'cli.js'))
   }
 }
 
@@ -91,9 +88,7 @@ export function getRelativePath(fileDir, filePath, config) {
 }
 
 export function getArgv(config, filePath, fileDir, configPath) {
-  if (configPath === null && config.disableWhenNoEslintConfig) {
-    return []
-  } else {
+  if (configPath === null) {
     configPath = config.eslintrcPath || null
   }
   const argv = [
