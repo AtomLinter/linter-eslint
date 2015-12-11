@@ -5,10 +5,14 @@ process.title = 'linter-eslint helper'
 import Path from 'path'
 import * as Helpers from './worker-helpers'
 import {create} from 'process-communication'
-import {findCached} from 'atom-linter'
+import {findCached, FindCache} from 'atom-linter'
 
 create().onRequest('job', function({contents, type, config, filePath}, job) {
   global.__LINTER_ESLINT_RESPONSE = []
+
+  if (config.disableFSCache) {
+    FindCache.clear()
+  }
 
   const fileDir = Path.dirname(filePath)
   const eslint = Helpers.getESLintInstance(fileDir, config)

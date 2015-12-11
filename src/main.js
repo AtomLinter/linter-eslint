@@ -51,6 +51,12 @@ module.exports = {
       title: 'Disable using .eslintignore files',
       type: 'boolean',
       default: false
+    },
+    disableFSCache: {
+      title: 'Disable FileSystem Cache',
+      description: 'Paths of node_modules, .eslintignore and others are cached',
+      type: 'boolean',
+      default: false
     }
   },
   activate: function() {
