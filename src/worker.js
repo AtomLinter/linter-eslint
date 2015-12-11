@@ -2,60 +2,40 @@
 // Note: 'use babel' doesn't work in forked processes
 process.title = 'linter-eslint helper'
 
-const CP = require('childprocess-promise')
-const Path = require('path')
+import Path from 'path'
+import CP from 'childprocess-promise'
+import resolveEnv from 'resolve-end'
+import * as Helpers from './helpers'
 
-const resolveEnv = require('resolve-env')
-const Helpers = require('./helpers')
-
-const findEslintDir = Helpers.findEslintDir
-const find = Helpers.find
-const determineConfigFile = Helpers.determineConfigFile
-const getEslintCli = Helpers.getEslintCli
 const Communication = new CP()
 
-// closed-over module-scope variables
-let eslintPath = null
-let eslint = null
-
-Communication.on('JOB', function(job) {
-  const params = job.Message
-  const modulesPath = find(params.fileDir, 'node_modules')
-  const eslintignoreDir = Path.dirname(find(params.fileDir, '.eslintignore'))
-  // Check for config file
-  const configFile = determineConfigFile(params)
+Communication.on('JOB', function(Job) {
   global.__LINTER_RESPONSE = []
 
-  // Determine whether to bail out
+  const params = Job.Message
+  const ignoreFile = Helpers.getIgnoresFile(params.fileDir)
+  const configFile = Helpers.getEslintConfig(params.fileDir)
+  const {eslint, eslintDirectory} = Helpers.getEslint(params)
+
   if (params.canDisable && configFile === null) {
-    job.Response = []
-    return
+    Job.Response = []
+    return Job.Response
   }
 
-  if (modulesPath) {
-    process.env.NODE_PATH = modulesPath
-  } else process.env.NODE_PATH = ''
-  require('module').Module._initPaths()
 
-  // Determine which eslint instance to use
-  const eslintNewPath = findEslintDir(params)
-  if (eslintNewPath !== eslintPath) {
-    eslint = getEslintCli(eslintNewPath)
-    eslintPath = eslintNewPath
-  }
-
-  job.Response = new Promise(function(resolve) {
+  Job.Response = new Promise(function(resolve) {
     let filePath
-    if (eslintignoreDir) {
-      filePath = Path.relative(eslintignoreDir, params.filePath)
-      process.chdir(eslintignoreDir)
+    if (ignoreFile) {
+      filePath = Path.relative(ignoreFile, params.filePath)
+      process.chdir(ignoreFile)
     } else {
       filePath = Path.basename(params.filePath)
       process.chdir(params.fileDir)
     }
+
     const argv = [
       process.execPath,
-      eslintPath,
+      eslintDirectory,
       '--stdin',
       '--format',
       Path.join(__dirname, 'reporter.js')
@@ -67,7 +47,7 @@ Communication.on('JOB', function(job) {
       }
       argv.push('--rulesdir', rulesDir)
     }
-    if (typeof configFile === 'string') {
+    if (configFile !== null) {
       argv.push('--config', resolveEnv(configFile))
     }
     if (params.disableIgnores) {
@@ -75,48 +55,35 @@ Communication.on('JOB', function(job) {
     }
     argv.push('--stdin-filename', filePath)
     process.argv = argv
+
     eslint.execute(process.argv, params.contents)
     resolve(global.__LINTER_RESPONSE)
   })
 })
 
-Communication.on('FIX', function(fixJob) {
-  const params = fixJob.Message
-  const modulesPath = find(params.fileDir, 'node_modules')
-  const configFile = determineConfigFile(params)
-
-  if (modulesPath) {
-    process.env.NODE_PATH = modulesPath
-  } else process.env.NODE_PATH = ''
-  require('module').Module._initPaths()
-
-  // Determine which eslint instance to use
-  const eslintNewPath = findEslintDir(params)
-  if (eslintNewPath !== eslintPath) {
-    eslint = getEslintCli(eslintNewPath)
-    eslintPath = eslintNewPath
-  }
+Communication.on('FIX', function(Job) {
+  const params = Job.Message
+  const {eslint, eslintDirectory} = Helpers.getEslint(params)
+  const configFile = Helpers.getEslintConfig(params)
 
   const argv = [
     process.execPath,
-    eslintPath,
+    eslintDirectory,
     params.filePath,
     '--fix'
   ]
-
-  if (typeof configFile === 'string') {
+  if (configFile !== null) {
     argv.push('--config', resolveEnv(configFile))
   }
+  process.argv = argv
+  process.chdir(params.fileDir)
 
-  fixJob.Response = new Promise(function(resolve, reject) {
-    try {
-      process.argv = argv
-      eslint.execute(process.argv)
-    } catch (err) {
-      reject('Linter-ESLint: Fix Attempt Completed, Linting Errors Remain')
-    }
-    resolve('Linter-ESLint: Fix Complete')
-  })
+  try {
+    eslint.execute(process.argv)
+  } catch (_) {
+    throw new Error('Linter-ESLint: Fix Attempt Completed, Linting Errors Remain')
+  }
+  return 'Linter-ESLint: Fix Complete'
 })
 
 process.exit = function() { /* Stop eslint from closing the daemon */ }
