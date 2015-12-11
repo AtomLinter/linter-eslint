@@ -5,7 +5,7 @@ import {CompositeDisposable} from 'atom'
 import {spawnWorker} from './helpers'
 import escapeHTML from 'escape-html'
 
-export default {
+module.exports = {
   config: {
     lintHtmlFiles: {
       title: 'Lint HTML Files',
@@ -105,13 +105,15 @@ export default {
 
     const initializeWorker = () => {
       if (this.active) {
-        if (this.worker !== null) {
-          atom.notifications.addWarning('[Linter-ESLint] Worker died unexpectedly', {detail: 'Check your console for more info. A new worker will be spawned instantly.', dismissable: true})
-        }
         const {worker, subscription} = spawnWorker()
         this.worker = worker
         this.subscriptions.add(subscription)
-        worker.onDidExit(initializeWorker)
+        worker.onDidExit(() => {
+          if (this.active) {
+            atom.notifications.addWarning('[Linter-ESLint] Worker died unexpectedly', {detail: 'Check your console for more info. A new worker will be spawned instantly.', dismissable: true})
+            setTimeout(initializeWorker, 1000)
+          }
+        })
       }
     }
     initializeWorker()
