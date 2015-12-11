@@ -3,39 +3,30 @@
 import Path from 'path'
 import FS from 'fs'
 import ChildProcess from 'child_process'
-import CP from 'childprocess-promise'
+import {Disposable} from 'atom'
+import {createFromProcess} from 'process-communication'
 import {find} from 'atom-linter'
 
 export function spawnWorker() {
-  let shouldLive = true
   const env = Object.create(process.env)
+
   delete env.NODE_PATH
   delete env.NODE_ENV
-  const data = {stdout: [], stderr: []}
+  delete env.OS
+
   const child = ChildProcess.fork(__dirname + '/worker.js', [], {env, silent: true})
-  const worker = new CP(child)
-  function killer() {
-    shouldLive = false
-    child.kill()
-  }
-  child.stdout.on('data', function(chunk) {
-    data.stdout.push(chunk)
+  const worker = createFromProcess(child)
+
+  child.stdout.on('data', function (chunk) {
+    console.log('[Linter-ESLint] STDOUT', chunk)
   })
-  child.stderr.on('data', function(chunk) {
-    data.stderr.push(chunk)
+  child.stderr.on('data', function (chunk) {
+    console.log('[Linter-ESLint] STDERR', chunk)
   })
-  child.on('exit', function() {
-    if (shouldLive) {
-      console.log('ESLint Worker Info', {stdout: data.stdout.join(''), stderr: data.stderr.join('')})
-      atom.notifications.addWarning('[Linter-ESLint] Worker died unexpectedly', {detail: 'Check your console for more info. A new worker will be spawned instantly.', dismissable: true})
-    }
-    child.emit('exit-linter', shouldLive)
-  })
-  process.on('exit', killer)
-  return {child, worker, subscription: {dispose: function() {
-    killer()
-    process.removeListener('exit', killer)
-  }}}
+
+  return {worker, subscription: new Disposable(function() {
+    worker.kill()
+  })}
 }
 
 export function getModulesDirectory(fileDir) {
