@@ -1,89 +1,42 @@
-'use strict'
+'use babel'
 // Note: 'use babel' doesn't work in forked processes
 process.title = 'linter-eslint helper'
 
 import Path from 'path'
-import CP from 'childprocess-promise'
-import resolveEnv from 'resolve-env'
-import * as Helpers from './helpers'
+import * as Helpers from './worker-helpers'
+import {create} from 'process-communication'
+import {findCached} from 'atom-linter'
 
-const Communication = new CP()
+create().onRequest('job', function({contents, type, config, filePath}, job) {
+  global.__LINTER_ESLINT_RESPONSE = []
 
-Communication.on('JOB', function(Job) {
-  global.__LINTER_RESPONSE = []
+  const fileDir = Path.dirname(filePath)
+  const eslint = Helpers.getESLintInstance(fileDir, config)
+  const configPath = Helpers.getConfigPath(fileDir)
+  const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config)
 
-  const params = Job.Message
-  const ignoreFile = Helpers.getIgnoresFile(params.fileDir)
-  const configFile = Helpers.getEslintConfig(params.fileDir) || null
-  const {eslint, eslintDirectory} = Helpers.getEslint(params)
+  const argv = Helpers.getArgv(config, relativeFilePath, fileDir, configPath)
 
-  if (params.canDisable && configFile === null) {
-    Job.Response = []
-    return Job.Response
+  if (type === 'lint') {
+    job.response = lintJob(argv, contents, eslint)
+  } else if (type === 'fix') {
+    job.response = fixJob(argv, eslint)
   }
-
-
-  Job.Response = new Promise(function(resolve) {
-    let filePath
-    if (ignoreFile) {
-      filePath = Path.relative(ignoreFile, params.filePath)
-      process.chdir(ignoreFile)
-    } else {
-      filePath = Path.basename(params.filePath)
-      process.chdir(params.fileDir)
-    }
-
-    const argv = [
-      process.execPath,
-      eslintDirectory,
-      '--stdin',
-      '--format',
-      Path.join(__dirname, 'reporter.js')
-    ]
-    if (params.rulesDir) {
-      let rulesDir = resolveEnv(params.rulesDir)
-      if (!Path.isAbsolute(rulesDir)) {
-        rulesDir = find(params.fileDir, rulesDir)
-      }
-      argv.push('--rulesdir', rulesDir)
-    }
-    if (configFile !== null) {
-      argv.push('--config', resolveEnv(configFile))
-    }
-    if (params.disableIgnores) {
-      argv.push('--no-ignore')
-    }
-    argv.push('--stdin-filename', filePath)
-    process.argv = argv
-
-    eslint.execute(process.argv, params.contents)
-    resolve(global.__LINTER_RESPONSE)
-  })
 })
 
-Communication.on('FIX', function(Job) {
-  const params = Job.Message
-  const {eslint, eslintDirectory} = Helpers.getEslint(params)
-  const configFile = Helpers.getEslintConfig(params) || null
-
-  const argv = [
-    process.execPath,
-    eslintDirectory,
-    params.filePath,
-    '--fix'
-  ]
-  if (configFile !== null) {
-    argv.push('--config', resolveEnv(configFile))
-  }
-  process.argv = argv
-  process.chdir(params.fileDir)
-
+function lintJob(argv, contents, eslint) {
+  eslint.execute(argv, contents)
+  return global.__LINTER_ESLINT_RESPONSE
+}
+function fixJob(argv, eslint) {
+  argv.push('--fix')
   try {
-    eslint.execute(process.argv)
-  } catch (_) {
+    process.argv = argv
+    eslint.execute(argv)
+    return 'Linter-ESLint: Fix Complete'
+  } catch (err) {
     throw new Error('Linter-ESLint: Fix Attempt Completed, Linting Errors Remain')
   }
-  return 'Linter-ESLint: Fix Complete'
-})
+}
 
 process.exit = function() { /* Stop eslint from closing the daemon */ }
