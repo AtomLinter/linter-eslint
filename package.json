@@ -13,7 +13,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "atom-linter": "^3.4.0",
+    "atom-linter": "^4.0.1",
     "atom-package-deps": "^3.0.5",
     "childprocess-promise": "^3.0.0",
     "escape-html": "^1.0.3",
@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^4.1.5",
-    "eslint-config-airbnb": "^1.0.2",
+    "eslint-config-airbnb": "^2.0.0",
     "eslint-plugin-import": "^0.11.0",
     "eslint-plugin-react": "^3.10.0",
     "shelljs": "^0.5.3"

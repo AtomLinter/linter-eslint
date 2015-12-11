@@ -2,7 +2,7 @@
 
 import Path from 'path'
 import OS from 'os'
-import {mkdir, cp, rm} from 'shelljs'
+import { mkdir, cp, rm } from 'shelljs'
 import {
   determineConfigFile,
   findEslintDir,
