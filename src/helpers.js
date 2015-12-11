@@ -18,10 +18,10 @@ export function spawnWorker() {
   const worker = createFromProcess(child)
 
   child.stdout.on('data', function (chunk) {
-    console.log('[Linter-ESLint] STDOUT', chunk)
+    console.log('[Linter-ESLint] STDOUT', chunk.toString())
   })
   child.stderr.on('data', function (chunk) {
-    console.log('[Linter-ESLint] STDERR', chunk)
+    console.log('[Linter-ESLint] STDERR', chunk.toString())
   })
 
   return {worker, subscription: new Disposable(function() {
