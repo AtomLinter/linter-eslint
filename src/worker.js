@@ -6,7 +6,7 @@ const CP = require('childprocess-promise')
 const Path = require('path')
 
 const resolveEnv = require('resolve-env')
-const Helpers = require('./es5-helpers')
+const Helpers = require('./helpers')
 
 const findEslintDir = Helpers.findEslintDir
 const find = Helpers.find
