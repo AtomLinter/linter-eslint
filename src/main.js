@@ -83,12 +83,6 @@ module.exports = {
           return
         }
 
-        if (this.worker === null) {
-          // Abort if worker is not yet ready
-          atom.notifications.addError('Linter-ESLint: Not ready, please try again')
-          return
-        }
-
         this.worker.request('FIX', {
           fileDir: fileDir,
           filePath: filePath,
@@ -137,15 +131,6 @@ module.exports = {
         const filePath = textEditor.getPath()
         const fileDir = Path.dirname(filePath)
         const showRule = atom.config.get('linter-eslint.showRuleIdInMessage')
-
-        if (this.worker === null) {
-          return Promise.resolve([{
-            filePath: filePath,
-            type: 'Info',
-            text: 'Worker initialization is delayed. Please try saving or typing to begin linting.',
-            range: Helpers.rangeFromLineNumber(textEditor, 0)
-          }])
-        }
 
         return this.worker.request('JOB', {
           fileDir: fileDir,
