@@ -4,7 +4,6 @@ import ChildProcess from 'child_process'
 import {Disposable} from 'atom'
 import {createFromProcess} from 'process-communication'
 
-
 export function spawnWorker() {
   const env = Object.create(process.env)
 
