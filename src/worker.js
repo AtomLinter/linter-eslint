@@ -4,7 +4,7 @@ process.title = 'linter-eslint helper'
 
 import Path from 'path'
 import CP from 'childprocess-promise'
-import resolveEnv from 'resolve-end'
+import resolveEnv from 'resolve-env'
 import * as Helpers from './helpers'
 
 const Communication = new CP()
@@ -14,7 +14,7 @@ Communication.on('JOB', function(Job) {
 
   const params = Job.Message
   const ignoreFile = Helpers.getIgnoresFile(params.fileDir)
-  const configFile = Helpers.getEslintConfig(params.fileDir)
+  const configFile = Helpers.getEslintConfig(params.fileDir) || null
   const {eslint, eslintDirectory} = Helpers.getEslint(params)
 
   if (params.canDisable && configFile === null) {
@@ -64,7 +64,7 @@ Communication.on('JOB', function(Job) {
 Communication.on('FIX', function(Job) {
   const params = Job.Message
   const {eslint, eslintDirectory} = Helpers.getEslint(params)
-  const configFile = Helpers.getEslintConfig(params)
+  const configFile = Helpers.getEslintConfig(params) || null
 
   const argv = [
     process.execPath,
