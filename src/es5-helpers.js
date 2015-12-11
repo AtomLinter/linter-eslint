@@ -3,7 +3,7 @@
 const ChildProcess = require('child_process')
 const Path = require('path')
 const FS = require('fs')
-const find = require('atom-linter').findFile
+const find = require('atom-linter').find
 
 let prefixPath = null
 const atomEslintPath = Path.join(FS.realpathSync(Path.join(__dirname, '..')), 'node_modules', 'eslint')
