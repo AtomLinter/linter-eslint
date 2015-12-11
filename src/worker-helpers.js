@@ -3,6 +3,7 @@
 import Path from 'path'
 import FS from 'fs'
 import ChildProcess from 'child_process'
+import resolveEnv from 'resolve-env'
 import {findCached} from 'atom-linter'
 
 const Cache = {
@@ -11,10 +12,8 @@ const Cache = {
   LAST_MODULES_PATH: null
 }
 
-export function getESLintInstance(filePath, config) {
-  const fileDir = Path.dirname(filePath)
+export function getESLintInstance(fileDir, config) {
   const modulesDir = findCached(fileDir, 'node_modules')
-
   refreshModulesPath(modulesDir)
   return getESLintFromDirectory(modulesDir, config)
 }
@@ -76,4 +75,47 @@ export function getConfigPath(fileDir) {
     return packagePath
   }
   return null
+}
+
+export function getRelativePath(fileDir, filePath, config) {
+  const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir)
+
+  if (ignoreFile) {
+    const ignoreDir = Path.dirname(ignoreFile)
+    process.chdir(ignoreDir)
+    return Path.relative(ignoreDir, filePath)
+  } else {
+    process.chdir(fileDir)
+    return Path.basename(filePath)
+  }
+}
+
+export function getArgv(config, filePath, fileDir, configPath) {
+  if (configPath === null && config.disableWhenNoEslintConfig) {
+    return []
+  } else {
+    configPath = config.eslintrcPath || null
+  }
+  const argv = [
+    process.execPath,
+    'a-b-c', // dummy value for eslint cwd
+    '--stdin',
+    '--format',
+    Path.join(__dirname, 'reporter.js')
+  ]
+
+  if (config.eslintRulesDir) {
+    let rulesDir = resolveEnv(config.eslintRulesDir)
+    if (!Path.isAbsolute(rulesDir)) {
+      rulesDir = findCached(fileDir, rulesDir)
+    }
+    argv.push('--rulesdir', rulesDir)
+  }
+  if (configPath) {
+    argv.push('--config', resolveEnv(configPath))
+  }
+  if (config.disableEslintIgnore) {
+    argv.push('--no-ignore')
+  }
+  argv.push('--stdin-filename', filePath)
 }
