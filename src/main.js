@@ -103,25 +103,18 @@ export default {
       }
     }))
 
-    // Reason: I (steelbrain) have observed that if we spawn a
-    // process while atom is starting up, it can increase startup
-    // time by several seconds, But if we do this after 5 seconds,
-    // we barely feel a thing.
     const initializeWorker = () => {
       if (this.active) {
-        const {child, worker, subscription} = spawnWorker()
+        if (this.worker !== null) {
+          atom.notifications.addWarning('[Linter-ESLint] Worker died unexpectedly', {detail: 'Check your console for more info. A new worker will be spawned instantly.', dismissable: true})
+        }
+        const {worker, subscription} = spawnWorker()
         this.worker = worker
         this.subscriptions.add(subscription)
-        child.on('exit-linter', shouldLive => {
-          this.worker = null
-          // Respawn if it crashed. See atom/electron#3446
-          if (shouldLive) {
-            initializeWorker()
-          }
-        })
+        worker.onDidExit(initializeWorker)
       }
     }
-    setTimeout(initializeWorker, 5 * 1000)
+    initializeWorker()
   },
   deactivate: function() {
     this.active = false
