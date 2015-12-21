@@ -52,8 +52,7 @@
         0,
         "never"
       ],
-      "comma-dangle": 0,
-      "indent": [1, 2]
+      "comma-dangle": 0
     },
     "extends": "airbnb/base",
     "parser": "babel-eslint",
