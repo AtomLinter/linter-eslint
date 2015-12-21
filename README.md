@@ -44,7 +44,7 @@ To do this in a straightforward way run this:
 eslint --init
 ```
 
-Alternatively you can create the `.eslintrc` file by yourself. In any way it is a good idea to have a look at the [Get Started With ESLint](http://devnull.guru/get-started-with-eslint/) blog post by [IanVS](https://github.com/IanVS) and obviously [the ESLint documenatation](http://eslint.org/docs/user-guide/configuring), especially the [list of rules](http://eslint.org/docs/rules/).
+Alternatively you can create the `.eslintrc` file by yourself. In any way it is a good idea to have a look at the [Get Started With ESLint](http://devnull.guru/get-started-with-eslint/) blog post by [IanVS](https://github.com/IanVS) and obviously [the ESLint documentation](http://eslint.org/docs/user-guide/configuring), especially the [list of rules](http://eslint.org/docs/rules/).
 
 ## Contributing
 
