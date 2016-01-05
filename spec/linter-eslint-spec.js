@@ -68,8 +68,9 @@ describe('The eslint provider for Linter', () => {
 
   describe('when resolving import paths using eslint-plugin-import', () => {
     it('correctly resolves imports from parent', () => {
+      const importingpath = `${__dirname}/fixtures/import-resolution/nested/importing.js`
       waitsForPromise(() => {
-        return atom.workspace.open(`${__dirname}/fixtures/import-resolution/nested/importing.js`).then(editor => {
+        return atom.workspace.open(importingpath).then(editor => {
           return lint(editor).then(messages => {
             expect(messages.length).toEqual(0)
           })
