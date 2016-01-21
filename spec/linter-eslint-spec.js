@@ -36,26 +36,30 @@ describe('The eslint provider for Linter', () => {
       })
     })
 
-    it('finds at least one message', () =>
-      lint(editor).then(messages =>
-        expect(messages.length).toBeGreaterThan(0)
+    it('finds at least one message', () => {
+      waitsForPromise(() =>
+        lint(editor).then(messages => {
+          expect(messages.length).toBeGreaterThan(0)
+        })
       )
-    )
+    })
 
-    it('verifies that message', () =>
-      lint(editor).then(messages => {
-        expect(messages[0].type).toBeDefined()
-        expect(messages[0].type).toEqual('Error')
-        expect(messages[0].html).not.toBeDefined()
-        expect(messages[0].text).toBeDefined()
-        expect(messages[0].text).toEqual('"foo" is not defined.')
-        expect(messages[0].filePath).toBeDefined()
-        expect(messages[0].filePath).toMatch(/.+spec[\\\/]fixtures[\\\/]files[\\\/]bad\.js$/)
-        expect(messages[0].range).toBeDefined()
-        expect(messages[0].range.length).toEqual(2)
-        expect(messages[0].range).toEqual([[0, 0], [0, 9]])
-      })
-    )
+    it('verifies that message', () => {
+      waitsForPromise(() =>
+        lint(editor).then(messages => {
+          expect(messages[0].type).toBeDefined()
+          expect(messages[0].type).toEqual('Error')
+          expect(messages[0].html).not.toBeDefined()
+          expect(messages[0].text).toBeDefined()
+          expect(messages[0].text).toEqual('"foo" is not defined.')
+          expect(messages[0].filePath).toBeDefined()
+          expect(messages[0].filePath).toMatch(/.+spec[\\\/]fixtures[\\\/]files[\\\/]bad\.js$/)
+          expect(messages[0].range).toBeDefined()
+          expect(messages[0].range.length).toEqual(2)
+          expect(messages[0].range).toEqual([[0, 0], [0, 9]])
+        })
+      )
+    })
   })
 
   it('finds nothing wrong with an empty file', () => {
