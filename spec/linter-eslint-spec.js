@@ -18,6 +18,7 @@ describe('The eslint provider for Linter', () => {
 
   beforeEach(() => {
     atom.config.set('linter-eslint.disableFSCache', false)
+    atom.config.set('linter-eslint.disableEslintIgnore', true)
     waitsForPromise(() =>
       atom.packages.activatePackage('language-javascript').then(() =>
         atom.workspace.open(goodPath)
@@ -28,12 +29,11 @@ describe('The eslint provider for Linter', () => {
   describe('checks bad.js and', () => {
     let editor = null
     beforeEach(() => {
-      waitsForPromise(() => {
-        atom.config.set('linter-eslint.disableEslintIgnore', true)
-        return atom.workspace.open(badPath).then(openEditor => {
+      waitsForPromise(() =>
+        atom.workspace.open(badPath).then(openEditor => {
           editor = openEditor
         })
-      })
+      )
     })
 
     it('finds at least one message', () => {
@@ -95,6 +95,9 @@ describe('The eslint provider for Linter', () => {
   })
 
   describe('when a file is specified in an .eslintignore file', () => {
+    beforeEach(() => {
+      atom.config.set('linter-eslint.disableEslintIgnore', false)
+    })
     it('will not give warnings for the file', () => {
       waitsForPromise(() =>
         atom.workspace.open(ignoredPath).then(editor =>
