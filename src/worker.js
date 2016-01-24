@@ -4,12 +4,30 @@ process.title = 'linter-eslint helper'
 
 import Path from 'path'
 import * as Helpers from './worker-helpers'
-import {create} from 'process-communication'
-import {findCached, FindCache} from 'atom-linter'
+import { create } from 'process-communication'
+import { FindCache } from 'atom-linter'
 
-const IGNORED_MESSAGE = 'File ignored because of your .eslintignore file. Use --no-ignore to override.'
+const IGNORED_MESSAGE =
+  'File ignored because of your .eslintignore file. Use --no-ignore to override.'
 
-create().onRequest('job', function({contents, type, config, filePath}, job) {
+function lintJob(argv, contents, eslint, configPath, config) {
+  if (configPath === null && config.disableWhenNoEslintConfig) {
+    return []
+  }
+  eslint.execute(argv, contents)
+  return global.__LINTER_ESLINT_RESPONSE
+    .filter(e => e.message !== IGNORED_MESSAGE)
+}
+function fixJob(argv, eslint) {
+  try {
+    eslint.execute(argv)
+    return 'Linter-ESLint: Fix Complete'
+  } catch (err) {
+    throw new Error('Linter-ESLint: Fix Attempt Completed, Linting Errors Remain')
+  }
+}
+
+create().onRequest('job', function ({ contents, type, config, filePath }, job) {
   global.__LINTER_ESLINT_RESPONSE = []
 
   if (config.disableFSCache) {
@@ -30,21 +48,4 @@ create().onRequest('job', function({contents, type, config, filePath}, job) {
   }
 })
 
-function lintJob(argv, contents, eslint, configPath, config) {
-  if (configPath === null && config.disableWhenNoEslintConfig) {
-    return []
-  }
-  eslint.execute(argv, contents)
-  return global.__LINTER_ESLINT_RESPONSE
-    .filter(e => e.message !== IGNORED_MESSAGE)
-}
-function fixJob(argv, eslint) {
-  try {
-    eslint.execute(argv)
-    return 'Linter-ESLint: Fix Complete'
-  } catch (err) {
-    throw new Error('Linter-ESLint: Fix Attempt Completed, Linting Errors Remain')
-  }
-}
-
-process.exit = function() { /* Stop eslint from closing the daemon */ }
+process.exit = function () { /* Stop eslint from closing the daemon */ }

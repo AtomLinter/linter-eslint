@@ -1,8 +1,7 @@
 'use babel'
 
-import Path from 'path'
-import {CompositeDisposable} from 'atom'
-import {spawnWorker} from './helpers'
+import { CompositeDisposable } from 'atom'
+import { spawnWorker, showError } from './helpers'
 import escapeHTML from 'escape-html'
 
 module.exports = {
@@ -59,7 +58,7 @@ module.exports = {
       default: false
     }
   },
-  activate: function() {
+  activate() {
     require('atom-package-deps').install()
 
     this.subscriptions = new CompositeDisposable()
@@ -91,33 +90,34 @@ module.exports = {
         this.worker.request('job', {
           type: 'fix',
           config: atom.config.get('linter-eslint'),
-          filePath: filePath
-        }).then(function(response) {
+          filePath
+        }).then(function (response) {
           atom.notifications.addSuccess(response)
-        }).catch(function(response) {
+        }).catch(function (response) {
           atom.notifications.addWarning(response)
         })
       }
     }))
 
     const initializeWorker = () => {
-      const {worker, subscription} = spawnWorker()
+      const { worker, subscription } = spawnWorker()
       this.worker = worker
       this.subscriptions.add(subscription)
       worker.onDidExit(() => {
         if (this.active) {
-          atom.notifications.addWarning('[Linter-ESLint] Worker died unexpectedly', {detail: 'Check your console for more info. A new worker will be spawned instantly.', dismissable: true})
+          showError('Worker died unexpectedly', 'Check your console for more ' +
+          'info. A new worker will be spawned instantly.')
           setTimeout(initializeWorker, 1000)
         }
       })
     }
     initializeWorker()
   },
-  deactivate: function() {
+  deactivate() {
     this.active = false
     this.subscriptions.dispose()
   },
-  provideLinter: function() {
+  provideLinter() {
     const Helpers = require('atom-linter')
     return {
       name: 'ESLint',
@@ -136,9 +136,9 @@ module.exports = {
           contents: text,
           type: 'lint',
           config: atom.config.get('linter-eslint'),
-          filePath: filePath
-        }).then(function(response) {
-          return response.map(function({message, line, severity, ruleId, column}) {
+          filePath
+        }).then(function (response) {
+          return response.map(function ({ message, line, severity, ruleId, column }) {
             const range = Helpers.rangeFromLineNumber(textEditor, line - 1)
             if (column) {
               range[0][1] = column - 1
@@ -147,12 +147,13 @@ module.exports = {
               range[1][1] = column - 1
             }
             const ret = {
-              filePath: filePath,
+              filePath,
               type: severity === 1 ? 'Warning' : 'Error',
-              range: range
+              range
             }
             if (showRule) {
-              ret.html = `<span class="badge badge-flexible">${ruleId || 'Fatal'}</span> ${escapeHTML(message)}`
+              ret.html = '<span class="badge badge-flexible">' + (ruleId || 'Fatal') +
+                '</span> ' + escapeHTML(message)
             } else {
               ret.text = message
             }

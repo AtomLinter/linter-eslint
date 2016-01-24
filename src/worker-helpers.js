@@ -1,10 +1,9 @@
 'use babel'
 
 import Path from 'path'
-import FS from 'fs'
 import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
-import {findCached} from 'atom-linter'
+import { findCached } from 'atom-linter'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
@@ -12,10 +11,19 @@ const Cache = {
   LAST_MODULES_PATH: null
 }
 
-export function getESLintInstance(fileDir, config) {
-  const modulesDir = findCached(fileDir, 'node_modules')
-  refreshModulesPath(modulesDir)
-  return getESLintFromDirectory(modulesDir, config)
+export function getNodePrefixPath() {
+  if (Cache.NODE_PREFIX_PATH === null) {
+    const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+    try {
+      Cache.NODE_PREFIX_PATH =
+        ChildProcess.spawnSync(npmCommand, ['get', 'prefix']).output[1].toString().trim()
+    } catch (e) {
+      throw new Error(
+        'Unable to execute `npm get prefix`. Please make sure Atom is getting $PATH correctly'
+      )
+    }
+  }
+  return Cache.NODE_PREFIX_PATH
 }
 
 export function getESLintFromDirectory(modulesDir, config) {
@@ -35,7 +43,9 @@ export function getESLintFromDirectory(modulesDir, config) {
     return require(Path.join(ESLintDirectory, 'lib', 'cli.js'))
   } catch (e) {
     if (config.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
-      throw new Error('ESLint not found, Please install or make sure Atom is getting $PATH correctly')
+      throw new Error(
+        'ESLint not found, Please install or make sure Atom is getting $PATH correctly'
+      )
     }
     return require(Path.join(Cache.ESLINT_LOCAL_PATH, 'lib', 'cli.js'))
   }
@@ -49,20 +59,17 @@ export function refreshModulesPath(modulesDir) {
   }
 }
 
-export function getNodePrefixPath() {
-  if (Cache.NODE_PREFIX_PATH === null) {
-    const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
-    try {
-      Cache.NODE_PREFIX_PATH = ChildProcess.spawnSync(npmCommand, ['get', 'prefix']).output[1].toString().trim()
-    } catch (e) {
-      throw new Error('Unable to execute `npm get prefix`. Please make sure Atom is getting $PATH correctly')
-    }
-  }
-  return Cache.NODE_PREFIX_PATH
+export function getESLintInstance(fileDir, config) {
+  const modulesDir = findCached(fileDir, 'node_modules')
+  refreshModulesPath(modulesDir)
+  return getESLintFromDirectory(modulesDir, config)
 }
 
 export function getConfigPath(fileDir) {
-  const configFile = findCached(fileDir, ['.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc'])
+  const configFile =
+    findCached(fileDir, [
+      '.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc'
+    ])
   if (configFile) {
     return configFile
   }
@@ -81,16 +88,17 @@ export function getRelativePath(fileDir, filePath, config) {
     const ignoreDir = Path.dirname(ignoreFile)
     process.chdir(ignoreDir)
     return Path.relative(ignoreDir, filePath)
-  } else {
-    process.chdir(fileDir)
-    return Path.basename(filePath)
   }
+  process.chdir(fileDir)
+  return Path.basename(filePath)
 }
 
-export function getArgv(type, config, filePath, fileDir, configPath) {
-  if (configPath === null) {
+export function getArgv(type, config, filePath, fileDir, givenConfigPath) {
+  let configPath
+  if (givenConfigPath === null) {
     configPath = config.eslintrcPath || null
-  }
+  } else configPath = givenConfigPath
+
   const argv = [
     process.execPath,
     'a-b-c' // dummy value for eslint cwd
