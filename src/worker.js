@@ -19,7 +19,7 @@ create().onRequest('job', function({contents, type, config, filePath}, job) {
   const configPath = Helpers.getConfigPath(fileDir)
   const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config)
 
-  const argv = Helpers.getArgv(config, relativeFilePath, fileDir, configPath)
+  const argv = Helpers.getArgv(type, config, relativeFilePath, fileDir, configPath)
 
   if (type === 'lint') {
     job.response = lintJob(argv, contents, eslint, configPath, config)
@@ -36,9 +36,7 @@ function lintJob(argv, contents, eslint, configPath, config) {
   return global.__LINTER_ESLINT_RESPONSE
 }
 function fixJob(argv, eslint) {
-  argv.push('--fix')
   try {
-    process.argv = argv
     eslint.execute(argv)
     return 'Linter-ESLint: Fix Complete'
   } catch (err) {

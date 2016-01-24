@@ -87,17 +87,18 @@ export function getRelativePath(fileDir, filePath, config) {
   }
 }
 
-export function getArgv(config, filePath, fileDir, configPath) {
+export function getArgv(type, config, filePath, fileDir, configPath) {
   if (configPath === null) {
     configPath = config.eslintrcPath || null
   }
   const argv = [
     process.execPath,
-    'a-b-c', // dummy value for eslint cwd
-    '--stdin',
-    '--format',
-    Path.join(__dirname, 'reporter.js')
+    'a-b-c' // dummy value for eslint cwd
   ]
+  if (type === 'lint') {
+    argv.push('--stdin')
+  }
+  argv.push('--format', Path.join(__dirname, 'reporter.js'))
 
   if (config.eslintRulesDir) {
     let rulesDir = resolveEnv(config.eslintRulesDir)
@@ -112,7 +113,12 @@ export function getArgv(config, filePath, fileDir, configPath) {
   if (config.disableEslintIgnore) {
     argv.push('--no-ignore')
   }
-  argv.push('--stdin-filename', filePath)
+  if (type === 'lint') {
+    argv.push('--stdin-filename', filePath)
+  } else if (type === 'fix') {
+    argv.push(filePath)
+    argv.push('--fix')
+  }
 
   return argv
 }
