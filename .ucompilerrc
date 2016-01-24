@@ -6,7 +6,7 @@
       "outputPathTrim": "src/",
       "plugins": ["babel"],
       "babel": {
-        "presets": ["steelbrain", "steelbrain-legacy"]
+        "presets": ["steelbrain"]
       }
     }
   ]
