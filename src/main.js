@@ -5,7 +5,7 @@ import {CompositeDisposable} from 'atom'
 import {spawnWorker} from './helpers'
 import escapeHTML from 'escape-html'
 
-export default {
+module.exports = {
   config: {
     lintHtmlFiles: {
       title: 'Lint HTML Files',
@@ -51,6 +51,12 @@ export default {
       title: 'Disable using .eslintignore files',
       type: 'boolean',
       default: false
+    },
+    disableFSCache: {
+      title: 'Disable FileSystem Cache',
+      description: 'Paths of node_modules, .eslintignore and others are cached',
+      type: 'boolean',
+      default: false
     }
   },
   activate: function() {
@@ -83,18 +89,10 @@ export default {
           return
         }
 
-        if (this.worker === null) {
-          // Abort if worker is not yet ready
-          atom.notifications.addError('Linter-ESLint: Not ready, please try again')
-          return
-        }
-
-        this.worker.request('FIX', {
-          fileDir: fileDir,
-          filePath: filePath,
-          global: atom.config.get('linter-eslint.useGlobalEslint'),
-          nodePath: atom.config.get('linter-eslint.globalNodePath'),
-          configFile: atom.config.get('linter-eslint.eslintrcPath')
+        this.worker.request('job', {
+          type: 'lint',
+          config: atom.config.get('linter-eslint'),
+          filePath: filePath
         }).then(function(response) {
           atom.notifications.addSuccess(response)
         }).catch(function(response) {
@@ -103,25 +101,18 @@ export default {
       }
     }))
 
-    // Reason: I (steelbrain) have observed that if we spawn a
-    // process while atom is starting up, it can increase startup
-    // time by several seconds, But if we do this after 5 seconds,
-    // we barely feel a thing.
     const initializeWorker = () => {
-      if (this.active) {
-        const {child, worker, subscription} = spawnWorker()
-        this.worker = worker
-        this.subscriptions.add(subscription)
-        child.on('exit-linter', shouldLive => {
-          this.worker = null
-          // Respawn if it crashed. See atom/electron#3446
-          if (shouldLive) {
-            initializeWorker()
-          }
-        })
-      }
+      const {worker, subscription} = spawnWorker()
+      this.worker = worker
+      this.subscriptions.add(subscription)
+      worker.onDidExit(() => {
+        if (this.active) {
+          atom.notifications.addWarning('[Linter-ESLint] Worker died unexpectedly', {detail: 'Check your console for more info. A new worker will be spawned instantly.', dismissable: true})
+          setTimeout(initializeWorker, 1000)
+        }
+      })
     }
-    setTimeout(initializeWorker, 5 * 1000)
+    initializeWorker()
   },
   deactivate: function() {
     this.active = false
@@ -140,32 +131,14 @@ export default {
           return Promise.resolve([])
         }
         const filePath = textEditor.getPath()
-        const fileDir = Path.dirname(filePath)
         const showRule = atom.config.get('linter-eslint.showRuleIdInMessage')
 
-        if (this.worker === null) {
-          return Promise.resolve([{
-            filePath: filePath,
-            type: 'Info',
-            text: 'Worker initialization is delayed. Please try saving or typing to begin linting.',
-            range: Helpers.rangeFromLineNumber(textEditor, 0)
-          }])
-        }
-
-        return this.worker.request('JOB', {
-          fileDir: fileDir,
-          filePath: filePath,
+        return this.worker.request('job', {
           contents: text,
-          global: atom.config.get('linter-eslint.useGlobalEslint'),
-          canDisable: atom.config.get('linter-eslint.disableWhenNoEslintConfig'),
-          nodePath: atom.config.get('linter-eslint.globalNodePath'),
-          rulesDir: atom.config.get('linter-eslint.eslintRulesDir'),
-          configFile: atom.config.get('linter-eslint.eslintrcPath'),
-          disableIgnores: atom.config.get('linter-eslint.disableEslintIgnore')
+          type: 'lint',
+          config: atom.config.get('linter-eslint'),
+          filePath: filePath
         }).then(function(response) {
-          if (response.length === 1 && response[0].message === 'File ignored because of your .eslintignore file. Use --no-ignore to override.') {
-            return []
-          }
           return response.map(function({message, line, severity, ruleId, column}) {
             const range = Helpers.rangeFromLineNumber(textEditor, line - 1)
             if (column) {
