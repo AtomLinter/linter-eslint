@@ -81,7 +81,6 @@ module.exports = {
       'linter-eslint:fix-file': () => {
         const textEditor = atom.workspace.getActiveTextEditor()
         const filePath = textEditor.getPath()
-        const fileDir = Path.dirname(filePath)
 
         if (!textEditor || textEditor.isModified()) {
           // Abort for invalid or unsaved text editors
