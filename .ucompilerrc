@@ -1,0 +1,13 @@
+{
+  "rules": [
+    {
+      "path": "src/**/*.js",
+      "outputPath": "lib/{relativeDir}{name}.js",
+      "outputPathTrim": "src/",
+      "plugins": ["babel"],
+      "babel": {
+        "presets": ["steelbrain"]
+      }
+    }
+  ]
+}

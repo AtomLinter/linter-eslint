@@ -1,11 +1,14 @@
 'use babel'
 
+import linter from '../lib/main'
+
 describe('The eslint provider for Linter', () => {
   const { spawnWorker } = require('../lib/helpers')
   const worker = spawnWorker()
-  const lint = require('../lib/main').provideLinter.call(worker).lint
+  const lint = linter.provideLinter.call(worker).lint
 
   beforeEach(() => {
+    atom.config.set('linter-eslint.disableFSCache', false)
     waitsForPromise(() => {
       return atom.packages.activatePackage('language-javascript').then(() =>
         atom.workspace.open(__dirname + '/fixtures/files/good.js')
