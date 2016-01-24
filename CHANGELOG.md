@@ -1,4 +1,6 @@
-### Upcoming
+### v5.2.7
+
+* Remove timeout from worker spawn
 
 ### v5.2.6
 

@@ -36,6 +36,15 @@ You have two options:
   * Activate `Use Global Eslint` package option
   * (Optional) Set `Global Node Path` with `$ npm config get prefix`
 
+## Using ESLint
+
+Note that recent versions of ESLint do not use any rules by-default. This means you have to specify a configuration file for your project!
+To do this in a straightforward way run this:
+```ShellSession
+eslint --init
+```
+
+Alternatively you can create the `.eslintrc` file by yourself. It is a good idea to have a look at the [Get Started With ESLint](http://devnull.guru/get-started-with-eslint/) blog post by [IanVS](https://github.com/IanVS) and [the ESLint documentation](http://eslint.org/docs/user-guide/configuring), including the [list of rules](http://eslint.org/docs/rules/).
 
 ## Contributing
 
