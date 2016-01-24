@@ -90,7 +90,7 @@ module.exports = {
         }
 
         this.worker.request('job', {
-          type: 'lint',
+          type: 'fix',
           config: atom.config.get('linter-eslint'),
           filePath: filePath
         }).then(function(response) {
