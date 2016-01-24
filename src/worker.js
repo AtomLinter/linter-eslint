@@ -7,6 +7,8 @@ import * as Helpers from './worker-helpers'
 import {create} from 'process-communication'
 import {findCached, FindCache} from 'atom-linter'
 
+const IGNORED_MESSAGE = 'File ignored because of your .eslintignore file. Use --no-ignore to override.'
+
 create().onRequest('job', function({contents, type, config, filePath}, job) {
   global.__LINTER_ESLINT_RESPONSE = []
 
@@ -34,6 +36,7 @@ function lintJob(argv, contents, eslint, configPath, config) {
   }
   eslint.execute(argv, contents)
   return global.__LINTER_ESLINT_RESPONSE
+    .filter(e => e.message !== IGNORED_MESSAGE)
 }
 function fixJob(argv, eslint) {
   try {
