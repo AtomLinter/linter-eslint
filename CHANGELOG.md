@@ -1,3 +1,8 @@
+### v6.0.0
+
+* Rewrite in ES6
+* Refactor the codebase and fix several bugs
+
 ### v5.2.7
 
 * Remove timeout from worker spawn
