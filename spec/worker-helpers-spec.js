@@ -32,7 +32,8 @@ describe('Worker Helpers', function () {
     })
 
     it('tries to find a local eslint with nested node_modules', function () {
-      const eslint = Helpers.getESLintInstance(Path.join(getFixturesPath('local-eslint'), 'lib', 'foo.js'), {})
+      const fileDir = Path.join(getFixturesPath('local-eslint'), 'lib', 'foo.js')
+      const eslint = Helpers.getESLintInstance(fileDir, {})
       expect(eslint).toBe('located')
     })
   })
