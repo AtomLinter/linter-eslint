@@ -60,7 +60,7 @@ export function refreshModulesPath(modulesDir) {
 }
 
 export function getESLintInstance(fileDir, config) {
-  const modulesDir = findCached(fileDir, 'node_modules')
+  const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint'))
   refreshModulesPath(modulesDir)
   return getESLintFromDirectory(modulesDir, config)
 }
