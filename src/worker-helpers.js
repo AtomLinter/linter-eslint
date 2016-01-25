@@ -4,6 +4,7 @@ import Path from 'path'
 import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
+import { getPath } from 'consistent-path'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
@@ -16,7 +17,9 @@ export function getNodePrefixPath() {
     const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
     try {
       Cache.NODE_PREFIX_PATH =
-        ChildProcess.spawnSync(npmCommand, ['get', 'prefix']).output[1].toString().trim()
+        ChildProcess.spawnSync(npmCommand, ['get', 'prefix'], {
+          env: Object.assign({}, process.env, {PATH: getPath()})
+        }).output[1].toString().trim()
     } catch (e) {
       throw new Error(
         'Unable to execute `npm get prefix`. Please make sure Atom is getting $PATH correctly'
