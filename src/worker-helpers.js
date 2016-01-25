@@ -24,7 +24,7 @@ export function getNodePrefixPath() {
     try {
       Cache.NODE_PREFIX_PATH =
         ChildProcess.spawnSync(npmCommand, ['get', 'prefix'], {
-          env: assign({}, process.env, {PATH: getPath()})
+          env: assign(assign({}, process.env), {PATH: getPath()})
         }).output[1].toString().trim()
     } catch (e) {
       throw new Error(
