@@ -91,11 +91,11 @@ module.exports = {
           type: 'fix',
           config: atom.config.get('linter-eslint'),
           filePath
-        }).then(function (response) {
+        }).then((response) =>
           atom.notifications.addSuccess(response)
-        }).catch(function (response) {
+        ).catch((response) =>
           atom.notifications.addWarning(response)
-        })
+        )
       }
     }))
 
@@ -137,8 +137,8 @@ module.exports = {
           type: 'lint',
           config: atom.config.get('linter-eslint'),
           filePath
-        }).then(function (response) {
-          return response.map(function ({ message, line, severity, ruleId, column }) {
+        }).then((response) =>
+          response.map(({ message, line, severity, ruleId, column }) => {
             const range = Helpers.rangeFromLineNumber(textEditor, line - 1)
             if (column) {
               range[0][1] = column - 1
@@ -152,14 +152,14 @@ module.exports = {
               range
             }
             if (showRule) {
-              ret.html = '<span class="badge badge-flexible">' + (ruleId || 'Fatal') +
-                '</span> ' + escapeHTML(message)
+              ret.html = '<span class="badge badge-flexible">' +
+                `${ruleId || 'Fatal'}</span>${escapeHTML(message)}`
             } else {
               ret.text = message
             }
             return ret
           })
-        })
+        )
       }
     }
   }
