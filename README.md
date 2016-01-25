@@ -45,21 +45,3 @@ eslint --init
 ```
 
 Alternatively you can create the `.eslintrc` file by yourself. It is a good idea to have a look at the [Get Started With ESLint](http://devnull.guru/get-started-with-eslint/) blog post by [IanVS](https://github.com/IanVS) and [the ESLint documentation](http://eslint.org/docs/user-guide/configuring), including the [list of rules](http://eslint.org/docs/rules/).
-
-## Contributing
-
-If you would like to contribute enhancements or fixes, please do the following:
-
-0. Fork the plugin repository
-0. Hack on a separate topic branch created from the latest `master`
-0. Commit and push the topic branch
-0. Make a pull request
-0. Welcome to the club!
-
-Please note that modifications should follow these coding guidelines:
-
-* Indent is 2 spaces
-* Code should pass the `eslint` linter with the provided `.eslintrc`
-* Vertical whitespace helps readability, don’t be afraid to use it
-
-Thank you for helping out!
