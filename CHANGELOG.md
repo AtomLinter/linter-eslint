@@ -1,3 +1,7 @@
+### v6.0.1
+
+* Workaround $PATH bug on OSX
+
 ### v6.0.0
 
 * Rewrite in ES6
