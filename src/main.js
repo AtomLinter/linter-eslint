@@ -1,6 +1,6 @@
 'use babel'
 
-import { CompositeDisposable } from 'atom'
+import { CompositeDisposable, Range } from 'atom'
 import { spawnWorker, showError } from './helpers'
 import escapeHTML from 'escape-html'
 
@@ -138,7 +138,19 @@ module.exports = {
           config: atom.config.get('linter-eslint'),
           filePath
         }).then((response) =>
-          response.map(({ message, line, severity, ruleId, column }) => {
+          response.map(({ message, line, severity, ruleId, column, fix }) => {
+            const textBuffer = textEditor.getBuffer()
+            let linterFix = null
+            if (fix) {
+              const fixRange = new Range(
+                textBuffer.positionForCharacterIndex(fix.range[0]),
+                textBuffer.positionForCharacterIndex(fix.range[1])
+              )
+              linterFix = {
+                range: fixRange,
+                newText: fix.text
+              }
+            }
             const range = Helpers.rangeFromLineNumber(textEditor, line - 1)
             if (column) {
               range[0][1] = column - 1
@@ -149,13 +161,17 @@ module.exports = {
             const ret = {
               filePath,
               type: severity === 1 ? 'Warning' : 'Error',
-              range
+              range,
+              fix: linterFix
             }
             if (showRule) {
               ret.html = '<span class="badge badge-flexible">' +
                 `${ruleId || 'Fatal'}</span>${escapeHTML(message)}`
             } else {
               ret.text = message
+            }
+            if (linterFix) {
+              ret.fix = linterFix
             }
             return ret
           })
