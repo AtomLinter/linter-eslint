@@ -27,7 +27,7 @@ function fixJob(argv, eslint) {
   }
 }
 
-create().onRequest('job', function ({ contents, type, config, filePath }, job) {
+create().onRequest('job', ({ contents, type, config, filePath }, job) => {
   global.__LINTER_ESLINT_RESPONSE = []
 
   if (config.disableFSCache) {
