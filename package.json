@@ -10,22 +10,27 @@
     "atom": ">0.50.0"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "watch": "ucompiler watch src",
+    "compile": "ucompiler go src"
   },
   "dependencies": {
-    "atom-linter": "^4.1.1",
-    "atom-package-deps": "^3.0.5",
+    "atom-linter": "^4.3.4",
+    "atom-package-deps": "^3.0.7",
     "consistent-path": "^1.0.3",
     "escape-html": "^1.0.3",
-    "eslint": "^1.10.1",
+    "eslint": "^1.10.3",
     "process-communication": "^1.1.0",
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "^4.1.5",
+    "babel-eslint": "^4.1.6",
     "eslint-config-airbnb": "^4.0.0",
-    "eslint-plugin-import": "^0.12.0",
-    "eslint-plugin-react": "^3.10.0"
+    "eslint-plugin-import": "^0.12.1",
+    "eslint-plugin-react": "^3.16.1",
+    "ucompiler": "^2.1.2",
+    "ucompiler-plugin-babel": "^1.0.3",
+    "babel-preset-steelbrain": "^1.0.1"
   },
   "package-deps": [
     "linter"
