@@ -11,6 +11,12 @@ const Cache = {
   NODE_PREFIX_PATH: null,
   LAST_MODULES_PATH: null
 }
+const assign = Object.assign || function(target, source) {
+    for (const key in source) {
+      target[key] = source[key]
+    }
+    return target
+  }
 
 export function getNodePrefixPath() {
   if (Cache.NODE_PREFIX_PATH === null) {
@@ -18,7 +24,7 @@ export function getNodePrefixPath() {
     try {
       Cache.NODE_PREFIX_PATH =
         ChildProcess.spawnSync(npmCommand, ['get', 'prefix'], {
-          env: Object.assign({}, process.env, {PATH: getPath()})
+          env: assign({}, process.env, {PATH: getPath()})
         }).output[1].toString().trim()
     } catch (e) {
       throw new Error(
