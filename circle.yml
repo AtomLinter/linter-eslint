@@ -13,6 +13,7 @@ dependencies:
     - apm install
 test:
   override:
-    - ./node_modules/.bin/eslint lib
+    - ./node_modules/.bin/eslint src
     - ./node_modules/.bin/eslint spec
+    - ./node_modules/.bin/eslint lib
     - apm test
