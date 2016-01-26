@@ -6,6 +6,7 @@ import * as path from 'path'
 const goodPath = path.join(__dirname, 'fixtures', 'files', 'good.js')
 const badPath = path.join(__dirname, 'fixtures', 'files', 'bad.js')
 const emptyPath = path.join(__dirname, 'fixtures', 'files', 'empty.js')
+const fixPath = path.join(__dirname, 'fixtures', 'files', 'fix.js')
 const importingpath = path.join(__dirname, 'fixtures',
   'import-resolution', 'nested', 'importing.js')
 const ignoredPath = path.join(__dirname, 'fixtures',
@@ -57,6 +58,7 @@ describe('The eslint provider for Linter', () => {
           expect(messages[0].range).toBeDefined()
           expect(messages[0].range.length).toEqual(2)
           expect(messages[0].range).toEqual([[0, 0], [0, 9]])
+          expect(messages[0].hasOwnProperty('fix')).toBeFalsy()
         })
       )
     })
@@ -79,6 +81,20 @@ describe('The eslint provider for Linter', () => {
           expect(messages.length).toEqual(0)
         })
       )
+    )
+  })
+
+  it('reports the fixes for fixable errors', () => {
+    waitsForPromise(() =>
+      atom.workspace.open(fixPath).then(editor =>
+        lint(editor)
+      ).then(messages => {
+        expect(messages[0].fix.range).toEqual([[0, 11], [0, 12]])
+        expect(messages[0].fix.newText).toEqual('')
+
+        expect(messages[1].fix.range).toEqual([[2, 1], [2, 1]])
+        expect(messages[1].fix.newText).toEqual(' ')
+      })
     )
   })
 
