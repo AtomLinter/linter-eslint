@@ -161,8 +161,7 @@ module.exports = {
             const ret = {
               filePath,
               type: severity === 1 ? 'Warning' : 'Error',
-              range,
-              fix: linterFix
+              range
             }
             if (showRule) {
               ret.html = '<span class="badge badge-flexible">' +
