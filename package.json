@@ -1,7 +1,6 @@
 {
   "name": "linter-eslint",
   "main": "./lib/main",
-  "activationCommands": [],
   "version": "6.0.0",
   "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
@@ -30,6 +29,7 @@
     "eslint-plugin-react": "^3.16.1",
     "ucompiler": "^2.1.2",
     "ucompiler-plugin-babel": "^1.0.3",
+    "ucompiler-plugin-newline": "^1.0.4",
     "babel-preset-steelbrain": "^1.0.1"
   },
   "package-deps": [
