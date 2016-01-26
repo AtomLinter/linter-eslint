@@ -1,6 +1,7 @@
-### v6.0.1
+### Upcoming
 
 * Workaround $PATH bug on OSX
+* Support the upcoming linter fix API
 
 ### v6.0.0
 
