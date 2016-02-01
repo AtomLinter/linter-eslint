@@ -21,9 +21,9 @@ Please note that modifications should follow these coding guidelines:
 
 ## Building
 
-The simplest procedure is to just run `npm run watch` in a terminal. This will
-launch `ucompiler` and tell it to watch the `src` directory, automatically
-recompiling any file that is updated for you. If you prefer to run this step
-manually, running `npm run compile` will also run `ucompiler go src` for you.
+The simplest procedure is to run `npm run watch` which executes
+`ucompiler watch`. UCompiler will automatically start watching the `src`
+directory and will recompile any changed files. If you prefer to compile
+them manually, use `npm run compile` which will run `ucompiler go` for you.
 
 Thank you for helping out!
