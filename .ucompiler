@@ -2,7 +2,7 @@
   "defaultRule": "compile-src",
   "rules": [{
     "name": "compile-src",
-    "plugins": ["babel"],
+    "plugins": ["babel", "newline"],
     "babel": {
       "presets": ["steelbrain"]
     },

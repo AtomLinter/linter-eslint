@@ -29,7 +29,7 @@
     "eslint-plugin-react": "^3.16.1",
     "ucompiler": "^3.0.1",
     "ucompiler-plugin-babel": "^3.0.0",
-    "ucompiler-plugin-newline": "^1.0.4",
+    "ucompiler-plugin-newline": "^3.0.0",
     "babel-preset-steelbrain": "^1.0.1"
   },
   "package-deps": [
