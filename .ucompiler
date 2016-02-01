@@ -1,0 +1,15 @@
+{
+  "defaultRule": "compile-src",
+  "rules": [{
+    "name": "compile-src",
+    "plugins": ["babel"],
+    "babel": {
+      "presets": ["steelbrain"]
+    },
+    "include": [{
+      "directory": "src",
+      "extensions": ["js"]
+    }],
+    "outputPath": "lib/{relativePath:4}"
+  }]
+}
