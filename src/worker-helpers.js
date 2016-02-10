@@ -112,7 +112,7 @@ export function getArgv(type, config, filePath, fileDir, givenConfigPath) {
 
   const argv = [
     process.execPath,
-    'a-b-c' // dummy value for eslint cwd
+    'a-b-c' // dummy value for eslint executable
   ]
   if (type === 'lint') {
     argv.push('--stdin')
