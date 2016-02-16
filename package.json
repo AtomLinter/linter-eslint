@@ -23,7 +23,7 @@
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "^4.1.6",
+    "babel-eslint": "^5.0.0",
     "eslint-config-airbnb": "^5.0.0",
     "eslint-plugin-import": "^0.13.0",
     "eslint-plugin-react": "^3.16.1",
