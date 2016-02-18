@@ -13,6 +13,7 @@ install:
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - SET PATH=%LOCALAPPDATA%\atom\bin;%PATH%
+  - apm -v
   - apm clean
   - apm install
   - apm test
