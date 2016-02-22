@@ -52,7 +52,7 @@ describe('The eslint provider for Linter', () => {
           expect(messages[0].type).toEqual('Error')
           expect(messages[0].html).not.toBeDefined()
           expect(messages[0].text).toBeDefined()
-          expect(messages[0].text).toEqual('"foo" is not defined.')
+          expect(messages[0].text).toEqual('\'foo\' is not defined.')
           expect(messages[0].filePath).toBeDefined()
           expect(messages[0].filePath).toMatch(/.+spec[\\\/]fixtures[\\\/]files[\\\/]bad\.js$/)
           expect(messages[0].range).toBeDefined()
