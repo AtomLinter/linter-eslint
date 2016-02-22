@@ -18,15 +18,15 @@
     "atom-package-deps": "^4.0.1",
     "consistent-path": "^1.0.3",
     "escape-html": "^1.0.3",
-    "eslint": "^1.10.3",
+    "eslint": "^2.2.0",
     "process-communication": "^1.1.0",
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^5.0.0",
-    "eslint-config-airbnb": "^5.0.0",
+    "eslint-config-airbnb": "^6.0.1",
     "eslint-plugin-import": "^0.13.0",
-    "eslint-plugin-react": "^3.16.1",
+    "eslint-plugin-react": "^4.0.0",
     "ucompiler": "^3.0.1",
     "ucompiler-plugin-babel": "^3.0.0",
     "ucompiler-plugin-newline": "^3.0.0",
