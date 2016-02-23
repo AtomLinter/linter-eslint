@@ -1,11 +1,11 @@
 # Changelog
 
-## v6.1.0
+## v7.0.0
 
 *   Fix finding local `eslint` instance again (#409)
 *   Workaround $PATH bug on OSX (#411)
 *   Support the upcoming linter fix API (#415)
-*   Update bundled `eslint` to v2.2.0 (#451)
+*   Update bundled `eslint` to v2.2.0 (#451) **Potentially Breaking**
 
 ## v6.0.0
 
