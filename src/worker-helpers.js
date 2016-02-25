@@ -4,7 +4,7 @@ import Path from 'path'
 import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
-import { getPath } from 'consistent-path'
+import getPath from 'consistent-path'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
