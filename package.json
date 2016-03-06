@@ -30,7 +30,7 @@
     "ucompiler": "^3.0.1",
     "ucompiler-plugin-babel": "^3.0.0",
     "ucompiler-plugin-newline": "^3.0.0",
-    "babel-preset-steelbrain": "^1.0.1"
+    "babel-preset-steelbrain": "^2.0.1"
   },
   "package-deps": [
     "linter"
