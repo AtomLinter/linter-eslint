@@ -42,7 +42,3 @@ export function showError(givenMessage, givenDetail = null) {
     dismissable: true
   })
 }
-
-export function ruleURI(ruleId) {
-  return `http://eslint.org/docs/rules/${ruleId}`
-}

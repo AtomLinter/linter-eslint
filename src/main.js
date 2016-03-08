@@ -1,7 +1,7 @@
 'use babel'
 
 import { CompositeDisposable, Range } from 'atom'
-import { spawnWorker, showError, ruleURI } from './helpers'
+import { spawnWorker, showError } from './helpers'
 import escapeHTML from 'escape-html'
 
 module.exports = {
@@ -164,10 +164,8 @@ module.exports = {
               range
             }
             if (showRule) {
-              const elName = ruleId ? 'a' : 'span'
-              const href = ruleId ? ` href=${ruleURI(ruleId)}` : ''
-              ret.html = `<${elName}${href} class="badge badge-flexible">` +
-                `${ruleId || 'Fatal'}</${elName}> ${escapeHTML(message)}`
+              ret.html = '<span class="badge badge-flexible">' +
+                `${ruleId || 'Fatal'}</span>${escapeHTML(message)}`
             } else {
               ret.text = message
             }
