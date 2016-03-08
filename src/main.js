@@ -4,8 +4,6 @@ import { CompositeDisposable, Range } from 'atom'
 import { spawnWorker, showError, ruleURI } from './helpers'
 import escapeHTML from 'escape-html'
 
-
-
 module.exports = {
   config: {
     lintHtmlFiles: {
