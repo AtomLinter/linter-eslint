@@ -1,8 +1,8 @@
 # Changelog
 
-## Upcoming
+## v7.1.1
 
-*   Fix link color in certain themes
+*   Fix link color in certain themes (#480)
 
 ## v7.1.0
 
