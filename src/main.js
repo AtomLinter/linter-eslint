@@ -166,7 +166,7 @@ module.exports = {
             if (showRule) {
               const elName = ruleId ? 'a' : 'span'
               const href = ruleId ? ` href=${ruleURI(ruleId)}` : ''
-              ret.html = `<${elName}${href} class="badge badge-flexible">` +
+              ret.html = `<${elName}${href} class="badge badge-flexible eslint">` +
                 `${ruleId || 'Fatal'}</${elName}> ${escapeHTML(message)}`
             } else {
               ret.text = message
