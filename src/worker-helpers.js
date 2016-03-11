@@ -119,6 +119,11 @@ export function getArgv(type, config, filePath, fileDir, givenConfigPath) {
   }
   argv.push('--format', Path.join(__dirname, 'reporter.js'))
 
+  const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
+  if (ignoreFile) {
+    argv.push('--ignore-path', ignoreFile)
+  }
+
   if (config.eslintRulesDir) {
     let rulesDir = resolveEnv(config.eslintRulesDir)
     if (!Path.isAbsolute(rulesDir)) {
