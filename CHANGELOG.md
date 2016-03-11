@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+*   Fix link color in certain themes
+
 ## v7.1.0
 
 *   Add a link to the rule definition page in HTML messages (#476)
