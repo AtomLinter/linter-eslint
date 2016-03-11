@@ -23,7 +23,6 @@
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "^5.0.0",
     "eslint-config-airbnb": "^6.0.2",
     "eslint-plugin-import": "^1.0.0",
     "eslint-plugin-react": "^4.0.0",
@@ -66,7 +65,6 @@
       "comma-dangle": 0
     },
     "extends": "airbnb/base",
-    "parser": "babel-eslint",
     "globals": {
       "atom": "true"
     },
