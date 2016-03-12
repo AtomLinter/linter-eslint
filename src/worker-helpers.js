@@ -25,9 +25,7 @@ export function getNodePrefixPath() {
     const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
     try {
       Cache.NODE_PREFIX_PATH =
-        ChildProcess.spawnSync(npmCommand, ['get', 'prefix'], {
-          env: assign(assign({}, process.env), { PATH: getPath() })
-        }).output[1].toString().trim()
+        ChildProcess.spawnSync(npmCommand, ['get', 'prefix']).output[1].toString().trim()
     } catch (e) {
       throw new Error(
         'Unable to execute `npm get prefix`. Please make sure Atom is getting $PATH correctly'
