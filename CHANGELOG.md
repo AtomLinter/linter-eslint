@@ -1,8 +1,12 @@
 # Changelog
 
-## v7.1.2
+## v7.1.3
 
 *   Reliably use `.eslintignore` file if present (#481)
+
+## v7.1.2
+
+*   Skipped due to release difficulties
 
 ## v7.1.1
 
