@@ -1,5 +1,9 @@
 # Changelog
 
+## v7.1.2
+
+*   Reliably use `.eslintignore` file if present (#481)
+
 ## v7.1.1
 
 *   Fix link color in certain themes (#480)
