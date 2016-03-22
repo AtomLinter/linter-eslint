@@ -34,13 +34,14 @@ the team decides it is time for a new release, the process is to:
 
 1. Update `CHANGELOG.md` with the planned version number and a short bulleted
 list of major changes.  Include pull request numbers if applicable.
-1. Commit the changelog changes to master.
-1. Publish a new version with `apm publish <version>` where the version number
-follows semver conventions (`v<major>.<minor>.<patch>`).
+1. Run `npm run compile` to build the files in `lib/`
+1. Commit the changelog and any `lib/` changes to master.
+1. Publish a new version with `apm publish {major|minor|patch}`, using semver to
+decide what type of version should be released.
 1. `apm` will then automatically:
   * Update `package.json` with the new version number
   * Commit the changed `package.json` to master
-  * Create a GitHub tag for the new version, at the point of the new commit
+  * Create a git tag for the new version and push it to GitHub
   * Publish the package to the Atom package manager
 
 Thank you for helping out!
