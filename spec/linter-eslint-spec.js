@@ -9,6 +9,8 @@ const emptyPath = path.join(__dirname, 'fixtures', 'files', 'empty.js')
 const fixPath = path.join(__dirname, 'fixtures', 'files', 'fix.js')
 const importingpath = path.join(__dirname, 'fixtures',
   'import-resolution', 'nested', 'importing.js')
+const badImportPath = path.join(__dirname, 'fixtures',
+  'import-resolution', 'nested', 'badImport.js')
 const ignoredPath = path.join(__dirname, 'fixtures',
   'eslintignore', 'ignored.js')
 
@@ -104,6 +106,21 @@ describe('The eslint provider for Linter', () => {
         atom.workspace.open(importingpath).then(editor =>
           lint(editor).then(messages => {
             expect(messages.length).toEqual(0)
+          })
+        )
+      )
+    })
+    it('shows a message for an invalid import', () => {
+      waitsForPromise(() =>
+        atom.workspace.open(badImportPath).then(editor =>
+          lint(editor).then(messages => {
+            expect(messages.length).toBeGreaterThan(0)
+            expect(messages[0].type).toBe('Error')
+            expect(messages[0].html).not.toBeDefined()
+            expect(messages[0].text).toEqual('Unable to resolve path to module \'../nonexistent\'.')
+            expect(messages[0].filePath).toBe(badImportPath)
+            expect(messages[0].range).toEqual([[0, 24], [0, 40]])
+            expect(messages[0].hasOwnProperty('fix')).toBeFalsy()
           })
         )
       )

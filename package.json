@@ -18,15 +18,14 @@
     "atom-package-deps": "^4.0.1",
     "consistent-path": "^2.0.1",
     "escape-html": "^1.0.3",
-    "eslint": "2.2.0",
+    "eslint": "^2.4.0",
     "process-communication": "^1.1.0",
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "^5.0.0",
-    "eslint-config-airbnb": "^6.0.2",
-    "eslint-plugin-import": "^1.0.0",
-    "eslint-plugin-react": "^4.0.0",
+    "eslint-config-airbnb": "^6.2.0",
+    "eslint-plugin-import": "^1.2.0",
+    "eslint-plugin-react": "^4.2.3",
     "ucompiler": "^3.0.1",
     "ucompiler-plugin-babel": "^3.0.0",
     "ucompiler-plugin-newline": "^3.0.0",
@@ -66,7 +65,6 @@
       "comma-dangle": 0
     },
     "extends": "airbnb/base",
-    "parser": "babel-eslint",
     "globals": {
       "atom": "true"
     },
