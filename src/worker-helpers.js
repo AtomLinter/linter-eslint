@@ -5,6 +5,7 @@ import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
 import getPath from 'consistent-path'
+import untildify from 'untildify'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
@@ -119,7 +120,14 @@ export function getArgv(type, config, filePath, fileDir, givenConfigPath) {
   if (config.eslintRulesDir) {
     let rulesDir = resolveEnv(config.eslintRulesDir)
     if (!Path.isAbsolute(rulesDir)) {
+      const splitPath = rulesDir.split('/')
+      if (splitPath[0] === '~') {
+        rulesDir = untildify(rulesDir)
+      }
       rulesDir = findCached(fileDir, rulesDir)
+    }
+    if (!rulesDir) {
+      throw new Error('Invalid ESLint Rules Dir path')
     }
     argv.push('--rulesdir', rulesDir)
   }

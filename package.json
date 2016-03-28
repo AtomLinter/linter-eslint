@@ -12,7 +12,8 @@
     "test": "npm run lint && apm test",
     "lint": "eslint .",
     "watch": "ucompiler watch",
-    "compile": "ucompiler go"
+    "compile": "ucompiler go",
+    "test": "apm test"
   },
   "dependencies": {
     "atom-linter": "^4.3.4",
@@ -21,7 +22,8 @@
     "escape-html": "^1.0.3",
     "eslint": "^2.8.0",
     "process-communication": "^1.1.0",
-    "resolve-env": "^1.0.0"
+    "resolve-env": "^1.0.0",
+    "untildify": "^2.1.0"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^1.0.3",
