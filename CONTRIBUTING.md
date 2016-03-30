@@ -19,6 +19,9 @@ Please note that modifications should follow these coding guidelines:
 *   Code should pass the `eslint` linter
 *   Vertical whitespace helps readability, don’t be afraid to use it
 
+## Discussion
+If you have any questions during development you can join the #linter-plugin-dev channel on [Atom's Slack instance](http://atom-slack.herokuapp.com/).
+
 ## Building
 
 The simplest procedure is to run `npm run watch` which executes
