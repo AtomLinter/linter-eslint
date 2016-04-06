@@ -141,4 +141,23 @@ describe('The eslint provider for Linter', () => {
       )
     })
   })
+
+  describe('Fix errors when saved', () => {
+    beforeEach(() => {
+      atom.config.set('linter-eslint.fixOnSave', true)
+    })
+    it('should fix lint errors when saved', () => {
+      waitsForPromise(() =>
+        atom.workspace.open(fixPath).then(editor => {
+          lint(editor).then(messages => {
+            expect(messages.length).toEqual(2)
+            editor.save()
+            lint(editor).then(messagesAfterSave => {
+              expect(messagesAfterSave.length).toEqual(0)
+            })
+          })
+        })
+      )
+    })
+  })
 })
