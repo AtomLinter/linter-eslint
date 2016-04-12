@@ -26,6 +26,7 @@
     "eslint-config-airbnb": "^7.0.0",
     "eslint-plugin-import": "^1.2.0",
     "eslint-plugin-react": "^4.2.3",
+    "eslint-plugin-jsx-a11y": "^0.6.2",
     "ucompiler": "^3.0.1",
     "ucompiler-plugin-babel": "^3.0.0",
     "ucompiler-plugin-newline": "^3.0.0",
