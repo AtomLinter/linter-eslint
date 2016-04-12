@@ -16,16 +16,17 @@
   "dependencies": {
     "atom-linter": "^4.3.4",
     "atom-package-deps": "^4.0.1",
+    "babel-eslint": "^6.0.2",
     "consistent-path": "^2.0.1",
     "escape-html": "^1.0.3",
     "eslint": "^2.4.0",
+    "eslint-config-airbnb": "^6.2.0",
+    "eslint-plugin-react": "^4.2.3",
     "process-communication": "^1.1.0",
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "eslint-config-airbnb": "^6.2.0",
     "eslint-plugin-import": "^1.2.0",
-    "eslint-plugin-react": "^4.2.3",
     "ucompiler": "^3.0.1",
     "ucompiler-plugin-babel": "^3.0.0",
     "ucompiler-plugin-newline": "^3.0.0",
