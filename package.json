@@ -6,7 +6,7 @@
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=1.4.0 <2.0.0"
   },
   "scripts": {
     "test": "npm run lint && apm test",
