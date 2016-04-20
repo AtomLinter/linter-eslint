@@ -1,5 +1,3 @@
-'use strict'
-
 const Path = require('path')
 
 module.exports.getFixturesPath = function (path) {
