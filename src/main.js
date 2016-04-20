@@ -84,7 +84,8 @@ module.exports = {
     }))
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(() => {
-        if (atom.config.get('linter-eslint.fixOnSave')) {
+        if (this.scopes.indexOf(editor.getGrammar().scopeName) !== -1 &&
+            atom.config.get('linter-eslint.fixOnSave')) {
           this.worker.request('job', {
             type: 'fix',
             config: atom.config.get('linter-eslint'),
