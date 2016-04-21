@@ -1,5 +1,9 @@
 # Changelog
 
+## v7.2.1
+
+*   Only run Fix on Save on supported file types ([#545](https://github.com/AtomLinter/linter-eslint/pull/545))
+
 ## v7.2.0
 
 *   Add Fix on Save option ([#508](https://github.com/AtomLinter/linter-eslint/pull/508))
