@@ -6,9 +6,10 @@
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
   "engines": {
-    "atom": ">0.50.0"
+    "atom": ">=1.4.0 <2.0.0"
   },
   "scripts": {
+    "test": "npm run lint && apm test",
     "lint": "eslint .",
     "watch": "ucompiler watch",
     "compile": "ucompiler go"
@@ -18,15 +19,13 @@
     "atom-package-deps": "^4.0.1",
     "consistent-path": "^2.0.1",
     "escape-html": "^1.0.3",
-    "eslint": "^2.7.0",
+    "eslint": "^2.8.0",
     "process-communication": "^1.1.0",
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "eslint-config-airbnb": "^7.0.0",
-    "eslint-plugin-import": "^1.2.0",
-    "eslint-plugin-react": "^4.3.0",
-    "eslint-plugin-jsx-a11y": "^0.6.2",
+    "eslint-config-airbnb-base": "^1.0.0",
+    "eslint-plugin-import": "^1.5.0",
     "ucompiler": "^3.2.0",
     "ucompiler-plugin-babel": "^3.0.0",
     "ucompiler-plugin-newline": "^3.0.0",
@@ -44,28 +43,16 @@
   },
   "eslintConfig": {
     "rules": {
-      "no-empty": 0,
       "no-console": 0,
-      "no-new": 0,
-      "no-extra-semi": 1,
-      "semi": [
-        2,
-        "never"
-      ],
+      "semi": [2, "never"],
       "func-names": 0,
-      "strict": [
-        0,
-        "never"
-      ],
-      "no-param-reassign": [
-        2,
-        {
-          "props": false
-        }
-      ],
-      "comma-dangle": 0
+      "no-param-reassign": [2, { "props": false }],
+      "comma-dangle": 0,
+      "no-underscore-dangle": 0,
+      "global-require": 0,
+      "import/no-unresolved": [2, { "ignore": ["atom"] }]
     },
-    "extends": "airbnb/base",
+    "extends": "airbnb-base",
     "globals": {
       "atom": "true"
     },
