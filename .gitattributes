@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text eol=lf
+
+# (binary is a macro for -text -diff)
+*.png binary
