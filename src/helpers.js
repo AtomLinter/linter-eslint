@@ -44,5 +44,12 @@ export function showError(givenMessage, givenDetail = null) {
 }
 
 export function ruleURI(ruleId) {
-  return `http://eslint.org/docs/rules/${ruleId}`
+  const ruleParts = ruleId.split('/')
+  if (ruleParts.length === 1) {
+    return `http://eslint.org/docs/rules/${ruleId}`
+  }
+  if (ruleParts[0] === 'react') {
+    return `https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/${ruleParts[1]}.md`
+  }
+  return ''
 }
