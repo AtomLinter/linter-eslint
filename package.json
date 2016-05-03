@@ -9,7 +9,7 @@
     "atom": ">=1.4.0 <2.0.0"
   },
   "scripts": {
-    "test": "npm run lint && apm test",
+    "test": "apm test",
     "lint": "eslint .",
     "watch": "ucompiler watch",
     "compile": "ucompiler go"
@@ -19,13 +19,13 @@
     "atom-package-deps": "^4.0.1",
     "consistent-path": "^2.0.1",
     "escape-html": "^1.0.3",
-    "eslint": "^2.8.0",
+    "eslint": "^2.9.0",
     "process-communication": "^1.1.0",
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^2.0.0",
-    "eslint-plugin-import": "^1.5.0",
+    "eslint-plugin-import": "^1.6.1",
     "ucompiler": "^3.2.0",
     "ucompiler-plugin-babel": "^3.0.0",
     "ucompiler-plugin-newline": "^3.0.0",
@@ -44,28 +44,13 @@
   "eslintConfig": {
     "rules": {
       "no-console": 0,
-      "semi": [
-        2,
-        "never"
-      ],
+      "semi": [2, "never"],
       "func-names": 0,
-      "no-param-reassign": [
-        2,
-        {
-          "props": false
-        }
-      ],
+      "no-param-reassign": [2, {"props": false}],
       "comma-dangle": 0,
       "no-underscore-dangle": 0,
       "global-require": 0,
-      "import/no-unresolved": [
-        2,
-        {
-          "ignore": [
-            "atom"
-          ]
-        }
-      ]
+      "import/no-unresolved": [2, {"ignore": ["atom"]}]
     },
     "extends": "airbnb-base",
     "globals": {
