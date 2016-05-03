@@ -1,5 +1,9 @@
 # Changelog
 
+## v7.2.2
+
+*   Add links for several plugin's rules ([#562](https://github.com/AtomLinter/linter-eslint/pull/562))
+
 ## v7.2.1
 
 *   Only run Fix on Save on supported file types ([#545](https://github.com/AtomLinter/linter-eslint/pull/545))
