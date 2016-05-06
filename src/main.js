@@ -47,7 +47,7 @@ module.exports = {
       default: ''
     },
     disableEslintIgnore: {
-      title: 'Disable using .eslintignore files',
+      title: 'Don\'t use .eslintignore files',
       type: 'boolean',
       default: false
     },
