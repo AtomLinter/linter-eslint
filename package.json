@@ -15,7 +15,7 @@
     "compile": "ucompiler go"
   },
   "dependencies": {
-    "atom-linter": "^4.3.4",
+    "atom-linter": "^5.0.0",
     "atom-package-deps": "^4.0.1",
     "consistent-path": "^2.0.1",
     "escape-html": "^1.0.3",
