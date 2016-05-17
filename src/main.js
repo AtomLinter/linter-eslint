@@ -40,6 +40,12 @@ module.exports = {
       type: 'string',
       default: ''
     },
+    localNodeModules: {
+      title: 'Path to the local node_modules folder',
+      description: 'Optionally specify the path to the local node_modules folder',
+      type: 'string',
+      default: ''
+    },
     eslintRulesDir: {
       title: 'ESLint Rules Dir',
       description: 'Specify a directory for ESLint to load rules from',
@@ -80,6 +86,17 @@ module.exports = {
         if (this.scopes.indexOf(embeddedScope) !== -1) {
           this.scopes.splice(this.scopes.indexOf(embeddedScope), 1)
         }
+      }
+    }))
+    this.subscriptions.add(
+    atom.config.observe('linter-eslint.localNodeModules', localNodeModules => {
+      if (localNodeModules) {
+        atom.config.set('linter-eslint.useGlobalEslint', false)
+      }
+    }))
+    this.subscriptions.add(atom.config.observe('linter-eslint.useGlobalEslint', useGlobalEslint => {
+      if (useGlobalEslint) {
+        atom.config.set('linter-eslint.localNodeModules', '')
       }
     }))
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
