@@ -32,15 +32,15 @@ export function getNodePrefixPath() {
 export function getESLintFromDirectory(modulesDir, config) {
   let ESLintDirectory = null
 
-  if (config.localNodeModules) {
-    ESLintDirectory = Path.join(config.localNodeModules || '', 'eslint')
-  } else if (config.useGlobalEslint) {
+  if (config.useGlobalEslint) {
     const prefixPath = config.globalNodePath || getNodePrefixPath()
     if (process.platform === 'win32') {
       ESLintDirectory = Path.join(prefixPath, 'node_modules', 'eslint')
     } else {
       ESLintDirectory = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
+  } else if (config.localNodeModules) {
+    ESLintDirectory = Path.join(config.localNodeModules || '', 'eslint')
   } else {
     ESLintDirectory = Path.join(modulesDir || '', 'eslint')
   }
