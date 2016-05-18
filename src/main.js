@@ -88,17 +88,6 @@ module.exports = {
         }
       }
     }))
-    this.subscriptions.add(
-    atom.config.observe('linter-eslint.localNodeModules', localNodeModules => {
-      if (localNodeModules) {
-        atom.config.set('linter-eslint.useGlobalEslint', false)
-      }
-    }))
-    this.subscriptions.add(atom.config.observe('linter-eslint.useGlobalEslint', useGlobalEslint => {
-      if (useGlobalEslint) {
-        atom.config.set('linter-eslint.localNodeModules', '')
-      }
-    }))
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(() => {
         if (this.scopes.indexOf(editor.getGrammar().scopeName) !== -1 &&
