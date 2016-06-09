@@ -17,7 +17,7 @@
   "dependencies": {
     "atom-linter": "^5.0.1",
     "atom-package-deps": "^4.0.1",
-    "consistent-path": "^2.0.1",
+    "consistent-path": "^2.0.3",
     "escape-html": "^1.0.3",
     "eslint": "^2.11.1",
     "process-communication": "^1.1.0",
