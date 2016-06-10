@@ -6,6 +6,15 @@ import * as Path from 'path'
 
 describe('Worker Helpers', () => {
   describe('getESLintInstance && getESLintFromDirectory', () => {
+    it('tries to find an indirect local eslint', () => {
+      const path = Path.join(getFixturesPath('indirect-local-eslint'),
+                       'testing', 'eslint', 'node_modules')
+      const eslint = Helpers.getESLintInstance('', {
+        useGlobalEslint: false,
+        localNodeModules: path
+      })
+      expect(eslint).toBe('located')
+    })
     it('tries to find a local eslint', () => {
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), {})
       expect(eslint).toBe('located')

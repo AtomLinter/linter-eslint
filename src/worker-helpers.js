@@ -39,6 +39,8 @@ export function getESLintFromDirectory(modulesDir, config) {
     } else {
       ESLintDirectory = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
+  } else if (config.localNodeModules) {
+    ESLintDirectory = Path.join(config.localNodeModules || '', 'eslint')
   } else {
     ESLintDirectory = Path.join(modulesDir || '', 'eslint')
   }

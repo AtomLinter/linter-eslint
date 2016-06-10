@@ -40,6 +40,12 @@ module.exports = {
       type: 'string',
       default: ''
     },
+    localNodeModules: {
+      title: 'Path to the local node_modules folder',
+      description: 'Optionally specify the path to the local node_modules folder',
+      type: 'string',
+      default: ''
+    },
     eslintRulesDir: {
       title: 'ESLint Rules Dir',
       description: 'Specify a directory for ESLint to load rules from',
