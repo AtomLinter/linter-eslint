@@ -57,7 +57,7 @@ export function ruleURI(ruleId) {
       return `https://github.com/Gillespie59/eslint-plugin-angular/blob/master/docs/${ruleName}.md`
 
     case 'ava':
-      return `https://github.com/sindresorhus/eslint-plugin-ava/blob/master/docs/rules/${ruleName}.md`
+      return `https://github.com/avajs/eslint-plugin-ava/blob/master/docs/rules/${ruleName}.md`
 
     case 'import':
       return `https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/${ruleName}.md`
