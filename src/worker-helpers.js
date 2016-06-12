@@ -99,7 +99,10 @@ export function getRelativePath(fileDir, filePath, config) {
 export function getArgv(type, config, filePath, fileDir, givenConfigPath) {
   let configPath
   if (givenConfigPath === null) {
-    configPath = config.eslintrcPath || null
+    var envVarPath = config.eslintrcPath.replace(/%([^%]+)%/g, function(_,n) {
+      return process.env[n];
+    });
+    configPath = envVarPath || null;
   } else configPath = givenConfigPath
 
   const argv = [
