@@ -6,6 +6,27 @@ import { getFixturesPath } from './common'
 
 describe('Worker Helpers', () => {
   describe('getESLintInstance && getESLintFromDirectory', () => {
+    it('tries to find an indirect local eslint using an absolute path', () => {
+      const path = Path.join(
+        getFixturesPath('indirect-local-eslint'), 'testing', 'eslint', 'node_modules')
+      const eslint = Helpers.getESLintInstance('', {
+        useGlobalEslint: false,
+        advancedLocalNodeModules: path
+      })
+      expect(eslint).toBe('located')
+    })
+    it('tries to find an indirect local eslint using a relative path', () => {
+      const path = Path.join(
+        getFixturesPath('indirect-local-eslint'), 'testing', 'eslint', 'node_modules')
+      const [projectPath, relativePath] = atom.project.relativizePath(path)
+
+      const eslint = Helpers.getESLintInstance('', {
+        useGlobalEslint: false,
+        advancedLocalNodeModules: relativePath
+      }, projectPath)
+
+      expect(eslint).toBe('located')
+    })
     it('tries to find a local eslint', () => {
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), {})
       expect(eslint).toBe('located')
