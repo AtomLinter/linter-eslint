@@ -41,7 +41,7 @@ function fixJob(argv, eslint) {
   }
 }
 
-create().onRequest('job', ({ contents, type, config, filePath, rules }, job) => {
+create().onRequest('job', ({ contents, type, config, filePath, projectPath, rules }, job) => {
   global.__LINTER_ESLINT_RESPONSE = []
 
   if (config.disableFSCache) {
@@ -49,7 +49,7 @@ create().onRequest('job', ({ contents, type, config, filePath, rules }, job) => 
   }
 
   const fileDir = Path.dirname(filePath)
-  const eslint = Helpers.getESLintInstance(fileDir, config)
+  const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
   const configPath = Helpers.getConfigPath(fileDir)
   const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config)
 

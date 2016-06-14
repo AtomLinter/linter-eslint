@@ -29,7 +29,7 @@ export function getNodePrefixPath() {
   return Cache.NODE_PREFIX_PATH
 }
 
-export function getESLintFromDirectory(modulesDir, config) {
+export function getESLintFromDirectory(modulesDir, config, projectPath) {
   let ESLintDirectory = null
 
   if (config.useGlobalEslint) {
@@ -39,8 +39,12 @@ export function getESLintFromDirectory(modulesDir, config) {
     } else {
       ESLintDirectory = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
-  } else {
+  } else if (!config.advancedLocalNodeModules) {
     ESLintDirectory = Path.join(modulesDir || '', 'eslint')
+  } else if (Path.isAbsolute(config.advancedLocalNodeModules)) {
+    ESLintDirectory = Path.join(config.advancedLocalNodeModules || '', 'eslint')
+  } else {
+    ESLintDirectory = Path.join(projectPath, config.advancedLocalNodeModules, 'eslint')
   }
   try {
     // eslint-disable-next-line import/no-dynamic-require
@@ -64,10 +68,10 @@ export function refreshModulesPath(modulesDir) {
   }
 }
 
-export function getESLintInstance(fileDir, config) {
+export function getESLintInstance(fileDir, config, projectPath) {
   const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
   refreshModulesPath(modulesDir)
-  return getESLintFromDirectory(modulesDir, config)
+  return getESLintFromDirectory(modulesDir, config, projectPath || '')
 }
 
 export function getConfigPath(fileDir) {

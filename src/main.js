@@ -45,10 +45,14 @@ module.exports = {
       editor.onDidSave(() => {
         if (scopes.indexOf(editor.getGrammar().scopeName) !== -1 &&
             atom.config.get('linter-eslint.fixOnSave')) {
+          const filePath = editor.getPath()
+          const projectPath = atom.project.relativizePath(filePath)[0]
+
           this.worker.request('job', {
             type: 'fix',
             config: atom.config.get('linter-eslint'),
-            filePath: editor.getPath()
+            filePath,
+            projectPath
           }).catch(response =>
             atom.notifications.addWarning(response)
           )
@@ -60,6 +64,7 @@ module.exports = {
       'linter-eslint:fix-file': () => {
         const textEditor = atom.workspace.getActiveTextEditor()
         const filePath = textEditor.getPath()
+        const projectPath = atom.project.relativizePath(filePath)[0]
 
         if (!textEditor || textEditor.isModified()) {
           // Abort for invalid or unsaved text editors
@@ -70,7 +75,8 @@ module.exports = {
         this.worker.request('job', {
           type: 'fix',
           config: atom.config.get('linter-eslint'),
-          filePath
+          filePath,
+          projectPath
         }).then(response =>
           atom.notifications.addSuccess(response)
         ).catch(response =>
@@ -128,11 +134,12 @@ module.exports = {
         }
 
         return this.worker.request('job', {
-          contents: text,
           type: 'lint',
+          contents: text,
           config: atom.config.get('linter-eslint'),
           rules,
-          filePath
+          filePath,
+          projectPath: atom.project.relativizePath(filePath)[0] || ''
         }).then((response) => {
           if (textEditor.getText() !== text) {
             /*
