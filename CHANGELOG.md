@@ -1,5 +1,9 @@
 # Changelog
 
+## v7.2.4
+
+*   Bump minimum Atom version to v1.8.0
+
 ## v7.2.3
 
 *   Clarified `disableEslintIgnore` description ([#569](https://github.com/AtomLinter/linter-eslint/pull/569))
