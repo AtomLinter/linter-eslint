@@ -112,13 +112,9 @@ module.exports = {
                 newText: fix.text
               }
             }
-            const range = Helpers.rangeFromLineNumber(textEditor, line - 1)
-            if (column) {
-              range[0][1] = column - 1
-            }
-            if (column > range[1][1]) {
-              range[1][1] = column - 1
-            }
+            const range = Helpers.rangeFromLineNumber(
+              textEditor, line - 1, column ? column - 1 : column
+            )
             const ret = {
               filePath,
               type: severity === 1 ? 'Warning' : 'Error',
