@@ -50,16 +50,11 @@ describe('The eslint provider for Linter', () => {
     it('verifies that message', () => {
       waitsForPromise(() =>
         lint(editor).then(messages => {
-          expect(messages[0].type).toBeDefined()
-          expect(messages[0].type).toEqual('Error')
+          expect(messages[0].type).toBe('Error')
           expect(messages[0].html).not.toBeDefined()
-          expect(messages[0].text).toBeDefined()
-          expect(messages[0].text).toEqual('\'foo\' is not defined.')
-          expect(messages[0].filePath).toBeDefined()
-          expect(messages[0].filePath).toMatch(/.+spec[\\\/]fixtures[\\\/]files[\\\/]bad\.js$/)
-          expect(messages[0].range).toBeDefined()
-          expect(messages[0].range.length).toEqual(2)
-          expect(messages[0].range).toEqual([[0, 0], [0, 9]])
+          expect(messages[0].text).toBe("'foo' is not defined.")
+          expect(messages[0].filePath).toBe(badPath)
+          expect(messages[0].range).toEqual([[0, 0], [0, 3]])
           expect(messages[0].hasOwnProperty('fix')).toBeFalsy()
         })
       )
@@ -70,7 +65,7 @@ describe('The eslint provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(emptyPath).then(editor =>
         lint(editor).then(messages => {
-          expect(messages.length).toEqual(0)
+          expect(messages.length).toBe(0)
         })
       )
     )
@@ -80,7 +75,7 @@ describe('The eslint provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(goodPath).then(editor =>
         lint(editor).then(messages => {
-          expect(messages.length).toEqual(0)
+          expect(messages.length).toBe(0)
         })
       )
     )
@@ -92,10 +87,10 @@ describe('The eslint provider for Linter', () => {
         lint(editor)
       ).then(messages => {
         expect(messages[0].fix.range).toEqual([[0, 11], [0, 12]])
-        expect(messages[0].fix.newText).toEqual('')
+        expect(messages[0].fix.newText).toBe('')
 
         expect(messages[1].fix.range).toEqual([[2, 1], [2, 1]])
-        expect(messages[1].fix.newText).toEqual(' ')
+        expect(messages[1].fix.newText).toBe(' ')
       })
     )
   })
@@ -105,7 +100,7 @@ describe('The eslint provider for Linter', () => {
       waitsForPromise(() =>
         atom.workspace.open(importingpath).then(editor =>
           lint(editor).then(messages => {
-            expect(messages.length).toEqual(0)
+            expect(messages.length).toBe(0)
           })
         )
       )
@@ -117,9 +112,9 @@ describe('The eslint provider for Linter', () => {
             expect(messages.length).toBeGreaterThan(0)
             expect(messages[0].type).toBe('Error')
             expect(messages[0].html).not.toBeDefined()
-            expect(messages[0].text).toEqual('Unable to resolve path to module \'../nonexistent\'.')
+            expect(messages[0].text).toBe("Unable to resolve path to module '../nonexistent'.")
             expect(messages[0].filePath).toBe(badImportPath)
-            expect(messages[0].range).toEqual([[0, 24], [0, 40]])
+            expect(messages[0].range).toEqual([[0, 24], [0, 39]])
             expect(messages[0].hasOwnProperty('fix')).toBeFalsy()
           })
         )
@@ -135,7 +130,7 @@ describe('The eslint provider for Linter', () => {
       waitsForPromise(() =>
         atom.workspace.open(ignoredPath).then(editor =>
           lint(editor).then(messages => {
-            expect(messages.length).toEqual(0)
+            expect(messages.length).toBe(0)
           })
         )
       )
@@ -150,10 +145,10 @@ describe('The eslint provider for Linter', () => {
       waitsForPromise(() =>
         atom.workspace.open(fixPath).then(editor => {
           lint(editor).then(messages => {
-            expect(messages.length).toEqual(2)
+            expect(messages.length).toBe(2)
             editor.save()
             lint(editor).then(messagesAfterSave => {
-              expect(messagesAfterSave.length).toEqual(0)
+              expect(messagesAfterSave.length).toBe(0)
             })
           })
         })
