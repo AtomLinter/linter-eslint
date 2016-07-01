@@ -65,6 +65,14 @@
       "description": "Have eslint attempt to fix some errors automatically when saving the file.",
       "type": "boolean",
       "default": false
+    },
+    "scopes": {
+      "title": "Language scopes to use linter",
+      "type": "array",
+      "default": ["source.js", "source.jsx", "source.js.jsx", "source.babel", "source.js-semantic"],
+      "items": {
+        "type": "string"
+      }
     }
   },
   "scripts": {

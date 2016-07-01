@@ -11,7 +11,7 @@ module.exports = {
     this.subscriptions = new CompositeDisposable()
     this.active = true
     this.worker = null
-    this.scopes = ['source.js', 'source.jsx', 'source.js.jsx', 'source.babel', 'source.js-semantic']
+    this.scopes = atom.config.get('linter-eslint.scopes')
 
     const embeddedScope = 'source.js.embedded.html'
     this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles', lintHtmlFiles => {
