@@ -69,7 +69,13 @@
     "scopes": {
       "title": "Language scopes to use linter",
       "type": "array",
-      "default": ["source.js", "source.jsx", "source.js.jsx", "source.babel", "source.js-semantic"],
+      "default": [
+        "source.js",
+        "source.jsx",
+        "source.js.jsx",
+        "source.babel",
+        "source.js-semantic"
+      ],
       "items": {
         "type": "string"
       }
