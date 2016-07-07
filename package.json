@@ -67,7 +67,7 @@
       "default": false
     },
     "scopes": {
-      "title": "Language scopes to use linter",
+      "title": "List of scopes to run ESLint on, run `Editor: Log Cursor Scope` to determine the scopes for a file.",
       "type": "array",
       "default": [
         "source.js",
