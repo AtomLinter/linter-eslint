@@ -11,9 +11,9 @@ module.exports = {
     this.subscriptions = new CompositeDisposable()
     this.active = true
     this.worker = null
-    this.scopes = new CompositeDisposable()
+    this.scopes = []
 
-    this.scopes.add(atom.config.observe('linter-eslint.scopes', scopes => {
+    this.subscriptions.add(atom.config.observe('linter-eslint.scopes', scopes => {
       // Remove any old scopes
       this.scopes.splice(0, this.scopes.length)
       // Add the current scopes
