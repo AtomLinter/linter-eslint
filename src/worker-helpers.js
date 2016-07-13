@@ -82,7 +82,7 @@ export function getConfigPath(fileDir) {
     if (Boolean(require(packagePath).eslintConfig)) {
       return packagePath
     }
-    packagePath = findCached(Path.join(fileDir, '..'))
+    packagePath = findCached(Path.join(fileDir, '..', 'package.json'))
   }
   return null
 }
