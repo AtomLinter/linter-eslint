@@ -35,7 +35,7 @@ You have two options:
 
     *   `$ npm i --save-dev eslint [eslint-plugins]`
 
-*   Install globaly `eslint` and plugins
+*   Install globally `eslint` and plugins
 
     *   `$ npm i -g eslint [eslint-plugins]`
     *   Activate `Use Global Eslint` package option
