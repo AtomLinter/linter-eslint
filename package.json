@@ -92,12 +92,12 @@
     "atom-package-deps": "^4.0.1",
     "consistent-path": "^2.0.1",
     "escape-html": "^1.0.3",
-    "eslint": "^2.11.1",
+    "eslint": "^3.0.1",
     "process-communication": "^1.1.0",
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "eslint-config-airbnb-base": "^3.0.1",
+    "eslint-config-airbnb-base": "^4.0.0",
     "eslint-plugin-import": "^1.7.0",
     "ucompiler": "^3.2.0",
     "ucompiler-plugin-babel": "^3.0.0",
