@@ -77,9 +77,12 @@ export function getConfigPath(fileDir) {
     return configFile
   }
 
-  const packagePath = findCached(fileDir, 'package.json')
-  if (packagePath && Boolean(require(packagePath).eslintConfig)) {
-    return packagePath
+  let packagePath = findCached(fileDir, 'package.json')
+  while (packagePath) {
+    if (Boolean(require(packagePath).eslintConfig)) {
+      return packagePath
+    }
+    packagePath = findCached(Path.join(fileDir, '..', 'package.json'))
   }
   return null
 }
