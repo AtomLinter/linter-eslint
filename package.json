@@ -92,7 +92,7 @@
     "atom-package-deps": "^4.0.1",
     "consistent-path": "^2.0.1",
     "escape-html": "^1.0.3",
-    "eslint": "^2.11.1",
+    "eslint": "^3.1.1",
     "process-communication": "^1.1.0",
     "resolve-env": "^1.0.0"
   },
