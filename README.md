@@ -38,16 +38,17 @@ You have two options:
 *   Install globally `eslint` and plugins
 
     *   `$ npm i -g eslint [eslint-plugins]`
-    *   Activate `Use Global Eslint` package option in Sublime's config
+    *   Activate `Use Global Eslint` package option in Atom's config
     ```
       "linter-eslint":
         "useGlobalEslint": true
     ```
-    *   (Optional) Set `Global Node Path` with `$ npm config get prefix`
+    *   (Optional) Set `Global Node Path`
     ```
       "linter-eslint":
         "globalNodePath": "/usr/local"
     ```
+    You can find the Global Node Path value by running `$ npm config get prefix`
 
 ## Using ESLint
 
