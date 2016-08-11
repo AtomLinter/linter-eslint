@@ -83,6 +83,9 @@ export function ruleURI(ruleId) {
     case 'react':
       return `https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/${ruleName}.md`
 
+    case 'standard':
+      return 'https://github.com/xjamundx/eslint-plugin-standard#rules-explanations'
+
     default:
       return 'https://github.com/AtomLinter/linter-eslint/wiki/Linking-to-Rule-Documentation'
   }
