@@ -47,7 +47,7 @@ export function showError(givenMessage, givenDetail = null) {
   })
 }
 
-export function idsToIgnoredRules(ruleIds) {
+export function idsToIgnoredRules(ruleIds = []) {
   return ruleIds.reduce((ids, id) => {
     ids[id] = 0
     return ids
