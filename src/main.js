@@ -5,7 +5,7 @@ import ruleURI from 'eslint-rule-documentation'
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CompositeDisposable, Range } from 'atom'
 
-import { spawnWorker, showError } from './helpers'
+import { spawnWorker, showError, idsToIgnoredRules } from './helpers'
 
 // Configuration
 const scopes = []
@@ -116,10 +116,14 @@ module.exports = {
         }
         const filePath = textEditor.getPath()
 
+        const silencedRuleIds = atom.config.get('linter-eslint.silencedRuleIds')
+        const silencedRules = idsToIgnoredRules(silencedRuleIds)
+
         return this.worker.request('job', {
           contents: text,
           type: 'lint',
           config: atom.config.get('linter-eslint'),
+          rules: silencedRules,
           filePath
         }).then((response) => {
           if (textEditor.getText() !== text) {
@@ -160,6 +164,7 @@ module.exports = {
               type: severity === 1 ? 'Warning' : 'Error',
               range
             }
+
             if (showRule) {
               const elName = ruleId ? 'a' : 'span'
               const href = ruleId ? ` href=${ruleURI(ruleId).url}` : ''
@@ -171,6 +176,7 @@ module.exports = {
             if (linterFix) {
               ret.fix = linterFix
             }
+
             return ret
           })
         })

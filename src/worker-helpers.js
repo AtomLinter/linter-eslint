@@ -96,7 +96,7 @@ export function getRelativePath(fileDir, filePath, config) {
   return Path.basename(filePath)
 }
 
-export function getArgv(type, config, filePath, fileDir, givenConfigPath) {
+export function getArgv(type, config, rules, filePath, fileDir, givenConfigPath) {
   let configPath
   if (givenConfigPath === null) {
     configPath = config.eslintrcPath || null
@@ -125,6 +125,9 @@ export function getArgv(type, config, filePath, fileDir, givenConfigPath) {
   }
   if (configPath) {
     argv.push('--config', resolveEnv(configPath))
+  }
+  if (rules) {
+    argv.push('--rule', JSON.stringify(rules))
   }
   if (config.disableEslintIgnore) {
     argv.push('--no-ignore')

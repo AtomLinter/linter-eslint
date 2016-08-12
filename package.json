@@ -79,6 +79,15 @@
       "items": {
         "type": "string"
       }
+    },
+    "silencedRuleIds": {
+      "title": "List of rules to silence",
+      "description": "Useful when Atom fixes errors on save like no-trailing-spaces or eol-last.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
     }
   },
   "scripts": {
