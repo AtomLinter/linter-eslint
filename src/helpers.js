@@ -43,6 +43,10 @@ export function showError(givenMessage, givenDetail = null) {
   })
 }
 
+export function getProjectPath(filePath) {
+  return atom.project.getPaths().find((path) => filePath.startsWith(path))
+}
+
 export function ruleURI(ruleId) {
   const ruleParts = ruleId.split('/')
 

@@ -31,6 +31,12 @@
       "type": "boolean",
       "default": true
     },
+    "eslintDir": {
+      "title": "ESLint installation directory",
+      "description": "Custom path to ESlint installation directory",
+      "type": "string",
+      "default": ""
+    },
     "eslintrcPath": {
       "title": ".eslintrc Path",
       "description": "It will only be used when there's no config file in project",

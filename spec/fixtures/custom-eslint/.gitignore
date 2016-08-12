@@ -1,0 +1,2 @@
+# Keep node_modules test fixtures
+!node_modules

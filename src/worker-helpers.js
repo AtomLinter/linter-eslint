@@ -62,8 +62,20 @@ export function refreshModulesPath(modulesDir) {
   }
 }
 
-export function getESLintInstance(fileDir, config) {
-  const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint'))
+export function getESLintDirectory(fileDir, projectPath, config) {
+  if (config.eslintDir) {
+    if (Path.isAbsolute(config.eslintDir)) {
+      return config.eslintDir
+    }
+    return Path.join(projectPath, config.eslintDir)
+  }
+  // Find directory of eslint installation. findCached will traverse up the tree
+  // checking every `node_modules` directory
+  return Path.dirname(findCached(fileDir, 'node_modules/eslint'))
+}
+
+export function getESLintInstance(fileDir, projectPath, config) {
+  const modulesDir = getESLintDirectory(fileDir, projectPath, config)
   refreshModulesPath(modulesDir)
   return getESLintFromDirectory(modulesDir, config)
 }

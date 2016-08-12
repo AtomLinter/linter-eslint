@@ -1,7 +1,7 @@
 'use babel'
 
 import { CompositeDisposable, Range } from 'atom'
-import { spawnWorker, showError, ruleURI } from './helpers'
+import { getProjectPath, spawnWorker, showError, ruleURI } from './helpers'
 import escapeHTML from 'escape-html'
 
 module.exports = {
@@ -33,10 +33,13 @@ module.exports = {
       editor.onDidSave(() => {
         if (this.scopes.indexOf(editor.getGrammar().scopeName) !== -1 &&
             atom.config.get('linter-eslint.fixOnSave')) {
+          const filePath = editor.getPath()
+          const projectPath = getProjectPath(filePath)
           this.worker.request('job', {
             type: 'fix',
             config: atom.config.get('linter-eslint'),
-            filePath: editor.getPath()
+            filePath,
+            projectPath,
           }).catch((response) =>
             atom.notifications.addWarning(response)
           )
@@ -47,6 +50,7 @@ module.exports = {
       'linter-eslint:fix-file': () => {
         const textEditor = atom.workspace.getActiveTextEditor()
         const filePath = textEditor.getPath()
+        const projectPath = getProjectPath(filePath)
 
         if (!textEditor || textEditor.isModified()) {
           // Abort for invalid or unsaved text editors
@@ -57,7 +61,8 @@ module.exports = {
         this.worker.request('job', {
           type: 'fix',
           config: atom.config.get('linter-eslint'),
-          filePath
+          filePath,
+          projectPath,
         }).then((response) =>
           atom.notifications.addSuccess(response)
         ).catch((response) =>
@@ -97,13 +102,15 @@ module.exports = {
           return Promise.resolve([])
         }
         const filePath = textEditor.getPath()
+        const projectPath = getProjectPath(filePath)
         const showRule = atom.config.get('linter-eslint.showRuleIdInMessage')
 
         return this.worker.request('job', {
           contents: text,
           type: 'lint',
           config: atom.config.get('linter-eslint'),
-          filePath
+          filePath,
+          projectPath,
         }).then((response) =>
           response.map(({ message, line, severity, ruleId, column, fix }) => {
             const textBuffer = textEditor.getBuffer()
