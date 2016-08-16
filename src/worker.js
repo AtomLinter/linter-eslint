@@ -14,6 +14,11 @@ const ignoredMessages = [
   'File ignored because of a matching ignore pattern. Use --no-ignore to override.',
   // V2.11.1
   'File ignored because of a matching ignore pattern. Use "--no-ignore" to override.',
+  // supress warning that the current file is ignored by eslint by default
+  'File ignored by default.  Use a negated ignore pattern (like "--ignore-pattern \'!<relative'
+    + '/path/to/filename>\'") to override.',
+  'File ignored by default. Use "--ignore-pattern \'!node_modules/*\'" to override.',
+  'File ignored by default. Use "--ignore-pattern \'!bower_components/*\'" to override.',
 ]
 
 function lintJob(argv, contents, eslint, configPath, config) {
