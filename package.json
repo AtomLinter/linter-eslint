@@ -80,8 +80,8 @@
         "type": "string"
       }
     },
-    "silencedRuleIds": {
-      "title": "List of rules to silence",
+    "silenceWhileTypingRules": {
+      "title": "Silence rules while typing",
       "description": "Useful when Atom fixes errors on save like no-trailing-spaces or eol-last.",
       "type": "array",
       "default": [],

@@ -118,7 +118,7 @@ module.exports = {
         let rules = {}
 
         if (textEditor.isModified()) {
-          rules = idsToIgnoredRules(atom.config.get('linter-eslint.silencedRuleIds'))
+          rules = idsToIgnoredRules(atom.config.get('linter-eslint.silenceWhileTypingRules'))
         }
 
         return this.worker.request('job', {
