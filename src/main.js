@@ -115,15 +115,17 @@ module.exports = {
           return Promise.resolve([])
         }
         const filePath = textEditor.getPath()
+        let rules = {}
 
-        const silencedRuleIds = atom.config.get('linter-eslint.silencedRuleIds')
-        const silencedRules = idsToIgnoredRules(silencedRuleIds)
+        if (textEditor.isModified()) {
+          rules = idsToIgnoredRules(atom.config.get('linter-eslint.silencedRuleIds'))
+        }
 
         return this.worker.request('job', {
           contents: text,
           type: 'lint',
           config: atom.config.get('linter-eslint'),
-          rules: silencedRules,
+          rules,
           filePath
         }).then((response) => {
           if (textEditor.getText() !== text) {
