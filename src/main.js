@@ -83,6 +83,10 @@ module.exports = {
       })
     )
 
+    this.subscriptions.add(atom.config.observe('linter-eslint.rulesToSilenceWhileTyping', (ids) => {
+      this.ignoredRulesWhenModified = idsToIgnoredRules(ids)
+    }))
+
     const initializeWorker = () => {
       const { worker, subscription } = spawnWorker()
       this.worker = worker
@@ -118,7 +122,7 @@ module.exports = {
         let rules = {}
 
         if (textEditor.isModified()) {
-          rules = idsToIgnoredRules(atom.config.get('linter-eslint.silenceWhileTypingRules'))
+          rules = this.ignoredRulesWhenModified
         }
 
         return this.worker.request('job', {
