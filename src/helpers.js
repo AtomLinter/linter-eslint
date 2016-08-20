@@ -84,7 +84,7 @@ export function ruleURI(ruleId) {
       return `https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/${ruleName}.md`
 
     case 'react-native':
-      return `https://github.com/Intellicode/eslint-plugin-react-native/tree/master/docs/rules/${ruleName}.md`
+      return `https://github.com/Intellicode/eslint-plugin-react-native/blob/master/docs/rules/${ruleName}.md`
 
     default:
       return 'https://github.com/AtomLinter/linter-eslint/wiki/Linking-to-Rule-Documentation'
