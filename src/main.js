@@ -1,8 +1,9 @@
 'use babel'
 
 import { CompositeDisposable, Range } from 'atom'
-import { spawnWorker, showError, ruleURI } from './helpers'
+import { spawnWorker, showError } from './helpers'
 import escapeHTML from 'escape-html'
+import ruleURI from 'eslint-rule-documentation'
 
 module.exports = {
   activate() {
@@ -128,7 +129,7 @@ module.exports = {
             }
             if (showRule) {
               const elName = ruleId ? 'a' : 'span'
-              const href = ruleId ? ` href=${ruleURI(ruleId)}` : ''
+              const href = ruleId ? ` href=${ruleURI(ruleId).url}` : ''
               ret.html = `<${elName}${href} class="badge badge-flexible eslint">` +
                 `${ruleId || 'Fatal'}</${elName}> ${escapeHTML(message)}`
             } else {
