@@ -99,7 +99,7 @@
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^3.0.1",
-    "eslint-plugin-import": "^1.7.0",
+    "eslint-plugin-import": "^1.8.1",
     "ucompiler": "^3.2.0",
     "ucompiler-plugin-babel": "^3.0.0",
     "ucompiler-plugin-newline": "^3.0.0",
