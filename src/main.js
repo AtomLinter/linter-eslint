@@ -112,9 +112,17 @@ module.exports = {
                 newText: fix.text
               }
             }
-            const range = Helpers.rangeFromLineNumber(
-              textEditor, line - 1, column ? column - 1 : column
-            )
+
+            let range
+            try {
+              range = Helpers.rangeFromLineNumber(
+                textEditor, line - 1, column ? column - 1 : column
+              )
+            } catch (err) {
+              throw new Error(`Cannot mark location in editor for (${ruleId}) - `
+                `(${message}) at line (${line}) column (${column})`)
+            }
+
             const ret = {
               filePath,
               type: severity === 1 ? 'Warning' : 'Error',
