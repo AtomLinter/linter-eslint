@@ -1,22 +1,31 @@
-# Project specific config
+### Project specific config ###
 language: generic
 
-os:
-  - linux
-  - osx
+matrix:
+  include:
+    - os: linux
+      env: ATOM_CHANNEL=stable
 
-env:
-  matrix:
-    - ATOM_CHANNEL=stable
-    - ATOM_CHANNEL=beta
+    - os: linux
+      env: ATOM_CHANNEL=beta
 
-# Generic setup follows
+    - os: osx
+      env: ATOM_CHANNEL=stable
+
+### Generic setup follows ###
 script: 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
+
+# Needed to disable the auto-install step running `npm install`
+install: true
 
 notifications:
   email:
     on_success: never
     on_failure: change
+
+branches:
+  only:
+    - master
 
 git:
   depth: 10
@@ -30,7 +39,3 @@ addons:
     - git
     - libgnome-keyring-dev
     - fakeroot
-
-branches:
-  only:
-    - master

@@ -1,15 +1,7 @@
-dependencies:
-  override:
-    - curl -L https://atom.io/download/deb -o atom-amd64.deb
-    - sudo dpkg --install atom-amd64.deb || true
-    - sudo apt-get update
-    - sudo apt-get -f install -y
-    - apm install
 test:
   override:
-    - atom -v
-    - apm -v
-    - ./node_modules/.bin/eslint src
-    - ./node_modules/.bin/eslint spec
-    - ./node_modules/.bin/eslint lib
-    - apm test
+    - curl -s https://raw.githubusercontent.com/Arcanemagus/ci/atomlinter/build-package.sh | sh
+
+dependencies:
+  override:
+    - echo "Managed in the script"
