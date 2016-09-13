@@ -98,7 +98,7 @@
     "resolve-env": "^1.0.0"
   },
   "devDependencies": {
-    "eslint-config-airbnb-base": "^3.0.1",
+    "eslint-config-airbnb-base": "^7.1.0",
     "eslint-plugin-import": "^1.7.0",
     "ucompiler": "^3.2.0",
     "ucompiler-plugin-babel": "^3.0.0",
