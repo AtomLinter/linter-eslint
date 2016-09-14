@@ -105,8 +105,17 @@ module.exports = {
           type: 'lint',
           config: atom.config.get('linter-eslint'),
           filePath
-        }).then((response) =>
-          response.map(({ message, line, severity, ruleId, column, fix }) => {
+        }).then((response) => {
+          if (textEditor.getText() !== text) {
+            /*
+               The editor text has been modified since the lint was triggered,
+               as we can't be sure that the results will map properly back to
+               the new contents, simply return `null` to tell the
+               `provideLinter` consumer not to update the saved results.
+             */
+            return null
+          }
+          return response.map(({ message, line, severity, ruleId, column, fix }) => {
             const textBuffer = textEditor.getBuffer()
             let linterFix = null
             if (fix) {
@@ -148,7 +157,7 @@ module.exports = {
             }
             return ret
           })
-        )
+        })
       }
     }
   }
