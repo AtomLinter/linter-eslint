@@ -56,3 +56,7 @@ Alternatively you can create the `.eslintrc` file by yourself. It is a good
 idea to have a look at the [Get Started With ESLint](http://devnull.guru/get-started-with-eslint/)
 blog post by [IanVS](https://github.com/IanVS) and [the ESLint documentation](http://eslint.org/docs/user-guide/configuring),
 including the [list of rules](http://eslint.org/docs/rules/).
+
+## Contributing
+
+See the [contributing guidelines](./CONTRIBUTING.md) to get started
