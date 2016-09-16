@@ -1,11 +1,12 @@
 'use babel'
 // Note: 'use babel' doesn't work in forked processes
-process.title = 'linter-eslint helper'
 
 import Path from 'path'
-import * as Helpers from './worker-helpers'
 import { create } from 'process-communication'
 import { FindCache } from 'atom-linter'
+import * as Helpers from './worker-helpers'
+
+process.title = 'linter-eslint helper'
 
 const ignoredMessages = [
   // V1

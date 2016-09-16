@@ -1,9 +1,11 @@
 'use babel'
 
-import { CompositeDisposable, Range } from 'atom'
-import { spawnWorker, showError } from './helpers'
 import escapeHTML from 'escape-html'
 import ruleURI from 'eslint-rule-documentation'
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { CompositeDisposable, Range } from 'atom'
+
+import { spawnWorker, showError } from './helpers'
 
 module.exports = {
   activate() {
@@ -14,20 +16,18 @@ module.exports = {
     this.worker = null
     this.scopes = []
 
-    this.subscriptions.add(atom.config.observe('linter-eslint.scopes', scopes => {
+    this.subscriptions.add(atom.config.observe('linter-eslint.scopes', (scopes) => {
       // Remove any old scopes
       this.scopes.splice(0, this.scopes.length)
       // Add the current scopes
       Array.prototype.push.apply(this.scopes, scopes)
     }))
     const embeddedScope = 'source.js.embedded.html'
-    this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles', lintHtmlFiles => {
+    this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles', (lintHtmlFiles) => {
       if (lintHtmlFiles) {
         this.scopes.push(embeddedScope)
-      } else {
-        if (this.scopes.indexOf(embeddedScope) !== -1) {
-          this.scopes.splice(this.scopes.indexOf(embeddedScope), 1)
-        }
+      } else if (this.scopes.indexOf(embeddedScope) !== -1) {
+        this.scopes.splice(this.scopes.indexOf(embeddedScope), 1)
       }
     }))
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
@@ -38,7 +38,7 @@ module.exports = {
             type: 'fix',
             config: atom.config.get('linter-eslint'),
             filePath: editor.getPath()
-          }).catch((response) =>
+          }).catch(response =>
             atom.notifications.addWarning(response)
           )
         }
@@ -59,9 +59,9 @@ module.exports = {
           type: 'fix',
           config: atom.config.get('linter-eslint'),
           filePath
-        }).then((response) =>
+        }).then(response =>
           atom.notifications.addSuccess(response)
-        ).catch((response) =>
+        ).catch(response =>
           atom.notifications.addWarning(response)
         )
       }
@@ -87,12 +87,13 @@ module.exports = {
   },
   provideLinter() {
     const Helpers = require('atom-linter')
+
     return {
       name: 'ESLint',
       grammarScopes: this.scopes,
       scope: 'file',
       lintOnFly: true,
-      lint: textEditor => {
+      lint: (textEditor) => {
         const text = textEditor.getText()
         if (text.length === 0) {
           return Promise.resolve([])
