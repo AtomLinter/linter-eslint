@@ -6,7 +6,7 @@
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.8.0 <2.0.0"
+    "atom": ">=1.10.0 <2.0.0"
   },
   "configSchema": {
     "lintHtmlFiles": {
