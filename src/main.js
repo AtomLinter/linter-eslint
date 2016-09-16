@@ -22,6 +22,7 @@ module.exports = {
       // Add the current scopes
       Array.prototype.push.apply(this.scopes, scopes)
     }))
+
     const embeddedScope = 'source.js.embedded.html'
     this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles', (lintHtmlFiles) => {
       if (lintHtmlFiles) {
@@ -30,6 +31,7 @@ module.exports = {
         this.scopes.splice(this.scopes.indexOf(embeddedScope), 1)
       }
     }))
+
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(() => {
         if (this.scopes.indexOf(editor.getGrammar().scopeName) !== -1 &&
@@ -44,6 +46,7 @@ module.exports = {
         }
       })
     }))
+
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:fix-file': () => {
         const textEditor = atom.workspace.getActiveTextEditor()

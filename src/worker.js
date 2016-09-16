@@ -30,6 +30,7 @@ function lintJob(argv, contents, eslint, configPath, config) {
   return global.__LINTER_ESLINT_RESPONSE
     .filter(e => !ignoredMessages.includes(e.message))
 }
+
 function fixJob(argv, eslint) {
   try {
     eslint.execute(argv)
