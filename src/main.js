@@ -7,7 +7,7 @@ import ruleURI from 'eslint-rule-documentation'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable, Range } from 'atom'
 
-import { spawnWorker, showError, idsToIgnoredRules } from './helpers'
+import { spawnWorker, showError, idsToIgnoredRules, validatePoint } from './helpers'
 
 // Configuration
 const scopes = []
@@ -181,7 +181,9 @@ module.exports = {
              */
             return null
           }
-          return response.map(({ message, line, severity, ruleId, column, fix }) => {
+          return response.map(({
+            message, line, severity, ruleId, column, fix, endLine, endColumn }
+          ) => {
             const textBuffer = textEditor.getBuffer()
             let linterFix = null
             if (fix) {
@@ -195,10 +197,16 @@ module.exports = {
               }
             }
             let range
+            const msgLine = line - 1
+            const msgCol = column ? column - 1 : column
             try {
-              range = Helpers.rangeFromLineNumber(
-                textEditor, line - 1, column ? column - 1 : column
-              )
+              if (endColumn && endLine) {
+                validatePoint(textEditor, msgLine, msgCol)
+                validatePoint(textEditor, endLine - 1, endColumn - 1)
+                range = [[msgLine, msgCol], [endLine - 1, endColumn - 1]]
+              } else {
+                range = Helpers.rangeFromLineNumber(textEditor, msgLine, msgCol)
+              }
             } catch (err) {
               throw new Error(
                 `Cannot mark location in editor for (${ruleId}) - (${message})` +
