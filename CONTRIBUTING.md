@@ -9,9 +9,9 @@ If you would like to contribute enhancements or fixes, please do the following:
 3.  Hack on a separate topic branch created from the latest `master`. The src files are under `/src`
 4.  Check for lint errors with `npm run lint` or Atom and `linter-eslint`.
 5.  Run `npm run compile` to generate compiled files under `lib/`.
-4.  Commit the changes under `src/` and `lib/` and push the topic branch
-5.  Make a pull request
-6.  Welcome to the club!
+6.  Commit the changes under `src/` and `lib/` and push the topic branch
+7.  Make a pull request
+8.  Welcome to the club!
 
 ## Guidelines
 
