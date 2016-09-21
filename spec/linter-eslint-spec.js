@@ -17,6 +17,10 @@ const badImportPath = path.join(__dirname, 'fixtures',
   'import-resolution', 'nested', 'badImport.js')
 const ignoredPath = path.join(__dirname, 'fixtures',
   'eslintignore', 'ignored.js')
+const modifiedIgnorePath = path.join(__dirname, 'fixtures',
+  'modified-ignore-rule', 'foo.js')
+const modifiedIgnoreSpacePath = path.join(__dirname, 'fixtures',
+  'modified-ignore-rule', 'foo-space.js')
 
 describe('The eslint provider for Linter', () => {
   const { spawnWorker } = require('../lib/helpers')
@@ -213,6 +217,58 @@ describe('The eslint provider for Linter', () => {
       waitsFor(
         () => doneCheckingFixes,
         'Messages should be checked after fixing'
+      )
+    })
+  })
+
+  describe('Ignores specified rules when editing', () => {
+    it('does nothing on saved files', () => {
+      atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
+      waitsForPromise(() =>
+        atom.workspace.open(modifiedIgnoreSpacePath).then((editor) => {
+          lint(editor).then((messages) => {
+            expect(messages.length).toBe(1)
+            expect(messages[0].type).toBe('Error')
+            expect(messages[0].html).not.toBeDefined()
+            expect(messages[0].text).toBe('Trailing spaces not allowed.')
+            expect(messages[0].filePath).toBe(modifiedIgnoreSpacePath)
+            expect(messages[0].range).toEqual([[0, 9], [0, 10]])
+          })
+        })
+      )
+    })
+
+    it('works when the file is modified', () => {
+      waitsForPromise(() =>
+        atom.workspace.open(modifiedIgnorePath).then((editor) => {
+          // Verify no error before
+          lint(editor).then(messages =>
+            expect(messages.length).toBe(0)
+          )
+
+          // Insert a space into the editor
+          .then(() => editor.getBuffer().insert([0, 9], ' '))
+
+          // Verify the space is showing an error
+          .then(lint(editor).then((messages) => {
+            expect(messages.length).toBe(1)
+            expect(messages[0].type).toBe('Error')
+            expect(messages[0].html).not.toBeDefined()
+            expect(messages[0].text).toBe('Trailing spaces not allowed.')
+            expect(messages[0].filePath).toBe(modifiedIgnoreSpacePath)
+            expect(messages[0].range).toEqual([[0, 9], [0, 10]])
+          }))
+
+          // Enable the option
+          .then(() =>
+            atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
+          )
+
+          // Check the lint results
+          .then(lint(editor).then(messages =>
+            expect(messages.length).toBe(0)
+          ))
+        })
       )
     })
   })
