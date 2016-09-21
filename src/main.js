@@ -119,8 +119,8 @@ module.exports = {
           return Promise.resolve([])
         }
         const filePath = textEditor.getPath()
-        let rules = {}
 
+        let rules = {}
         if (textEditor.isModified()) {
           rules = this.ignoredRulesWhenModified
         }
