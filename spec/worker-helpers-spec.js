@@ -1,8 +1,8 @@
 'use babel'
 
+import * as Path from 'path'
 import * as Helpers from '../lib/worker-helpers'
 import { getFixturesPath } from './common'
-import * as Path from 'path'
 
 describe('Worker Helpers', () => {
   describe('getESLintInstance && getESLintFromDirectory', () => {

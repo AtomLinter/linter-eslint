@@ -1,11 +1,12 @@
 'use babel'
 // Note: 'use babel' doesn't work in forked processes
-process.title = 'linter-eslint helper'
 
 import Path from 'path'
-import * as Helpers from './worker-helpers'
 import { create } from 'process-communication'
 import { FindCache } from 'atom-linter'
+import * as Helpers from './worker-helpers'
+
+process.title = 'linter-eslint helper'
 
 const ignoredMessages = [
   // V1
@@ -29,6 +30,7 @@ function lintJob(argv, contents, eslint, configPath, config) {
   return global.__LINTER_ESLINT_RESPONSE
     .filter(e => !ignoredMessages.includes(e.message))
 }
+
 function fixJob(argv, eslint) {
   try {
     eslint.execute(argv)

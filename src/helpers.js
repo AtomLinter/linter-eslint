@@ -1,9 +1,10 @@
 'use babel'
 
 import ChildProcess from 'child_process'
-import { Disposable } from 'atom'
 import { createFromProcess } from 'process-communication'
 import { join } from 'path'
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Disposable } from 'atom'
 
 export function spawnWorker() {
   const env = Object.create(process.env)
@@ -22,9 +23,12 @@ export function spawnWorker() {
     console.log('[Linter-ESLint] STDERR', chunk.toString())
   })
 
-  return { worker, subscription: new Disposable(() => {
-    worker.kill()
-  }) }
+  return {
+    worker,
+    subscription: new Disposable(() => {
+      worker.kill()
+    })
+  }
 }
 
 export function showError(givenMessage, givenDetail = null) {

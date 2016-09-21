@@ -1,7 +1,7 @@
 'use babel'
 
-import linter from '../lib/main'
 import * as path from 'path'
+import linter from '../lib/main'
 
 const goodPath = path.join(__dirname, 'fixtures', 'files', 'good.js')
 const badPath = path.join(__dirname, 'fixtures', 'files', 'bad.js')
@@ -16,6 +16,7 @@ const ignoredPath = path.join(__dirname, 'fixtures',
 
 describe('The eslint provider for Linter', () => {
   const { spawnWorker } = require('../lib/helpers')
+
   const worker = spawnWorker()
   const lint = linter.provideLinter.call(worker).lint
 
@@ -33,7 +34,7 @@ describe('The eslint provider for Linter', () => {
     let editor = null
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(badPath).then(openEditor => {
+        atom.workspace.open(badPath).then((openEditor) => {
           editor = openEditor
         })
       )
@@ -41,21 +42,19 @@ describe('The eslint provider for Linter', () => {
 
     it('finds at least one message', () => {
       waitsForPromise(() =>
-        lint(editor).then(messages => {
-          expect(messages.length).toBeGreaterThan(0)
-        })
+        lint(editor).then(messages => expect(messages.length).toBeGreaterThan(0))
       )
     })
 
     it('verifies that message', () => {
       waitsForPromise(() =>
-        lint(editor).then(messages => {
+        lint(editor).then((messages) => {
           expect(messages[0].type).toBe('Error')
           expect(messages[0].html).not.toBeDefined()
           expect(messages[0].text).toBe("'foo' is not defined.")
           expect(messages[0].filePath).toBe(badPath)
           expect(messages[0].range).toEqual([[0, 0], [0, 3]])
-          expect(messages[0].hasOwnProperty('fix')).toBeFalsy()
+          expect(Object.hasOwnProperty.call(messages[0], 'fix')).toBeFalsy()
         })
       )
     })
@@ -64,9 +63,7 @@ describe('The eslint provider for Linter', () => {
   it('finds nothing wrong with an empty file', () => {
     waitsForPromise(() =>
       atom.workspace.open(emptyPath).then(editor =>
-        lint(editor).then(messages => {
-          expect(messages.length).toBe(0)
-        })
+        lint(editor).then(messages => expect(messages.length).toBe(0))
       )
     )
   })
@@ -74,9 +71,7 @@ describe('The eslint provider for Linter', () => {
   it('finds nothing wrong with a valid file', () => {
     waitsForPromise(() =>
       atom.workspace.open(goodPath).then(editor =>
-        lint(editor).then(messages => {
-          expect(messages.length).toBe(0)
-        })
+        lint(editor).then(messages => expect(messages.length).toBe(0))
       )
     )
   })
@@ -85,7 +80,7 @@ describe('The eslint provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(fixPath).then(editor =>
         lint(editor)
-      ).then(messages => {
+      ).then((messages) => {
         expect(messages[0].fix.range).toEqual([[0, 11], [0, 12]])
         expect(messages[0].fix.newText).toBe('')
 
@@ -99,23 +94,21 @@ describe('The eslint provider for Linter', () => {
     it('correctly resolves imports from parent', () => {
       waitsForPromise(() =>
         atom.workspace.open(importingpath).then(editor =>
-          lint(editor).then(messages => {
-            expect(messages.length).toBe(0)
-          })
+          lint(editor).then(messages => expect(messages.length).toBe(0))
         )
       )
     })
     it('shows a message for an invalid import', () => {
       waitsForPromise(() =>
         atom.workspace.open(badImportPath).then(editor =>
-          lint(editor).then(messages => {
+          lint(editor).then((messages) => {
             expect(messages.length).toBeGreaterThan(0)
             expect(messages[0].type).toBe('Error')
             expect(messages[0].html).not.toBeDefined()
             expect(messages[0].text).toBe("Unable to resolve path to module '../nonexistent'.")
             expect(messages[0].filePath).toBe(badImportPath)
             expect(messages[0].range).toEqual([[0, 24], [0, 39]])
-            expect(messages[0].hasOwnProperty('fix')).toBeFalsy()
+            expect(Object.hasOwnProperty.call(messages[0], 'fix')).toBeFalsy()
           })
         )
       )
@@ -129,9 +122,7 @@ describe('The eslint provider for Linter', () => {
     it('will not give warnings for the file', () => {
       waitsForPromise(() =>
         atom.workspace.open(ignoredPath).then(editor =>
-          lint(editor).then(messages => {
-            expect(messages.length).toBe(0)
-          })
+          lint(editor).then(messages => expect(messages.length).toBe(0))
         )
       )
     })
@@ -143,11 +134,11 @@ describe('The eslint provider for Linter', () => {
     })
     it('should fix lint errors when saved', () => {
       waitsForPromise(() =>
-        atom.workspace.open(fixPath).then(editor => {
-          lint(editor).then(messages => {
+        atom.workspace.open(fixPath).then((editor) => {
+          lint(editor).then((messages) => {
             expect(messages.length).toBe(2)
             editor.save()
-            lint(editor).then(messagesAfterSave => {
+            lint(editor).then((messagesAfterSave) => {
               expect(messagesAfterSave.length).toBe(0)
             })
           })
