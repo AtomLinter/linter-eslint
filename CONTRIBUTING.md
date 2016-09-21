@@ -6,7 +6,8 @@ If you would like to contribute enhancements or fixes, please do the following:
 
 1.  Fork the plugin repository
 2.  Run `npm install` to setup all dependencies
-3.  Hack on a separate topic branch created from the latest `master`. The src files are under `src`
+3.  Hack on a separate topic branch created from the latest `master`. Changes to
+    the package code should be made to the files in the `src` directory.
 4.  Check for lint errors with `npm run lint` or Atom and `linter-eslint`.
 5.  Run `npm run compile` to generate compiled files under `lib`.
 6.  Commit the changes under `src` and `lib` and push the topic branch
