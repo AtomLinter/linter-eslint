@@ -84,8 +84,8 @@ describe('The eslint provider for Linter', () => {
         expect(messages[0].fix.range).toEqual([[0, 11], [0, 12]])
         expect(messages[0].fix.newText).toBe('')
 
-        expect(messages[1].fix.range).toEqual([[2, 1], [2, 1]])
-        expect(messages[1].fix.newText).toBe(' ')
+        expect(messages[1].fix.range).toEqual([[2, 0], [2, 1]])
+        expect(messages[1].fix.newText).toEqual('  ')
       })
     )
   })
