@@ -1,8 +1,10 @@
 'use babel'
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 
 import * as path from 'path'
 import * as fs from 'fs'
 import { tmpdir } from 'os'
+import rimraf from 'rimraf'
 import linter from '../lib/main'
 
 const goodPath = path.join(__dirname, 'fixtures', 'files', 'good.js')
@@ -160,9 +162,7 @@ describe('The eslint provider for Linter', () => {
     })
 
     afterEach(() => {
-      fs.unlinkSync(tempFixturePath)
-      fs.unlinkSync(tempConfigPath)
-      fs.rmdirSync(tempFixtureDir)
+      rimraf.sync(tempFixtureDir)
     })
 
     it('should fix linting errors', () => {
