@@ -147,7 +147,7 @@ describe('The eslint provider for Linter', () => {
 
     beforeEach(() => {
       waitsForPromise(() => {
-        tempFixtureDir = fs.mkdtempSync(tmpdir())
+        tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
         tempFixturePath = path.join(tempFixtureDir, 'fixed.js')
         tempConfigPath = path.join(tempFixtureDir, '.eslintrc.yaml')
         fs.createReadStream(configPath).pipe(fs.createWriteStream(tempConfigPath))
