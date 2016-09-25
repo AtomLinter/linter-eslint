@@ -26,7 +26,6 @@ describe('The eslint provider for Linter', () => {
   const lint = linter.provideLinter.call(worker).lint
   const fix = textEditor =>
     worker.worker.request('job', {
-      contents: textEditor.getText(),
       type: 'fix',
       config: atom.config.get('linter-eslint'),
       filePath: textEditor.getPath()
@@ -97,7 +96,7 @@ describe('The eslint provider for Linter', () => {
         expect(messages[0].fix.newText).toBe('')
 
         expect(messages[1].fix.range).toEqual([[2, 0], [2, 1]])
-        expect(messages[1].fix.newText).toEqual('  ')
+        expect(messages[1].fix.newText).toBe('  ')
       })
     )
   })
@@ -140,7 +139,7 @@ describe('The eslint provider for Linter', () => {
     })
   })
 
-  describe('Fix errors', () => {
+  describe('fixes errors', () => {
     let editor
     let doneCheckingFixes
     let tempFixtureDir
@@ -149,9 +148,9 @@ describe('The eslint provider for Linter', () => {
 
     beforeEach(() => {
       waitsForPromise(() => {
-        tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
-        tempFixturePath = `${tempFixtureDir}${path.sep}fixed.js`
-        tempConfigPath = `${tempFixtureDir}${path.sep}.eslintrc.yaml`
+        tempFixtureDir = fs.mkdtempSync(tmpdir())
+        tempFixturePath = path.join(tempFixtureDir, 'fixed.js')
+        tempConfigPath = path.join(tempFixtureDir, '.eslintrc.yaml')
         fs.createReadStream(configPath).pipe(fs.createWriteStream(tempConfigPath))
 
         return atom.workspace.open(fixPath).then((openEditor) => {
@@ -168,18 +167,17 @@ describe('The eslint provider for Linter', () => {
     it('should fix linting errors', () => {
       function firstLint(textEditor) {
         return lint(textEditor)
-        .then((messages) => {
-          // The original file has two errors
-          expect(messages.length).toBe(2)
-          return textEditor
-        })
+          .then((messages) => {
+            // The original file has two errors
+            expect(messages.length).toBe(2)
+            return textEditor
+          })
       }
       function makeFixes(textEditor) {
         return fix(textEditor)
           .then((messagesAfterSave) => {
             // Linter reports a successful fix
             expect(messagesAfterSave).toBe('Linter-ESLint: Fix Complete')
-            return textEditor
           })
       }
       // Create a subscription to watch when the editor changes (from the fix)
