@@ -1,5 +1,4 @@
 'use babel'
-/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 
 import * as path from 'path'
 import * as fs from 'fs'
