@@ -1,0 +1,14 @@
+---
+
+  root: true
+
+  env:
+    es6: true
+
+  rules:
+    semi:
+      - error
+      - never
+    indent:
+      - error
+      - 2

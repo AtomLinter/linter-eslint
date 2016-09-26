@@ -1,12 +1,16 @@
 'use babel'
 
 import * as path from 'path'
+import * as fs from 'fs'
+import { tmpdir } from 'os'
+import rimraf from 'rimraf'
 import linter from '../lib/main'
 
 const goodPath = path.join(__dirname, 'fixtures', 'files', 'good.js')
 const badPath = path.join(__dirname, 'fixtures', 'files', 'bad.js')
 const emptyPath = path.join(__dirname, 'fixtures', 'files', 'empty.js')
 const fixPath = path.join(__dirname, 'fixtures', 'files', 'fix.js')
+const configPath = path.join(__dirname, 'fixtures', 'configs', '.eslintrc.yml')
 const importingpath = path.join(__dirname, 'fixtures',
   'import-resolution', 'nested', 'importing.js')
 const badImportPath = path.join(__dirname, 'fixtures',
@@ -19,6 +23,12 @@ describe('The eslint provider for Linter', () => {
 
   const worker = spawnWorker()
   const lint = linter.provideLinter.call(worker).lint
+  const fix = textEditor =>
+    worker.worker.request('job', {
+      type: 'fix',
+      config: atom.config.get('linter-eslint'),
+      filePath: textEditor.getPath()
+    })
 
   beforeEach(() => {
     atom.config.set('linter-eslint.disableFSCache', false)
@@ -84,8 +94,8 @@ describe('The eslint provider for Linter', () => {
         expect(messages[0].fix.range).toEqual([[0, 11], [0, 12]])
         expect(messages[0].fix.newText).toBe('')
 
-        expect(messages[1].fix.range).toEqual([[2, 1], [2, 1]])
-        expect(messages[1].fix.newText).toBe(' ')
+        expect(messages[1].fix.range).toEqual([[2, 0], [2, 1]])
+        expect(messages[1].fix.newText).toBe('  ')
       })
     )
   })
@@ -128,21 +138,69 @@ describe('The eslint provider for Linter', () => {
     })
   })
 
-  describe('Fix errors when saved', () => {
+  describe('fixes errors', () => {
+    let editor
+    let doneCheckingFixes
+    let tempFixtureDir
+    let tempFixturePath
+    let tempConfigPath
+
     beforeEach(() => {
-      atom.config.set('linter-eslint.fixOnSave', true)
-    })
-    it('should fix lint errors when saved', () => {
-      waitsForPromise(() =>
-        atom.workspace.open(fixPath).then((editor) => {
-          lint(editor).then((messages) => {
-            expect(messages.length).toBe(2)
-            editor.save()
-            lint(editor).then((messagesAfterSave) => {
-              expect(messagesAfterSave.length).toBe(0)
-            })
-          })
+      waitsForPromise(() => {
+        tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+        tempFixturePath = path.join(tempFixtureDir, 'fixed.js')
+        tempConfigPath = path.join(tempFixtureDir, '.eslintrc.yaml')
+        fs.createReadStream(configPath).pipe(fs.createWriteStream(tempConfigPath))
+
+        return atom.workspace.open(fixPath).then((openEditor) => {
+          openEditor.saveAs(tempFixturePath)
+          editor = openEditor
         })
+      })
+    })
+
+    afterEach(() => {
+      rimraf.sync(tempFixtureDir)
+    })
+
+    it('should fix linting errors', () => {
+      function firstLint(textEditor) {
+        return lint(textEditor)
+          .then((messages) => {
+            // The original file has two errors
+            expect(messages.length).toBe(2)
+            return textEditor
+          })
+      }
+      function makeFixes(textEditor) {
+        return fix(textEditor)
+          .then((messagesAfterSave) => {
+            // Linter reports a successful fix
+            expect(messagesAfterSave).toBe('Linter-ESLint: Fix Complete')
+          })
+      }
+      // Create a subscription to watch when the editor changes (from the fix)
+      editor.onDidChange(() => {
+        lint(editor)
+          .then((messagesAfterFixing) => {
+            // Note: this fires several times, with only the final time resulting in
+            // a non-null messagesAfterFixing.  This is the reason for the check here
+            // and for the `waitsFor` which makes sure the expectation is tested.
+            if (messagesAfterFixing) {
+              // After opening the file again, there are no linting errors
+              expect(messagesAfterFixing.length).toBe(0)
+              doneCheckingFixes = true
+            }
+          })
+      })
+
+      waitsForPromise(() =>
+        firstLint(editor)
+          .then(makeFixes)
+      )
+      waitsFor(
+        () => doneCheckingFixes,
+        'Messages should be checked after fixing'
       )
     })
   })
