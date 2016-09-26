@@ -239,36 +239,49 @@ describe('The eslint provider for Linter', () => {
     })
 
     it('works when the file is modified', () => {
+      let done
+
+      // Set up an observer to check the editor once it is modified
       waitsForPromise(() =>
         atom.workspace.open(modifiedIgnorePath).then((editor) => {
+          editor.onDidChange(() => {
+            lint(editor).then((messages) => {
+              if (messages) {
+                // Verify the space is showing an error
+                expect(messages.length).toBe(1)
+                expect(messages[0].type).toBe('Error')
+                expect(messages[0].html).not.toBeDefined()
+                expect(messages[0].text).toBe('Trailing spaces not allowed.')
+                expect(messages[0].filePath).toBe(modifiedIgnorePath)
+                expect(messages[0].range).toEqual([[0, 9], [0, 10]])
+
+                // Enable the option under test
+                atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
+
+                // Check the lint results
+                lint(editor).then((newMessages) => {
+                  expect(newMessages.length).toBe(0)
+                  done = true
+                })
+              }
+            })
+          })
+
           // Verify no error before
-          lint(editor).then(messages =>
+          return lint(editor).then(messages =>
             expect(messages.length).toBe(0)
           )
 
           // Insert a space into the editor
-          .then(() => editor.getBuffer().insert([0, 9], ' '))
-
-          // Verify the space is showing an error
-          .then(lint(editor).then((messages) => {
-            expect(messages.length).toBe(1)
-            expect(messages[0].type).toBe('Error')
-            expect(messages[0].html).not.toBeDefined()
-            expect(messages[0].text).toBe('Trailing spaces not allowed.')
-            expect(messages[0].filePath).toBe(modifiedIgnoreSpacePath)
-            expect(messages[0].range).toEqual([[0, 9], [0, 10]])
-          }))
-
-          // Enable the option
-          .then(() =>
-            atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
-          )
-
-          // Check the lint results
-          .then(lint(editor).then(messages =>
-            expect(messages.length).toBe(0)
-          ))
+          .then(() => {
+            editor.getBuffer().insert([0, 9], ' ')
+          })
         })
+      )
+
+      waitsFor(
+        () => done,
+        'Messages should be checked after modifying the buffer'
       )
     })
   })
