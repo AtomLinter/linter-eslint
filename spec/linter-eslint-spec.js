@@ -225,7 +225,7 @@ describe('The eslint provider for Linter', () => {
     it('does nothing on saved files', () => {
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
       waitsForPromise(() =>
-        atom.workspace.open(modifiedIgnoreSpacePath).then((editor) => {
+        atom.workspace.open(modifiedIgnoreSpacePath).then(editor =>
           lint(editor).then((messages) => {
             expect(messages.length).toBe(1)
             expect(messages[0].type).toBe('Error')
@@ -234,7 +234,7 @@ describe('The eslint provider for Linter', () => {
             expect(messages[0].filePath).toBe(modifiedIgnoreSpacePath)
             expect(messages[0].range).toEqual([[0, 9], [0, 10]])
           })
-        })
+        )
       )
     })
 
