@@ -33,8 +33,12 @@ describe('The eslint provider for Linter', () => {
   beforeEach(() => {
     atom.config.set('linter-eslint.disableFSCache', false)
     atom.config.set('linter-eslint.disableEslintIgnore', true)
+
     waitsForPromise(() =>
-      atom.packages.activatePackage('language-javascript').then(() =>
+      Promise.all([
+        atom.packages.activatePackage('language-javascript'),
+        atom.packages.activatePackage('linter-eslint'),
+      ]).then(() =>
         atom.workspace.open(goodPath)
       )
     )
