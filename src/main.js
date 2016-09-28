@@ -9,6 +9,7 @@ import { spawnWorker, showError } from './helpers'
 
 // Configuration
 const scopes = []
+let showRule
 
 module.exports = {
   activate() {
@@ -76,6 +77,12 @@ module.exports = {
       }
     }))
 
+    this.subscriptions.add(
+      atom.config.observe('linter-eslint.showRuleIdInMessage', (value) => {
+        showRule = value
+      })
+    )
+
     const initializeWorker = () => {
       const { worker, subscription } = spawnWorker()
       this.worker = worker
@@ -108,7 +115,6 @@ module.exports = {
           return Promise.resolve([])
         }
         const filePath = textEditor.getPath()
-        const showRule = atom.config.get('linter-eslint.showRuleIdInMessage')
 
         return this.worker.request('job', {
           contents: text,
