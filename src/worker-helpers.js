@@ -43,6 +43,7 @@ export function getESLintFromDirectory(modulesDir, config) {
     ESLintDirectory = Path.join(modulesDir || '', 'eslint')
   }
   try {
+    // eslint-disable-next-line import/no-dynamic-require
     return require(Path.join(ESLintDirectory, 'lib', 'cli.js'))
   } catch (e) {
     if (config.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
@@ -50,6 +51,7 @@ export function getESLintFromDirectory(modulesDir, config) {
         'ESLint not found, Please install or make sure Atom is getting $PATH correctly'
       )
     }
+    // eslint-disable-next-line import/no-dynamic-require
     return require(Path.join(Cache.ESLINT_LOCAL_PATH, 'lib', 'cli.js'))
   }
 }
@@ -78,6 +80,7 @@ export function getConfigPath(fileDir) {
   }
 
   const packagePath = findCached(fileDir, 'package.json')
+  // eslint-disable-next-line import/no-dynamic-require
   if (packagePath && Boolean(require(packagePath).eslintConfig)) {
     return packagePath
   }

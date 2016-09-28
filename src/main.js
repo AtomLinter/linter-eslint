@@ -2,8 +2,10 @@
 
 import escapeHTML from 'escape-html'
 import ruleURI from 'eslint-rule-documentation'
-// eslint-disable-next-line import/no-extraneous-dependencies
+
+/* eslint-disable import/no-extraneous-dependencies, import/extensions */
 import { CompositeDisposable, Range } from 'atom'
+/* eslint-enable import/no-extraneous-dependencies, import/extensions */
 
 import { spawnWorker, showError, idsToIgnoredRules } from './helpers'
 

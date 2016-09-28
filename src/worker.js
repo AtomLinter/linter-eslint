@@ -1,4 +1,5 @@
 'use babel'
+
 // Note: 'use babel' doesn't work in forked processes
 
 import Path from 'path'
