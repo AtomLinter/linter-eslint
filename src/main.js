@@ -10,6 +10,7 @@ import { spawnWorker, showError, idsToIgnoredRules } from './helpers'
 // Configuration
 const scopes = []
 let showRule
+let ignoredRulesWhenModified
 
 module.exports = {
   activate() {
@@ -84,7 +85,7 @@ module.exports = {
     )
 
     this.subscriptions.add(atom.config.observe('linter-eslint.rulesToSilenceWhileTyping', (ids) => {
-      this.ignoredRulesWhenModified = idsToIgnoredRules(ids)
+      ignoredRulesWhenModified = idsToIgnoredRules(ids)
     }))
 
     const initializeWorker = () => {
@@ -122,7 +123,7 @@ module.exports = {
 
         let rules = {}
         if (textEditor.isModified()) {
-          rules = this.ignoredRulesWhenModified
+          rules = ignoredRulesWhenModified
         }
 
         return this.worker.request('job', {
