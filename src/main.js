@@ -5,11 +5,12 @@ import ruleURI from 'eslint-rule-documentation'
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CompositeDisposable, Range } from 'atom'
 
-import { spawnWorker, showError } from './helpers'
+import { spawnWorker, showError, idsToIgnoredRules } from './helpers'
 
 // Configuration
 const scopes = []
 let showRule
+let ignoredRulesWhenModified
 
 module.exports = {
   activate() {
@@ -83,6 +84,10 @@ module.exports = {
       })
     )
 
+    this.subscriptions.add(atom.config.observe('linter-eslint.rulesToSilenceWhileTyping', (ids) => {
+      ignoredRulesWhenModified = idsToIgnoredRules(ids)
+    }))
+
     const initializeWorker = () => {
       const { worker, subscription } = spawnWorker()
       this.worker = worker
@@ -116,10 +121,16 @@ module.exports = {
         }
         const filePath = textEditor.getPath()
 
+        let rules = {}
+        if (textEditor.isModified() && Object.keys(ignoredRulesWhenModified).length > 0) {
+          rules = ignoredRulesWhenModified
+        }
+
         return this.worker.request('job', {
           contents: text,
           type: 'lint',
           config: atom.config.get('linter-eslint'),
+          rules,
           filePath
         }).then((response) => {
           if (textEditor.getText() !== text) {
@@ -160,6 +171,7 @@ module.exports = {
               type: severity === 1 ? 'Warning' : 'Error',
               range
             }
+
             if (showRule) {
               const elName = ruleId ? 'a' : 'span'
               const href = ruleId ? ` href=${ruleURI(ruleId).url}` : ''
@@ -171,6 +183,7 @@ module.exports = {
             if (linterFix) {
               ret.fix = linterFix
             }
+
             return ret
           })
         })

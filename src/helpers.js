@@ -6,6 +6,8 @@ import { join } from 'path'
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Disposable } from 'atom'
 
+const RULE_OFF_SEVERITY = 0
+
 export function spawnWorker() {
   const env = Object.create(process.env)
 
@@ -45,4 +47,11 @@ export function showError(givenMessage, givenDetail = null) {
     detail,
     dismissable: true
   })
+}
+
+export function idsToIgnoredRules(ruleIds = []) {
+  return ruleIds.reduce((ids, id) => {
+    ids[id] = RULE_OFF_SEVERITY
+    return ids
+  }, {})
 }
