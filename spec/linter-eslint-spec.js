@@ -222,6 +222,9 @@ describe('The eslint provider for Linter', () => {
   })
 
   describe('Ignores specified rules when editing', () => {
+    const expected = '<a href=http://eslint.org/docs/rules/no-trailing-spaces ' +
+      'class="badge badge-flexible eslint">no-trailing-spaces</a> ' +
+      'Trailing spaces not allowed.'
     it('does nothing on saved files', () => {
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
       waitsForPromise(() =>
@@ -229,8 +232,8 @@ describe('The eslint provider for Linter', () => {
           lint(editor).then((messages) => {
             expect(messages.length).toBe(1)
             expect(messages[0].type).toBe('Error')
-            expect(messages[0].html).not.toBeDefined()
-            expect(messages[0].text).toBe('Trailing spaces not allowed.')
+            expect(messages[0].text).not.toBeDefined()
+            expect(messages[0].html).toBe(expected)
             expect(messages[0].filePath).toBe(modifiedIgnoreSpacePath)
             expect(messages[0].range).toEqual([[0, 9], [0, 10]])
           })
@@ -250,8 +253,8 @@ describe('The eslint provider for Linter', () => {
                 // Verify the space is showing an error
                 expect(messages.length).toBe(1)
                 expect(messages[0].type).toBe('Error')
-                expect(messages[0].html).not.toBeDefined()
-                expect(messages[0].text).toBe('Trailing spaces not allowed.')
+                expect(messages[0].text).not.toBeDefined()
+                expect(messages[0].html).toBe(expected)
                 expect(messages[0].filePath).toBe(modifiedIgnorePath)
                 expect(messages[0].range).toEqual([[0, 9], [0, 10]])
 
