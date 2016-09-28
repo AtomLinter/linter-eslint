@@ -3,7 +3,8 @@
 import ChildProcess from 'child_process'
 import { createFromProcess } from 'process-communication'
 import { join } from 'path'
-// eslint-disable-next-line import/no-extraneous-dependencies
+
+// eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Disposable } from 'atom'
 
 const RULE_OFF_SEVERITY = 0
