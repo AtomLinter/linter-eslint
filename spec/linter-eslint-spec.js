@@ -33,8 +33,12 @@ describe('The eslint provider for Linter', () => {
   beforeEach(() => {
     atom.config.set('linter-eslint.disableFSCache', false)
     atom.config.set('linter-eslint.disableEslintIgnore', true)
+
     waitsForPromise(() =>
-      atom.packages.activatePackage('language-javascript').then(() =>
+      Promise.all([
+        atom.packages.activatePackage('language-javascript'),
+        atom.packages.activatePackage('linter-eslint'),
+      ]).then(() =>
         atom.workspace.open(goodPath)
       )
     )
@@ -59,9 +63,12 @@ describe('The eslint provider for Linter', () => {
     it('verifies that message', () => {
       waitsForPromise(() =>
         lint(editor).then((messages) => {
+          const expected = '<a href=http://eslint.org/docs/rules/no-undef ' +
+            'class="badge badge-flexible eslint">no-undef</a> ' +
+            '&#39;foo&#39; is not defined.'
           expect(messages[0].type).toBe('Error')
-          expect(messages[0].html).not.toBeDefined()
-          expect(messages[0].text).toBe("'foo' is not defined.")
+          expect(messages[0].text).not.toBeDefined()
+          expect(messages[0].html).toBe(expected)
           expect(messages[0].filePath).toBe(badPath)
           expect(messages[0].range).toEqual([[0, 0], [0, 3]])
           expect(Object.hasOwnProperty.call(messages[0], 'fix')).toBeFalsy()
@@ -112,10 +119,15 @@ describe('The eslint provider for Linter', () => {
       waitsForPromise(() =>
         atom.workspace.open(badImportPath).then(editor =>
           lint(editor).then((messages) => {
+            const expected = '<a href=' +
+              'https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md ' +
+              'class="badge badge-flexible eslint">import/no-unresolved</a> ' +
+              'Unable to resolve path to module &#39;../nonexistent&#39;.'
+
             expect(messages.length).toBeGreaterThan(0)
             expect(messages[0].type).toBe('Error')
-            expect(messages[0].html).not.toBeDefined()
-            expect(messages[0].text).toBe("Unable to resolve path to module '../nonexistent'.")
+            expect(messages[0].text).not.toBeDefined()
+            expect(messages[0].html).toBe(expected)
             expect(messages[0].filePath).toBe(badImportPath)
             expect(messages[0].range).toEqual([[0, 24], [0, 39]])
             expect(Object.hasOwnProperty.call(messages[0], 'fix')).toBeFalsy()

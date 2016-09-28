@@ -7,6 +7,9 @@ import { CompositeDisposable, Range } from 'atom'
 
 import { spawnWorker, showError } from './helpers'
 
+// Configuration
+const scopes = []
+
 module.exports = {
   activate() {
     require('atom-package-deps').install()
@@ -14,27 +17,30 @@ module.exports = {
     this.subscriptions = new CompositeDisposable()
     this.active = true
     this.worker = null
-    this.scopes = []
 
-    this.subscriptions.add(atom.config.observe('linter-eslint.scopes', (scopes) => {
-      // Remove any old scopes
-      this.scopes.splice(0, this.scopes.length)
-      // Add the current scopes
-      Array.prototype.push.apply(this.scopes, scopes)
-    }))
+    this.subscriptions.add(
+      atom.config.observe('linter-eslint.scopes', (value) => {
+        // Remove any old scopes
+        scopes.splice(0, scopes.length)
+        // Add the current scopes
+        Array.prototype.push.apply(scopes, value)
+      })
+    )
 
     const embeddedScope = 'source.js.embedded.html'
-    this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles', (lintHtmlFiles) => {
-      if (lintHtmlFiles) {
-        this.scopes.push(embeddedScope)
-      } else if (this.scopes.indexOf(embeddedScope) !== -1) {
-        this.scopes.splice(this.scopes.indexOf(embeddedScope), 1)
-      }
-    }))
+    this.subscriptions.add(
+      atom.config.observe('linter-eslint.lintHtmlFiles', (lintHtmlFiles) => {
+        if (lintHtmlFiles) {
+          scopes.push(embeddedScope)
+        } else if (scopes.indexOf(embeddedScope) !== -1) {
+          scopes.splice(scopes.indexOf(embeddedScope), 1)
+        }
+      })
+    )
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(() => {
-        if (this.scopes.indexOf(editor.getGrammar().scopeName) !== -1 &&
+        if (scopes.indexOf(editor.getGrammar().scopeName) !== -1 &&
             atom.config.get('linter-eslint.fixOnSave')) {
           this.worker.request('job', {
             type: 'fix',
@@ -93,7 +99,7 @@ module.exports = {
 
     return {
       name: 'ESLint',
-      grammarScopes: this.scopes,
+      grammarScopes: scopes,
       scope: 'file',
       lintOnFly: true,
       lint: (textEditor) => {
