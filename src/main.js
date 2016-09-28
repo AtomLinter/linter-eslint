@@ -122,7 +122,7 @@ module.exports = {
         const filePath = textEditor.getPath()
 
         let rules = {}
-        if (textEditor.isModified()) {
+        if (textEditor.isModified() && Object.keys(ignoredRulesWhenModified).length > 0) {
           rules = ignoredRulesWhenModified
         }
 

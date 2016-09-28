@@ -126,7 +126,7 @@ export function getArgv(type, config, rules, filePath, fileDir, givenConfigPath)
   if (configPath) {
     argv.push('--config', resolveEnv(configPath))
   }
-  if (rules) {
+  if (rules && Object.keys(rules).length > 0) {
     argv.push('--rule', JSON.stringify(rules))
   }
   if (config.disableEslintIgnore) {
