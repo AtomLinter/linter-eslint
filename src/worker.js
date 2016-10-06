@@ -4,7 +4,7 @@
 
 import Path from 'path'
 import { create } from 'process-communication'
-import { FindCache } from 'atom-linter'
+import { FindCache, findCached } from 'atom-linter'
 import * as Helpers from './worker-helpers'
 
 process.title = 'linter-eslint helper'
@@ -59,6 +59,9 @@ create().onRequest('job', ({ contents, type, config, filePath, rules }, job) => 
     job.response = lintJob(argv, contents, eslint, configPath, config)
   } else if (type === 'fix') {
     job.response = fixJob(argv, eslint)
+  } else if (type === 'debug') {
+    const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
+    job.response = Helpers.findESLintDirectory(modulesDir, config)
   }
 })
 
