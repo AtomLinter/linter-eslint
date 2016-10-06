@@ -5,6 +5,55 @@ import * as Helpers from '../lib/worker-helpers'
 import { getFixturesPath } from './common'
 
 describe('Worker Helpers', () => {
+  describe('findESLintDirectory', () => {
+    it('returns an object with path and type keys', () => {
+      const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
+      const foundEslint = Helpers.findESLintDirectory(modulesDir, {})
+      expect(typeof foundEslint === 'object').toBe(true)
+      expect(foundEslint.path).toBeDefined()
+      expect(foundEslint.type).toBeDefined()
+    })
+
+    it('finds a local eslint when useGlobalEslint is false', () => {
+      const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
+      const foundEslint = Helpers.findESLintDirectory(modulesDir, { useGlobalEslint: false })
+      const expectedEslintPath = Path.join(getFixturesPath('local-eslint'), 'node_modules', 'eslint')
+      expect(foundEslint.path).toEqual(expectedEslintPath)
+      expect(foundEslint.type).toEqual('local project')
+    })
+
+    it('does not find a local eslint when useGlobalEslint is true', () => {
+      const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
+      const globalNodePath = getFixturesPath('global-eslint')
+      const config = { useGlobalEslint: true, globalNodePath }
+      const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
+      const expectedEslintPath = Path.join(getFixturesPath('local-eslint'), 'node_modules', 'eslint')
+      expect(foundEslint.path).not.toEqual(expectedEslintPath)
+      expect(foundEslint.type).not.toEqual('local project')
+    })
+
+    it('finds a global eslint when useGlobalEslint is true and a valid globalNodePath is provided', () => {
+      const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
+      const globalNodePath = getFixturesPath('global-eslint')
+      const config = { useGlobalEslint: true, globalNodePath }
+      const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
+      const expectedEslintPath = process.platform === 'win32'
+        ? Path.join(globalNodePath, 'node_modules', 'eslint')
+        : Path.join(globalNodePath, 'lib', 'node_modules', 'eslint')
+      expect(foundEslint.path).toEqual(expectedEslintPath)
+      expect(foundEslint.type).toEqual('global')
+    })
+
+    it('falls back to the packaged eslint when no local eslint is found', () => {
+      const modulesDir = 'not/a/real/path'
+      const config = { useGlobalEslint: false }
+      const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
+      const expectedBundledPath = Path.join(__dirname, '..', 'node_modules', 'eslint')
+      expect(foundEslint.path).toEqual(expectedBundledPath)
+      expect(foundEslint.type).toEqual('bundled fallback')
+    })
+  })
+
   describe('getESLintInstance && getESLintFromDirectory', () => {
     it('tries to find a local eslint', () => {
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), {})

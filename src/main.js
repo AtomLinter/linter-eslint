@@ -1,5 +1,6 @@
 'use babel'
 
+import Path from 'path'
 import escapeHTML from 'escape-html'
 import ruleURI from 'eslint-rule-documentation'
 
@@ -54,6 +55,36 @@ module.exports = {
           )
         }
       })
+    }))
+
+    this.subscriptions.add(atom.commands.add('atom-text-editor', {
+      'linter-eslint:debug': () => {
+        const textEditor = atom.workspace.getActiveTextEditor()
+        const filePath = textEditor.getPath()
+        const linterEslintMeta = require(Path.join(atom.packages.resolvePackagePath('linter-eslint'), 'package.json'))
+        const config = atom.config.get('linter-eslint')
+        const configString = JSON.stringify(config, null, 2)
+        const hoursSinceRestart = process.uptime() / 3600
+        this.worker.request('job', {
+          type: 'debug',
+          config,
+          filePath
+        }).then((response) => {
+          const detail = [
+            `atom version: ${atom.getVersion()}`,
+            `linter-eslint version: ${linterEslintMeta.version}`,
+            `eslint version: ${require(Path.join(response.path, 'package.json')).version}`,
+            `hours since last atom restart: ${Math.round(hoursSinceRestart * 10) / 10}`,
+            `platform: ${process.platform}`,
+            `Using ${response.type} eslint from ${response.path}`,
+            `linter-eslint configuration: ${configString}`
+          ].join('\n')
+          const notificationOptions = { detail, dismissable: true }
+          atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
+        }).catch((response) => {
+          atom.notifications.addError(`${response}`)
+        })
+      }
     }))
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {

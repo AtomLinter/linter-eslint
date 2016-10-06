@@ -1,6 +1,7 @@
 'use babel'
 
 import Path from 'path'
+import fs from 'fs'
 import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
@@ -29,19 +30,43 @@ export function getNodePrefixPath() {
   return Cache.NODE_PREFIX_PATH
 }
 
-export function getESLintFromDirectory(modulesDir, config) {
-  let ESLintDirectory = null
-
+export function findESLintDirectory(modulesDir, config) {
+  let eslintDir = null
+  let locationType = null
   if (config.useGlobalEslint) {
+    locationType = 'global'
     const prefixPath = config.globalNodePath || getNodePrefixPath()
     if (process.platform === 'win32') {
-      ESLintDirectory = Path.join(prefixPath, 'node_modules', 'eslint')
+      eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
     } else {
-      ESLintDirectory = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
+      eslintDir = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
   } else {
-    ESLintDirectory = Path.join(modulesDir || '', 'eslint')
+    locationType = 'local project'
+    eslintDir = Path.join(modulesDir || '', 'eslint')
   }
+  try {
+    if (fs.statSync(eslintDir).isDirectory()) {
+      return {
+        path: eslintDir,
+        type: locationType,
+      }
+    }
+  } catch (e) {
+    if (config.useGlobalEslint && e.code === 'ENOENT') {
+      throw new Error(
+          'ESLint not found, Please install or make sure Atom is getting $PATH correctly'
+        )
+    }
+  }
+  return {
+    path: Cache.ESLINT_LOCAL_PATH,
+    type: 'bundled fallback',
+  }
+}
+
+export function getESLintFromDirectory(modulesDir, config) {
+  const { path: ESLintDirectory } = findESLintDirectory(modulesDir, config)
   try {
     // eslint-disable-next-line import/no-dynamic-require
     return require(Path.join(ESLintDirectory, 'lib', 'cli.js'))
