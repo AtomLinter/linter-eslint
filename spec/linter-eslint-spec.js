@@ -6,21 +6,23 @@ import { tmpdir } from 'os'
 import rimraf from 'rimraf'
 import linter from '../lib/main'
 
-const goodPath = path.join(__dirname, 'fixtures', 'files', 'good.js')
-const badPath = path.join(__dirname, 'fixtures', 'files', 'bad.js')
-const emptyPath = path.join(__dirname, 'fixtures', 'files', 'empty.js')
-const fixPath = path.join(__dirname, 'fixtures', 'files', 'fix.js')
-const configPath = path.join(__dirname, 'fixtures', 'configs', '.eslintrc.yml')
-const importingpath = path.join(__dirname, 'fixtures',
+const fixturesDir = path.join(__dirname, 'fixtures')
+
+const goodPath = path.join(fixturesDir, 'files', 'good.js')
+const badPath = path.join(fixturesDir, 'files', 'bad.js')
+const emptyPath = path.join(fixturesDir, 'files', 'empty.js')
+const fixPath = path.join(fixturesDir, 'files', 'fix.js')
+const configPath = path.join(fixturesDir, 'configs', '.eslintrc.yml')
+const importingpath = path.join(fixturesDir,
   'import-resolution', 'nested', 'importing.js')
-const badImportPath = path.join(__dirname, 'fixtures',
+const badImportPath = path.join(fixturesDir,
   'import-resolution', 'nested', 'badImport.js')
-const ignoredPath = path.join(__dirname, 'fixtures',
-  'eslintignore', 'ignored.js')
-const modifiedIgnorePath = path.join(__dirname, 'fixtures',
+const ignoredPath = path.join(fixturesDir, 'eslintignore', 'ignored.js')
+const modifiedIgnorePath = path.join(fixturesDir,
   'modified-ignore-rule', 'foo.js')
-const modifiedIgnoreSpacePath = path.join(__dirname, 'fixtures',
+const modifiedIgnoreSpacePath = path.join(fixturesDir,
   'modified-ignore-rule', 'foo-space.js')
+const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
 
 describe('The eslint provider for Linter', () => {
   const { spawnWorker } = require('../lib/helpers')
@@ -342,4 +344,21 @@ describe('The eslint provider for Linter', () => {
       )
     })
   })
+
+  it('handles ranges in messages', () =>
+    waitsForPromise(() =>
+      atom.workspace.open(endRangePath).then(editor =>
+        lint(editor).then((messages) => {
+          const expected = '<a href=http://eslint.org/docs/rules/no-unreachable ' +
+            'class="badge badge-flexible eslint">no-unreachable</a> ' +
+            'Unreachable code.'
+          expect(messages[0].type).toBe('Error')
+          expect(messages[0].text).not.toBeDefined()
+          expect(messages[0].html).toBe(expected)
+          expect(messages[0].filePath).toBe(endRangePath)
+          expect(messages[0].range).toEqual([[5, 2], [6, 15]])
+        })
+      )
+    )
+  )
 })

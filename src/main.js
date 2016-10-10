@@ -7,7 +7,7 @@ import ruleURI from 'eslint-rule-documentation'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable, Range } from 'atom'
 
-import { spawnWorker, showError, idsToIgnoredRules } from './helpers'
+import { spawnWorker, showError, idsToIgnoredRules, validatePoint } from './helpers'
 
 // Configuration
 const scopes = []
@@ -65,6 +65,7 @@ module.exports = {
       'linter-eslint:debug': () => {
         const textEditor = atom.workspace.getActiveTextEditor()
         const filePath = textEditor.getPath()
+        // eslint-disable-next-line import/no-dynamic-require
         const linterEslintMeta = require(Path.join(atom.packages.resolvePackagePath('linter-eslint'), 'package.json'))
         const config = atom.config.get('linter-eslint')
         const configString = JSON.stringify(config, null, 2)
@@ -77,6 +78,7 @@ module.exports = {
           const detail = [
             `atom version: ${atom.getVersion()}`,
             `linter-eslint version: ${linterEslintMeta.version}`,
+            // eslint-disable-next-line import/no-dynamic-require
             `eslint version: ${require(Path.join(response.path, 'package.json')).version}`,
             `hours since last atom restart: ${Math.round(hoursSinceRestart * 10) / 10}`,
             `platform: ${process.platform}`,
@@ -181,7 +183,9 @@ module.exports = {
              */
             return null
           }
-          return response.map(({ message, line, severity, ruleId, column, fix }) => {
+          return response.map(({
+            message, line, severity, ruleId, column, fix, endLine, endColumn }
+          ) => {
             const textBuffer = textEditor.getBuffer()
             let linterFix = null
             if (fix) {
@@ -195,10 +199,20 @@ module.exports = {
               }
             }
             let range
+            const msgLine = line - 1
             try {
-              range = Helpers.rangeFromLineNumber(
-                textEditor, line - 1, column ? column - 1 : column
-              )
+              if (typeof endColumn !== 'undefined' && typeof endLine !== 'undefined') {
+                // Here we always want the column to be a number
+                const msgCol = Math.max(0, column - 1)
+                validatePoint(textEditor, msgLine, msgCol)
+                validatePoint(textEditor, endLine - 1, endColumn - 1)
+                range = [[msgLine, msgCol], [endLine - 1, endColumn - 1]]
+              } else {
+                // We want msgCol to remain undefined if it was initially so
+                // `rangeFromLineNumber` will give us a range over the entire line
+                const msgCol = typeof column !== 'undefined' ? column - 1 : column
+                range = Helpers.rangeFromLineNumber(textEditor, msgLine, msgCol)
+              }
             } catch (err) {
               throw new Error(
                 `Cannot mark location in editor for (${ruleId}) - (${message})` +
