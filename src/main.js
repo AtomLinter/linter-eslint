@@ -65,6 +65,7 @@ module.exports = {
       'linter-eslint:debug': () => {
         const textEditor = atom.workspace.getActiveTextEditor()
         const filePath = textEditor.getPath()
+        // eslint-disable-next-line import/no-dynamic-require
         const linterEslintMeta = require(Path.join(atom.packages.resolvePackagePath('linter-eslint'), 'package.json'))
         const config = atom.config.get('linter-eslint')
         const configString = JSON.stringify(config, null, 2)
@@ -77,6 +78,7 @@ module.exports = {
           const detail = [
             `atom version: ${atom.getVersion()}`,
             `linter-eslint version: ${linterEslintMeta.version}`,
+            // eslint-disable-next-line import/no-dynamic-require
             `eslint version: ${require(Path.join(response.path, 'package.json')).version}`,
             `hours since last atom restart: ${Math.round(hoursSinceRestart * 10) / 10}`,
             `platform: ${process.platform}`,
