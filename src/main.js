@@ -198,13 +198,17 @@ module.exports = {
             }
             let range
             const msgLine = line - 1
-            const msgCol = column ? column - 1 : column
             try {
-              if (endColumn && endLine) {
+              if (typeof endColumn !== 'undefined' && typeof endLine !== 'undefined') {
+                // Here we always want the column to be a number
+                const msgCol = Math.max(0, column - 1)
                 validatePoint(textEditor, msgLine, msgCol)
                 validatePoint(textEditor, endLine - 1, endColumn - 1)
                 range = [[msgLine, msgCol], [endLine - 1, endColumn - 1]]
               } else {
+                // We want msgCol to remain undefined if it was initially so
+                // `rangeFromLineNumber` will give us a range over the entire line
+                const msgCol = typeof column !== 'undefined' ? column - 1 : column
                 range = Helpers.rangeFromLineNumber(textEditor, msgLine, msgCol)
               }
             } catch (err) {
