@@ -1,5 +1,13 @@
 # Changelog
 
+## v8.0.0
+
+*   Update ESLint to v3.5.0 ([#692](https://github.com/AtomLinter/linter-eslint/pull/692))
+*   Add setting for rules to silence while typing ([#666](https://github.com/AtomLinter/linter-eslint/pull/666))
+*   Update ESLint to v3.6.0 ([#713](https://github.com/AtomLinter/linter-eslint/pull/713))
+*   Add a debug information command ([#730](https://github.com/AtomLinter/linter-eslint/pull/730))
+*   Add support for `endLine` and `endColumn` in ESLint messages ([#709](https://github.com/AtomLinter/linter-eslint/pull/709))
+
 ## v7.3.2
 
 *   Fix a race condition with modified editor text ([#703](https://github.com/AtomLinter/linter-eslint/pull/703))
