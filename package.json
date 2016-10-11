@@ -114,6 +114,7 @@
   },
   "devDependencies": {
     "babel-preset-steelbrain": "^4.0.2",
+    "eslint": "^3.6.0",
     "eslint-config-airbnb-base": "^8.0.0",
     "eslint-plugin-import": "^1.16.0",
     "rimraf": "^2.5.4",
