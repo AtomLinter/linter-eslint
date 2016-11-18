@@ -8,6 +8,7 @@
   "engines": {
     "atom": ">=1.10.0 <2.0.0"
   },
+  "activationHooks": ["language-javascript:grammar-used"],
   "configSchema": {
     "lintHtmlFiles": {
       "title": "Lint HTML Files",

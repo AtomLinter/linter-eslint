@@ -40,14 +40,22 @@ describe('The eslint provider for Linter', () => {
     atom.config.set('linter-eslint.disableFSCache', false)
     atom.config.set('linter-eslint.disableEslintIgnore', true)
 
+    // This whole beforeEach function is inspired by:
+    // https://github.com/AtomLinter/linter-jscs/pull/295/files
+    //
+    // See also:
+    // https://discuss.atom.io/t/activationhooks-break-unit-tests/36028/8
+    const activationPromise =
+      atom.packages.activatePackage('linter-eslint')
+
     waitsForPromise(() =>
-      Promise.all([
-        atom.packages.activatePackage('language-javascript'),
-        atom.packages.activatePackage('linter-eslint'),
-      ]).then(() =>
-        atom.workspace.open(goodPath)
-      )
-    )
+      atom.packages.activatePackage('language-javascript'))
+
+    waitsForPromise(() =>
+      atom.workspace.open(goodPath))
+
+    atom.packages.triggerDeferredActivationHooks()
+    waitsForPromise(() => activationPromise)
   })
 
   describe('checks bad.js and', () => {
