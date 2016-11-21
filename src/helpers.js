@@ -64,3 +64,49 @@ export function validatePoint(textEditor, line, col) {
     throw new Error(`${line}:${col} isn't a valid point!`)
   }
 }
+
+export async function getDebugInfo(worker) {
+  const textEditor = atom.workspace.getActiveTextEditor()
+  const filePath = textEditor.getPath()
+  const packagePath = atom.packages.resolvePackagePath('linter-eslint')
+  // eslint-disable-next-line import/no-dynamic-require
+  const linterEslintMeta = require(join(packagePath, 'package.json'))
+  const config = atom.config.get('linter-eslint')
+  const hoursSinceRestart = Math.round((process.uptime() / 3600) * 10) / 10
+  let returnVal
+  try {
+    const response = await worker.request('job', {
+      type: 'debug',
+      config,
+      filePath
+    })
+    returnVal = {
+      atomVersion: atom.getVersion(),
+      linterEslintVersion: linterEslintMeta.version,
+      linterEslintConfig: config,
+      // eslint-disable-next-line import/no-dynamic-require
+      eslintVersion: require(join(response.path, 'package.json')).version,
+      hoursSinceRestart,
+      platform: process.platform,
+      eslintType: response.type,
+      eslintPath: response.path,
+    }
+  } catch (error) {
+    atom.notifications.addError(`${error}`)
+  }
+  return returnVal
+}
+
+export async function generateDebugString(worker) {
+  const debug = await getDebugInfo(worker)
+  const details = [
+    `Atom version: ${debug.atomVersion}`,
+    `linter-eslint version: ${debug.linterEslintVersion}`,
+    `ESLint version: ${debug.eslintVersion}`,
+    `Hours since last Atom restart: ${debug.hoursSinceRestart}`,
+    `Platform: ${debug.platform}`,
+    `Using ${debug.eslintType} ESLint from ${debug.eslintPath}`,
+    `linter-eslint configuration: ${JSON.stringify(debug.linterEslintConfig, null, 2)}`
+  ]
+  return details.join('\n')
+}
