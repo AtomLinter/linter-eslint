@@ -100,7 +100,8 @@
     "test": "apm test",
     "lint": "eslint .",
     "watch": "ucompiler watch",
-    "compile": "ucompiler go"
+    "compile": "ucompiler go",
+    "test": "apm test"
   },
   "dependencies": {
     "atom-linter": "^8.0.0",
@@ -110,7 +111,8 @@
     "eslint": "^3.6.0",
     "eslint-rule-documentation": "^1.0.0",
     "process-communication": "^1.1.0",
-    "resolve-env": "^1.0.0"
+    "resolve-env": "^1.0.0",
+    "untildify": "^2.1.0"
   },
   "devDependencies": {
     "babel-preset-steelbrain": "^4.0.2",
