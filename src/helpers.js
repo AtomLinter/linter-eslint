@@ -128,7 +128,7 @@ const generateInvalidTrace = async (
   const title = encodeURIComponent(titleText)
   const body = encodeURIComponent([
     'ESLint returned a point that did not exist in the document being edited.',
-    `Rule: ${ruleId}`,
+    `Rule: \`${ruleId}\``,
     rangeText,
     '', '',
     '<!-- If at all possible, please include code to reproduce this issue! -->',
