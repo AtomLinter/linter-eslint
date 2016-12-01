@@ -114,6 +114,55 @@ export async function generateDebugString(worker) {
   return details.join('\n')
 }
 
+const generateInvalidTrace = async (
+  msgLine, msgCol, msgEndLine, msgEndCol,
+  eslintFullRange, filePath, textEditor, ruleId, message
+) => {
+  let errMsgRange = `${msgLine + 1}:${msgCol}`
+  if (eslintFullRange) {
+    errMsgRange += ` - ${msgEndLine + 1}:${msgEndCol + 1}`
+  }
+  const rangeText = `Requested ${eslintFullRange ? 'start point' : 'range'}: ${errMsgRange}`
+  const issueURL = 'https://github.com/AtomLinter/linter-eslint/issues/new'
+  const titleText = `Invalid position given by '${ruleId}'`
+  const title = encodeURIComponent(titleText)
+  const body = encodeURIComponent([
+    'ESLint returned a point that did not exist in the document being edited.',
+    `Rule: ${ruleId}`,
+    rangeText,
+    '', '',
+    '<!-- If at all possible, please include code to reproduce this issue! -->',
+    '', '',
+    'Debug information:',
+    '```json',
+    JSON.stringify(await getDebugInfo(), null, 2),
+    '```'
+  ].join('\n'))
+  const newIssueURL = `${issueURL}?title=${title}&body=${body}`
+  return {
+    type: 'Error',
+    severity: 'error',
+    html: `${escapeHTML(titleText)}. See the trace for details. ` +
+      `<a href="${newIssueURL}">Report this!</a>`,
+    filePath,
+    range: rangeFromLineNumber(textEditor, 0),
+    trace: [
+      {
+        type: 'Trace',
+        text: `Original message: ${ruleId} - ${message}`,
+        filePath,
+        severity: 'info',
+      },
+      {
+        type: 'Trace',
+        text: rangeText,
+        filePath,
+        severity: 'info',
+      },
+    ]
+  }
+}
+
 export async function processMessages(response, textEditor, showRule) {
   return Promise.all(response.map(async ({
     message, line, severity, ruleId, column, fix, endLine, endColumn
@@ -176,49 +225,10 @@ export async function processMessages(response, textEditor, showRule) {
         ret.fix = linterFix
       }
     } catch (err) {
-      let errMsgRange = `${msgLine + 1}:${msgCol}`
-      if (eslintFullRange) {
-        errMsgRange += ` - ${msgEndLine + 1}:${msgEndCol + 1}`
-      }
-      const rangeText = `Requested ${eslintFullRange ? 'start point' : 'range'}: ${errMsgRange}`
-      const issueURL = 'https://github.com/AtomLinter/linter-eslint/issues/new'
-      const titleText = `Invalid position given by '${ruleId}'`
-      const title = encodeURIComponent(titleText)
-      const body = encodeURIComponent([
-        'ESLint returned a point that did not exist in the document being edited.',
-        `Rule: ${ruleId}`,
-        rangeText,
-        '', '',
-        '<!-- If at all possible, please include code to reproduce this issue! -->',
-        '', '',
-        'Debug information:',
-        '```json',
-        JSON.stringify(await getDebugInfo(), null, 2),
-        '```'
-      ].join('\n'))
-      const newIssueURL = `${issueURL}?title=${title}&body=${body}`
-      ret = {
-        type: 'Error',
-        severity: 'error',
-        html: `${escapeHTML(titleText)}. See the trace for details. ` +
-          `<a href="${newIssueURL}">Report this!</a>`,
-        filePath,
-        range: rangeFromLineNumber(textEditor, 0),
-        trace: [
-          {
-            type: 'Trace',
-            text: `Original message: ${ruleId} - ${message}`,
-            filePath,
-            severity: 'info',
-          },
-          {
-            type: 'Trace',
-            text: rangeText,
-            filePath,
-            severity: 'info',
-          },
-        ]
-      }
+      ret = await generateInvalidTrace(
+        msgLine, msgCol, msgEndLine, msgEndCol,
+        eslintFullRange, filePath, textEditor, ruleId, message
+      )
     }
 
     return ret
