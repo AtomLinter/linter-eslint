@@ -6,7 +6,10 @@ import ruleURI from 'eslint-rule-documentation'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable, Range } from 'atom'
 
-import { spawnWorker, showError, idsToIgnoredRules, validatePoint, generateDebugString } from './helpers'
+import {
+  spawnWorker, showError, idsToIgnoredRules, validatePoint,
+  getDebugInfo, generateDebugString
+} from './helpers'
 
 // Configuration
 const scopes = []
@@ -158,9 +161,9 @@ module.exports = {
              */
             return null
           }
-          return response.map(({
-            message, line, severity, ruleId, column, fix, endLine, endColumn }
-          ) => {
+          const messagePromises = response.map(async ({
+            message, line, severity, ruleId, column, fix, endLine, endColumn
+          }) => {
             const textBuffer = textEditor.getBuffer()
             let linterFix = null
             if (fix) {
@@ -173,47 +176,100 @@ module.exports = {
                 newText: fix.text
               }
             }
-            let range
             const msgLine = line - 1
-            try {
-              if (typeof endColumn !== 'undefined' && typeof endLine !== 'undefined') {
-                // Here we always want the column to be a number
-                const msgCol = Math.max(0, column - 1)
-                validatePoint(textEditor, msgLine, msgCol)
-                validatePoint(textEditor, endLine - 1, endColumn - 1)
-                range = [[msgLine, msgCol], [endLine - 1, endColumn - 1]]
-              } else {
-                // We want msgCol to remain undefined if it was initially so
-                // `rangeFromLineNumber` will give us a range over the entire line
-                const msgCol = typeof column !== 'undefined' ? column - 1 : column
-                range = Helpers.rangeFromLineNumber(textEditor, msgLine, msgCol)
-              }
-            } catch (err) {
-              throw new Error(
-                `Cannot mark location in editor for (${ruleId}) - (${message})` +
-                ` at line (${line}) column (${column})`
-              )
-            }
-            const ret = {
-              filePath,
-              type: severity === 1 ? 'Warning' : 'Error',
-              range
+            let msgCol
+            let msgEndLine
+            let msgEndCol
+            let eslintFullRange = false
+            if (typeof endColumn !== 'undefined' && typeof endLine !== 'undefined') {
+              eslintFullRange = true
+              // Here we always want the column to be a number
+              msgCol = Math.max(0, column - 1)
+              msgEndLine = endLine - 1
+              msgEndCol = endColumn - 1
+            } else {
+              // We want msgCol to remain undefined if it was initially so
+              // `rangeFromLineNumber` will give us a range over the entire line
+              msgCol = typeof column !== 'undefined' ? column - 1 : column
             }
 
-            if (showRule) {
-              const elName = ruleId ? 'a' : 'span'
-              const href = ruleId ? ` href=${ruleURI(ruleId).url}` : ''
-              ret.html = `<${elName}${href} class="badge badge-flexible eslint">` +
-                `${ruleId || 'Fatal'}</${elName}> ${escapeHTML(message)}`
-            } else {
-              ret.text = message
-            }
-            if (linterFix) {
-              ret.fix = linterFix
+            let ret
+            let range
+            try {
+              if (eslintFullRange) {
+                validatePoint(textEditor, msgLine, msgCol)
+                validatePoint(textEditor, msgEndLine, msgEndCol)
+                range = [[msgLine, msgCol], [msgEndLine, msgEndCol]]
+              } else {
+                range = Helpers.rangeFromLineNumber(textEditor, msgLine, msgCol)
+              }
+              ret = {
+                filePath,
+                type: severity === 1 ? 'Warning' : 'Error',
+                range
+              }
+
+              if (showRule) {
+                const elName = ruleId ? 'a' : 'span'
+                const href = ruleId ? ` href=${ruleURI(ruleId).url}` : ''
+                ret.html = `<${elName}${href} class="badge badge-flexible eslint">` +
+                  `${ruleId || 'Fatal'}</${elName}> ${escapeHTML(message)}`
+              } else {
+                ret.text = message
+              }
+              if (linterFix) {
+                ret.fix = linterFix
+              }
+            } catch (err) {
+              let errMsgRange = `${msgLine + 1}:${msgCol}`
+              if (eslintFullRange) {
+                errMsgRange += ` - ${msgEndLine + 1}:${msgEndCol + 1}`
+              }
+              const rangeText = `Requested ${eslintFullRange ? 'start point' : 'range'}: ${errMsgRange}`
+              const issueURL = 'https://github.com/AtomLinter/linter-eslint/issues/new'
+              const titleText = `Invalid position given by '${ruleId}'`
+              const title = encodeURIComponent(titleText)
+              const body = encodeURIComponent([
+                'ESLint returned a point that did not exist in the document being edited.',
+                `Rule: ${ruleId}`,
+                rangeText,
+                '', '',
+                '<!-- If at all possible, please include code to reproduce this issue! -->',
+                '', '',
+                'Debug information:',
+                '```json',
+                JSON.stringify(await getDebugInfo(), null, 2),
+                '```'
+              ].join('\n'))
+              const newIssueURL = `${issueURL}?title=${title}&body=${body}`
+              ret = {
+                type: 'Error',
+                severity: 'error',
+                html: `${escapeHTML(titleText)}. See the trace for details. ` +
+                  `<a href="${newIssueURL}">Report this!</a>`,
+                filePath,
+                range: Helpers.rangeFromLineNumber(textEditor, 0),
+                trace: [
+                  {
+                    type: 'Trace',
+                    text: `Original message: ${ruleId} - ${message}`,
+                    filePath,
+                    severity: 'info',
+                  },
+                  {
+                    type: 'Trace',
+                    text: rangeText,
+                    filePath,
+                    severity: 'info',
+                  },
+                ]
+              }
             }
 
             return ret
           })
+
+          return Promise.all(messagePromises).then(messages => messages)
         })
       }
     }
