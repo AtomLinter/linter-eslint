@@ -116,7 +116,7 @@ export async function generateDebugString(worker) {
 
 const generateInvalidTrace = async (
   msgLine, msgCol, msgEndLine, msgEndCol,
-  eslintFullRange, filePath, textEditor, ruleId, message
+  eslintFullRange, filePath, textEditor, ruleId, message, worker
 ) => {
   let errMsgRange = `${msgLine + 1}:${msgCol}`
   if (eslintFullRange) {
@@ -135,7 +135,7 @@ const generateInvalidTrace = async (
     '', '',
     'Debug information:',
     '```json',
-    JSON.stringify(await getDebugInfo(), null, 2),
+    JSON.stringify(await getDebugInfo(worker), null, 2),
     '```'
   ].join('\n'))
   const newIssueURL = `${issueURL}?title=${title}&body=${body}`
@@ -163,7 +163,7 @@ const generateInvalidTrace = async (
   }
 }
 
-export async function processMessages(response, textEditor, showRule) {
+export async function processMessages(response, textEditor, showRule, worker) {
   return Promise.all(response.map(async ({
     message, line, severity, ruleId, column, fix, endLine, endColumn
   }) => {
@@ -227,7 +227,7 @@ export async function processMessages(response, textEditor, showRule) {
     } catch (err) {
       ret = await generateInvalidTrace(
         msgLine, msgCol, msgEndLine, msgEndCol,
-        eslintFullRange, filePath, textEditor, ruleId, message
+        eslintFullRange, filePath, textEditor, ruleId, message, worker
       )
     }
 

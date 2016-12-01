@@ -156,7 +156,7 @@ module.exports = {
              */
             return null
           }
-          return processMessages(response, textEditor, showRule)
+          return processMessages(response, textEditor, showRule, this.worker)
         })
       }
     }
