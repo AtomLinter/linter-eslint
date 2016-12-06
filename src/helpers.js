@@ -240,6 +240,12 @@ export async function processESLintMessages(response, textEditor, showRule, work
         ret.fix = linterFix
       }
     } catch (err) {
+      if (!err.message.startsWith('Line number ') &&
+        !err.message.startsWith('Column start ')
+      ) {
+        // This isn't an invalid point error from `rangeFromLineNumber`, re-throw it
+        throw err
+      }
       ret = await generateInvalidTrace(
         msgLine, msgCol, msgEndLine, msgEndCol,
         eslintFullRange, filePath, textEditor, ruleId, message, worker
