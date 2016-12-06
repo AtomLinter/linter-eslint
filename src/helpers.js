@@ -163,6 +163,15 @@ const generateInvalidTrace = async (
   }
 }
 
+/**
+ * Given a raw response from ESLint, this processes the messages into a format
+ * compatible with the Linter API.
+ * @param  {Object}     response   The raw response from ESLint
+ * @param  {TextEditor} textEditor The Atom::TextEditor of the file the messages belong to
+ * @param  {bool}       showRule   Whether to show the rule in the messages
+ * @param  {Object}     worker     The current Worker process to send Debug jobs to
+ * @return {Promise}               The messages transformed into Linter messages
+ */
 export async function processESLintMessages(response, textEditor, showRule, worker) {
   return Promise.all(response.map(async ({
     message, line, severity, ruleId, column, fix, endLine, endColumn
