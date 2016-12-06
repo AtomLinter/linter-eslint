@@ -180,11 +180,17 @@ export async function processMessages(response, textEditor, showRule, worker) {
         newText: fix.text
       }
     }
-    const msgLine = line - 1
     let msgCol
     let msgEndLine
     let msgEndCol
     let eslintFullRange = false
+
+    /*
+     Note: ESLint positions are 1-indexed, while Atom expects 0-indexed,
+     positions. We are subtracting 1 from these values here so we don't have to
+     keep doing so in later uses.
+     */
+    const msgLine = line - 1
     if (typeof endColumn !== 'undefined' && typeof endLine !== 'undefined') {
       eslintFullRange = true
       // Here we always want the column to be a number
