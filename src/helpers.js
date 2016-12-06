@@ -163,7 +163,7 @@ const generateInvalidTrace = async (
   }
 }
 
-export async function processMessages(response, textEditor, showRule, worker) {
+export async function processESLintMessages(response, textEditor, showRule, worker) {
   return Promise.all(response.map(async ({
     message, line, severity, ruleId, column, fix, endLine, endColumn
   }) => {

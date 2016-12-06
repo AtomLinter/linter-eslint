@@ -4,7 +4,7 @@
 import { CompositeDisposable, } from 'atom'
 
 import {
-  spawnWorker, showError, idsToIgnoredRules, processMessages,
+  spawnWorker, showError, idsToIgnoredRules, processESLintMessages,
   generateDebugString
 } from './helpers'
 
@@ -156,7 +156,7 @@ module.exports = {
              */
             return null
           }
-          return processMessages(response, textEditor, showRule, this.worker)
+          return processESLintMessages(response, textEditor, showRule, this.worker)
         })
       }
     }
