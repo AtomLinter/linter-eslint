@@ -325,11 +325,11 @@ describe('The eslint provider for Linter', () => {
       const checkNotificaton = (notification) => {
         if (notification.getMessage() === 'linter-eslint debugging information') {
           const detail = notification.getDetail()
-          expect(detail.includes(`atom version: ${atom.getVersion()}`)).toBe(true)
+          expect(detail.includes(`Atom version: ${atom.getVersion()}`)).toBe(true)
           expect(detail.includes('linter-eslint version:')).toBe(true)
-          expect(detail.includes(`platform: ${process.platform}`)).toBe(true)
+          expect(detail.includes(`Platform: ${process.platform}`)).toBe(true)
           expect(detail.includes('linter-eslint configuration:')).toBe(true)
-          expect(detail.includes('Using local project eslint')).toBe(true)
+          expect(detail.includes('Using local project ESLint')).toBe(true)
           done = true
         }
       }
