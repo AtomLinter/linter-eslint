@@ -1,5 +1,6 @@
 'use babel'
 
+import Path from 'path'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable, } from 'atom'
 
@@ -7,6 +8,7 @@ import {
   spawnWorker, showError, idsToIgnoredRules, processESLintMessages,
   generateDebugString
 } from './helpers'
+import { getConfigPath } from './worker-helpers'
 
 // Configuration
 const scopes = []
@@ -47,6 +49,11 @@ module.exports = {
             atom.config.get('linter-eslint.fixOnSave')) {
           const filePath = editor.getPath()
           const projectPath = atom.project.relativizePath(filePath)[0]
+
+          // Do not try to fix if linting should be disabled
+          const fileDir = Path.dirname(filePath)
+          const configPath = getConfigPath(fileDir)
+          if (configPath === null && atom.config.get('linter-eslint.disableWhenNoEslintConfig')) return
 
           this.worker.request('job', {
             type: 'fix',
