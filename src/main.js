@@ -53,9 +53,9 @@ module.exports = {
             config: atom.config.get('linter-eslint'),
             filePath,
             projectPath
-          }).catch(response =>
-            atom.notifications.addWarning(response)
-          )
+          }).catch((err) => {
+            atom.notifications.addWarning(err.message)
+          })
         }
       })
     }))
@@ -87,9 +87,9 @@ module.exports = {
           projectPath
         }).then(response =>
           atom.notifications.addSuccess(response)
-        ).catch(response =>
-          atom.notifications.addWarning(response)
-        )
+        ).catch((err) => {
+          atom.notifications.addWarning(err.message)
+        })
       }
     }))
 
