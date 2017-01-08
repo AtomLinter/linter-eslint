@@ -14,6 +14,7 @@ import { getConfigPath } from './worker-helpers'
 const scopes = []
 let showRule
 let ignoredRulesWhenModified
+let disableWhenNoEslintConfig
 
 module.exports = {
   activate() {
@@ -53,7 +54,7 @@ module.exports = {
           // Do not try to fix if linting should be disabled
           const fileDir = Path.dirname(filePath)
           const configPath = getConfigPath(fileDir)
-          if (configPath === null && atom.config.get('linter-eslint.disableWhenNoEslintConfig')) return
+          if (configPath === null && disableWhenNoEslintConfig) return
 
           this.worker.request('job', {
             type: 'fix',
@@ -103,6 +104,12 @@ module.exports = {
     this.subscriptions.add(
       atom.config.observe('linter-eslint.showRuleIdInMessage', (value) => {
         showRule = value
+      })
+    )
+
+    this.subscriptions.add(
+      atom.config.observe('linter-eslint.disableWhenNoEslintConfig', (value) => {
+        disableWhenNoEslintConfig = value
       })
     )
 
