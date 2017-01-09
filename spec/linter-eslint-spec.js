@@ -194,7 +194,7 @@ describe('The eslint provider for Linter', () => {
         return fix(textEditor)
           .then((messagesAfterSave) => {
             // Linter reports a successful fix
-            expect(messagesAfterSave).toBe('Linter-ESLint: Fix Complete')
+            expect(messagesAfterSave).toBe('Linter-ESLint: Fix complete.')
           })
       }
       // Create a subscription to watch when the editor changes (from the fix)

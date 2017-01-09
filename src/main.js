@@ -1,5 +1,6 @@
 'use babel'
 
+import Path from 'path'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable, } from 'atom'
 
@@ -7,11 +8,13 @@ import {
   spawnWorker, showError, idsToIgnoredRules, processESLintMessages,
   generateDebugString
 } from './helpers'
+import { getConfigPath } from './worker-helpers'
 
 // Configuration
 const scopes = []
 let showRule
 let ignoredRulesWhenModified
+let disableWhenNoEslintConfig
 
 module.exports = {
   activate() {
@@ -48,14 +51,19 @@ module.exports = {
           const filePath = editor.getPath()
           const projectPath = atom.project.relativizePath(filePath)[0]
 
+          // Do not try to fix if linting should be disabled
+          const fileDir = Path.dirname(filePath)
+          const configPath = getConfigPath(fileDir)
+          if (configPath === null && disableWhenNoEslintConfig) return
+
           this.worker.request('job', {
             type: 'fix',
             config: atom.config.get('linter-eslint'),
             filePath,
             projectPath
-          }).catch(response =>
-            atom.notifications.addWarning(response)
-          )
+          }).catch((err) => {
+            atom.notifications.addWarning(err.message)
+          })
         }
       })
     }))
@@ -87,15 +95,21 @@ module.exports = {
           projectPath
         }).then(response =>
           atom.notifications.addSuccess(response)
-        ).catch(response =>
-          atom.notifications.addWarning(response)
-        )
+        ).catch((err) => {
+          atom.notifications.addWarning(err.message)
+        })
       }
     }))
 
     this.subscriptions.add(
       atom.config.observe('linter-eslint.showRuleIdInMessage', (value) => {
         showRule = value
+      })
+    )
+
+    this.subscriptions.add(
+      atom.config.observe('linter-eslint.disableWhenNoEslintConfig', (value) => {
+        disableWhenNoEslintConfig = value
       })
     )
 
