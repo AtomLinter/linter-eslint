@@ -2,10 +2,11 @@
 
 import ChildProcess from 'child_process'
 import { createFromProcess } from 'process-communication'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import escapeHTML from 'escape-html'
 import ruleURI from 'eslint-rule-documentation'
 import { rangeFromLineNumber } from 'atom-linter'
+import userHome from 'user-home'
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Disposable, Range } from 'atom'
@@ -254,4 +255,17 @@ export async function processESLintMessages(response, textEditor, showRule, work
 
     return ret
   }))
+}
+
+/**
+ * Check if a config is directly inside a user's home directory.
+ * Such config files are used by ESLint as a fallback, only for situations
+ * when there is no other config file between a file being linted and root.
+ *
+ * @param  {string}  configPath - The path of the config file being checked
+ * @return {Boolean}            [description]
+ */
+export function isConfigAtHomeRoot(configPath) {
+  console.log(userHome, dirname(configPath);
+  return (dirname(configPath) === userHome)
 }

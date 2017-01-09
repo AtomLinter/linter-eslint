@@ -6,7 +6,7 @@ import { CompositeDisposable, } from 'atom'
 
 import {
   spawnWorker, showError, idsToIgnoredRules, processESLintMessages,
-  generateDebugString
+  generateDebugString, isConfigAtHomeRoot
 } from './helpers'
 import { getConfigPath } from './worker-helpers'
 
@@ -54,7 +54,8 @@ module.exports = {
           // Do not try to fix if linting should be disabled
           const fileDir = Path.dirname(filePath)
           const configPath = getConfigPath(fileDir)
-          if (configPath === null && disableWhenNoEslintConfig) return
+          const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
+          if (noProjectConfig && disableWhenNoEslintConfig) return
 
           this.worker.request('job', {
             type: 'fix',

@@ -10,6 +10,7 @@ const fixturesDir = path.join(__dirname, 'fixtures')
 
 const goodPath = path.join(fixturesDir, 'files', 'good.js')
 const badPath = path.join(fixturesDir, 'files', 'bad.js')
+const badInlinePath = path.join(fixturesDir, 'files', 'badInline.js')
 const emptyPath = path.join(fixturesDir, 'files', 'empty.js')
 const fixPath = path.join(fixturesDir, 'files', 'fix.js')
 const configPath = path.join(fixturesDir, 'configs', '.eslintrc.yml')
@@ -361,4 +362,94 @@ describe('The eslint provider for Linter', () => {
       )
     )
   )
+
+  describe('when setting `disableWhenNoEslintConfig` is false', () => {
+    let editor
+    let didError
+    let gotLintingErrors
+    let tempFixtureDir
+    let tempFixturePath
+    beforeEach(() => {
+      atom.config.set('linter-eslint.disableWhenNoEslintConfig', false)
+
+      waitsForPromise(() =>
+        new Promise((resolve) => {
+          tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+          tempFixturePath = path.join(tempFixtureDir, 'badInline.js')
+          const wr = fs.createWriteStream(tempFixturePath)
+          wr.on('close', () =>
+            atom.workspace.open(tempFixturePath).then((openEditor) => {
+              editor = openEditor
+              resolve()
+            })
+          )
+          fs.createReadStream(badInlinePath).pipe(wr)
+        })
+      )
+    })
+
+    afterEach(() => {
+      rimraf.sync(tempFixtureDir)
+    })
+
+    it('errors when no config file is found', () => {
+      lint(editor)
+        .then((messages) => {
+          // Older versions of ESLint will report an error
+          // (or if current user running tests has a config in their home directory)
+          const expectedHtml = '<a href=http://eslint.org/docs/rules/no-undef ' +
+            'class="badge badge-flexible eslint">no-undef</a> &#39;foo&#39; is not defined.'
+          expect(messages.length).toBe(1)
+          expect(messages[0].html).toBe(expectedHtml)
+          gotLintingErrors = true
+        })
+        .catch((err) => {
+          // Newer versions of ESLint will throw an exception
+          expect(err.message).toBe('No ESLint configuration found.')
+          didError = true
+        })
+
+      waitsFor(
+        () => didError || gotLintingErrors,
+        'An error should have been thrown or linting performed'
+      )
+    })
+  })
+
+  describe('when `disableWhenNoEslintConfig` is true', () => {
+    let editor
+    let tempFixtureDir
+    let tempFixturePath
+    beforeEach(() => {
+      atom.config.set('linter-eslint.disableWhenNoEslintConfig', true)
+
+      waitsForPromise(() =>
+        new Promise((resolve) => {
+          tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+          tempFixturePath = path.join(tempFixtureDir, 'badInline.js')
+          const wr = fs.createWriteStream(tempFixturePath)
+          wr.on('close', () =>
+            atom.workspace.open(tempFixturePath).then((openEditor) => {
+              editor = openEditor
+              resolve()
+            })
+          )
+          fs.createReadStream(badInlinePath).pipe(wr)
+        })
+      )
+    })
+
+    afterEach(() => {
+      rimraf.sync(tempFixtureDir)
+    })
+
+    it('does not report errors when no config file is found', () =>
+      waitsForPromise(() =>
+        lint(editor)
+          .then((messages) => {
+            expect(messages.length).toBe(0)
+          })
+      )
+    )
+  })
 })
