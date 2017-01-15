@@ -25,6 +25,19 @@ const modifiedIgnoreSpacePath = path.join(fixturesDir,
   'modified-ignore-rule', 'foo-space.js')
 const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
 
+function copyFileToTempDir(fileToCopyPath, tempFixtureDir) {
+  return new Promise((resolve) => {
+    const tempFixturePath = path.join(tempFixtureDir, path.basename(fileToCopyPath))
+    const wr = fs.createWriteStream(tempFixturePath)
+    wr.on('close', () =>
+      atom.workspace.open(tempFixturePath).then((openEditor) => {
+        resolve(openEditor)
+      })
+    )
+    fs.createReadStream(fileToCopyPath).pipe(wr)
+  })
+}
+
 describe('The eslint provider for Linter', () => {
   const { spawnWorker } = require('../lib/helpers')
 
@@ -367,24 +380,14 @@ describe('The eslint provider for Linter', () => {
     let editor
     let didError
     let gotLintingErrors
-    let tempFixtureDir
-    let tempFixturePath
+    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+
     beforeEach(() => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', false)
 
       waitsForPromise(() =>
-        new Promise((resolve) => {
-          tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
-          tempFixturePath = path.join(tempFixtureDir, 'badInline.js')
-          const wr = fs.createWriteStream(tempFixturePath)
-          wr.on('close', () =>
-            atom.workspace.open(tempFixturePath).then((openEditor) => {
-              editor = openEditor
-              resolve()
-            })
-          )
-          fs.createReadStream(badInlinePath).pipe(wr)
-        })
+        copyFileToTempDir(badInlinePath, tempFixtureDir)
+          .then((openEditor) => { editor = openEditor })
       )
     })
 
@@ -418,24 +421,14 @@ describe('The eslint provider for Linter', () => {
 
   describe('when `disableWhenNoEslintConfig` is true', () => {
     let editor
-    let tempFixtureDir
-    let tempFixturePath
+    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+
     beforeEach(() => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', true)
 
       waitsForPromise(() =>
-        new Promise((resolve) => {
-          tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
-          tempFixturePath = path.join(tempFixtureDir, 'badInline.js')
-          const wr = fs.createWriteStream(tempFixturePath)
-          wr.on('close', () =>
-            atom.workspace.open(tempFixturePath).then((openEditor) => {
-              editor = openEditor
-              resolve()
-            })
-          )
-          fs.createReadStream(badInlinePath).pipe(wr)
-        })
+        copyFileToTempDir(badInlinePath, tempFixtureDir)
+          .then((openEditor) => { editor = openEditor })
       )
     })
 
