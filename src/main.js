@@ -6,9 +6,10 @@ import { CompositeDisposable, } from 'atom'
 
 import {
   spawnWorker, showError, idsToIgnoredRules, processESLintMessages,
-  generateDebugString, isConfigAtHomeRoot
+  generateDebugString,
 } from './helpers'
 import { getConfigPath } from './worker-helpers'
+import { isConfigAtHomeRoot } from './is-config-at-home-root'
 
 // Configuration
 const scopes = []
