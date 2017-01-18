@@ -25,13 +25,14 @@ const modifiedIgnoreSpacePath = path.join(fixturesDir,
   'modified-ignore-rule', 'foo-space.js')
 const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
 
-function copyFileToTempDir(fileToCopyPath, tempFixtureDir) {
+function copyFileToTempDir(fileToCopyPath) {
   return new Promise((resolve) => {
+    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
     const tempFixturePath = path.join(tempFixtureDir, path.basename(fileToCopyPath))
     const wr = fs.createWriteStream(tempFixturePath)
     wr.on('close', () =>
       atom.workspace.open(tempFixturePath).then((openEditor) => {
-        resolve(openEditor)
+        resolve({ openEditor, tempDir: tempFixtureDir })
       })
     )
     fs.createReadStream(fileToCopyPath).pipe(wr)
@@ -380,14 +381,17 @@ describe('The eslint provider for Linter', () => {
     let editor
     let didError
     let gotLintingErrors
-    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+    let tempFixtureDir
 
     beforeEach(() => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', false)
 
       waitsForPromise(() =>
         copyFileToTempDir(badInlinePath, tempFixtureDir)
-          .then((openEditor) => { editor = openEditor })
+          .then(({ openEditor, tempDir }) => {
+            editor = openEditor
+            tempFixtureDir = tempDir
+          })
       )
     })
 
@@ -421,14 +425,17 @@ describe('The eslint provider for Linter', () => {
 
   describe('when `disableWhenNoEslintConfig` is true', () => {
     let editor
-    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+    let tempFixtureDir
 
     beforeEach(() => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', true)
 
       waitsForPromise(() =>
-        copyFileToTempDir(badInlinePath, tempFixtureDir)
-          .then((openEditor) => { editor = openEditor })
+        copyFileToTempDir(badInlinePath)
+          .then(({ openEditor, tempDir }) => {
+            editor = openEditor
+            tempFixtureDir = tempDir
+          })
       )
     })
 
