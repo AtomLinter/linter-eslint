@@ -175,21 +175,24 @@ describe('The eslint provider for Linter', () => {
     let editor
     let doneCheckingFixes
     let tempFixtureDir
-    let tempFixturePath
-    let tempConfigPath
 
     beforeEach(() => {
-      waitsForPromise(() => {
-        tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
-        tempFixturePath = path.join(tempFixtureDir, 'fixed.js')
-        tempConfigPath = path.join(tempFixtureDir, '.eslintrc.yaml')
-        fs.createReadStream(configPath).pipe(fs.createWriteStream(tempConfigPath))
+      waitsForPromise(() =>
+        copyFileToTempDir(fixPath)
+          .then(({ openEditor, tempDir }) => {
+            editor = openEditor
+            tempFixtureDir = tempDir
 
-        return atom.workspace.open(fixPath).then((openEditor) => {
-          openEditor.saveAs(tempFixturePath)
-          editor = openEditor
-        })
-      })
+            return new Promise((resolve) => {
+              const configWritePath = path.join(tempFixtureDir, path.basename(configPath))
+              const wr = fs.createWriteStream(configWritePath)
+              wr.on('close', () => {
+                resolve()
+              })
+              fs.createReadStream(configPath).pipe(wr)
+            })
+          })
+      )
     })
 
     afterEach(() => {
