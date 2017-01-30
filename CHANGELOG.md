@@ -1,5 +1,13 @@
 # Changelog
 
+## v8.1.0
+
+*   Handle invalid points gracefully ([#761](https://github.com/AtomLinter/linter-eslint/pull/761))
+*   Warn on partial fixes ([#777](https://github.com/AtomLinter/linter-eslint/pull/777))
+*   Ignore `~/.eslintrc` when determining `disableWhenNoEslintConfig` status ([#778](https://github.com/AtomLinter/linter-eslint/pull/778))
+*   Allow rules to be excluded from fix runs ([#795](https://github.com/AtomLinter/linter-eslint/pull/795))
+
+
 ## v8.0.0
 
 *   Update ESLint to v3.5.0 ([#692](https://github.com/AtomLinter/linter-eslint/pull/692))
