@@ -94,6 +94,15 @@
       "items": {
         "type": "string"
       }
+    },
+    "rulesToDisableWhileFixing": {
+      "title": "Disable specific rules from fixes",
+      "description": "Prevent rules from being auto-fixed by ESLint. Applies to fixes made during saves as well as when running the `Linter Eslint: Fix File` command.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
     }
   },
   "scripts": {
