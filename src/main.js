@@ -15,6 +15,7 @@ import { isConfigAtHomeRoot } from './is-config-at-home-root'
 const scopes = []
 let showRule
 let ignoredRulesWhenModified
+let ignoredRulesWhenFixing
 let disableWhenNoEslintConfig
 
 module.exports = {
@@ -58,9 +59,15 @@ module.exports = {
           const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
           if (noProjectConfig && disableWhenNoEslintConfig) return
 
+          let rules = {}
+          if (Object.keys(ignoredRulesWhenFixing).length > 0) {
+            rules = ignoredRulesWhenFixing
+          }
+
           this.worker.request('job', {
             type: 'fix',
             config: atom.config.get('linter-eslint'),
+            rules,
             filePath,
             projectPath
           }).catch((err) => {
@@ -90,9 +97,15 @@ module.exports = {
           return
         }
 
+        let rules = {}
+        if (textEditor.isModified() && Object.keys(ignoredRulesWhenFixing).length > 0) {
+          rules = ignoredRulesWhenFixing
+        }
+
         this.worker.request('job', {
           type: 'fix',
           config: atom.config.get('linter-eslint'),
+          rules,
           filePath,
           projectPath
         }).then(response =>
@@ -117,6 +130,10 @@ module.exports = {
 
     this.subscriptions.add(atom.config.observe('linter-eslint.rulesToSilenceWhileTyping', (ids) => {
       ignoredRulesWhenModified = idsToIgnoredRules(ids)
+    }))
+
+    this.subscriptions.add(atom.config.observe('linter-eslint.rulesToDisableWhileFixing', (ids) => {
+      ignoredRulesWhenFixing = idsToIgnoredRules(ids)
     }))
 
     const initializeWorker = () => {

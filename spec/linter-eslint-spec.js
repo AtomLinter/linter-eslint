@@ -5,6 +5,7 @@ import * as fs from 'fs'
 import { tmpdir } from 'os'
 import rimraf from 'rimraf'
 import linter from '../lib/main'
+import { idsToIgnoredRules } from '../lib/helpers'
 
 const fixturesDir = path.join(__dirname, 'fixtures')
 
@@ -47,6 +48,7 @@ describe('The eslint provider for Linter', () => {
   const fix = textEditor =>
     worker.worker.request('job', {
       type: 'fix',
+      rules: idsToIgnoredRules(atom.config.get('linter-eslint.rulesToDisableWhileFixing')),
       config: atom.config.get('linter-eslint'),
       filePath: textEditor.getPath()
     })
@@ -175,21 +177,25 @@ describe('The eslint provider for Linter', () => {
     let editor
     let doneCheckingFixes
     let tempFixtureDir
-    let tempFixturePath
-    let tempConfigPath
 
     beforeEach(() => {
-      waitsForPromise(() => {
-        tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
-        tempFixturePath = path.join(tempFixtureDir, 'fixed.js')
-        tempConfigPath = path.join(tempFixtureDir, '.eslintrc.yaml')
-        fs.createReadStream(configPath).pipe(fs.createWriteStream(tempConfigPath))
+      doneCheckingFixes = false
+      waitsForPromise(() =>
+        copyFileToTempDir(fixPath)
+          .then(({ openEditor, tempDir }) => {
+            editor = openEditor
+            tempFixtureDir = tempDir
 
-        return atom.workspace.open(fixPath).then((openEditor) => {
-          openEditor.saveAs(tempFixturePath)
-          editor = openEditor
-        })
-      })
+            return new Promise((resolve) => {
+              const configWritePath = path.join(tempFixtureDir, path.basename(configPath))
+              const wr = fs.createWriteStream(configWritePath)
+              wr.on('close', () => {
+                resolve()
+              })
+              fs.createReadStream(configPath).pipe(wr)
+            })
+          })
+      )
     })
 
     afterEach(() => {
@@ -222,6 +228,50 @@ describe('The eslint provider for Linter', () => {
             if (messagesAfterFixing) {
               // After opening the file again, there are no linting errors
               expect(messagesAfterFixing.length).toBe(0)
+              doneCheckingFixes = true
+            }
+          })
+      })
+
+      waitsForPromise(() =>
+        firstLint(editor)
+          .then(makeFixes)
+      )
+      waitsFor(
+        () => doneCheckingFixes,
+        'Messages should be checked after fixing'
+      )
+    })
+
+    it('should not fix linting errors for rules that are disabled with rulesToDisableWhileFixing', () => {
+      atom.config.set('linter-eslint.rulesToDisableWhileFixing', ['semi'])
+
+      function firstLint(textEditor) {
+        return lint(textEditor)
+          .then((messages) => {
+            // The original file has two errors
+            expect(messages.length).toBe(2)
+            return textEditor
+          })
+      }
+      function makeFixes(textEditor) {
+        return fix(textEditor)
+          .then((messagesAfterSave) => {
+            // Linter reports a successful fix
+            expect(messagesAfterSave).toBe('Linter-ESLint: Fix complete.')
+          })
+      }
+      // Create a subscription to watch when the editor changes (from the fix)
+      editor.onDidChange(() => {
+        lint(editor)
+          .then((messagesAfterFixing) => {
+            // Note: this fires several times, with only the final time resulting in
+            // a non-null messagesAfterFixing.  This is the reason for the check here
+            // and for the `waitsFor` which makes sure the expectation is tested.
+            if (messagesAfterFixing) {
+              // There is still one linting error, `semi` which was disabled during fixing
+              expect(messagesAfterFixing.length).toBe(1)
+              expect(messagesAfterFixing[0].html).toBe('<a href=http://eslint.org/docs/rules/semi class="badge badge-flexible eslint">semi</a> Extra semicolon.')
               doneCheckingFixes = true
             }
           })
