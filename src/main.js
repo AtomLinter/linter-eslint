@@ -48,8 +48,10 @@ module.exports = {
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(() => {
-        if (scopes.indexOf(editor.getGrammar().scopeName) !== -1 &&
-            atom.config.get('linter-eslint.fixOnSave')) {
+        const validScope = editor.getCursors().some(cursor =>
+          cursor.getScopeDescriptor().getScopesArray().some(scope =>
+            scopes.includes(scope)))
+        if (validScope && atom.config.get('linter-eslint.fixOnSave')) {
           const filePath = editor.getPath()
           const projectPath = atom.project.relativizePath(filePath)[0]
 
