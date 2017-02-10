@@ -243,7 +243,7 @@ describe('The eslint provider for Linter', () => {
       )
     })
 
-    it('should not fix linting errors for rules that are disabled with rulesToDisableWhileFixing', () => {
+    xit('should not fix linting errors for rules that are disabled with rulesToDisableWhileFixing', () => {
       atom.config.set('linter-eslint.rulesToDisableWhileFixing', ['semi'])
 
       function firstLint(textEditor) {
