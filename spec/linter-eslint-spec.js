@@ -86,9 +86,8 @@ describe('The eslint provider for Linter', () => {
     it('verifies that message', () => {
       waitsForPromise(() =>
         lint(editor).then((messages) => {
-          const expected = '<a href=http://eslint.org/docs/rules/no-undef ' +
-            'class="badge badge-flexible eslint">no-undef</a> ' +
-            '&#39;foo&#39; is not defined.'
+          const expected = '&#39;foo&#39; is not defined. ' +
+            '(<a href="http://eslint.org/docs/rules/no-undef">no-undef</a>)'
           expect(messages[0].type).toBe('Error')
           expect(messages[0].text).not.toBeDefined()
           expect(messages[0].html).toBe(expected)
@@ -142,10 +141,9 @@ describe('The eslint provider for Linter', () => {
       waitsForPromise(() =>
         atom.workspace.open(badImportPath).then(editor =>
           lint(editor).then((messages) => {
-            const expected = '<a href=' +
-              'https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md ' +
-              'class="badge badge-flexible eslint">import/no-unresolved</a> ' +
-              'Unable to resolve path to module &#39;../nonexistent&#39;.'
+            const expected = 'Unable to resolve path to module &#39;../nonexistent&#39;. ' +
+              '(<a href="https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md">' +
+              'import/no-unresolved</a>)'
 
             expect(messages.length).toBeGreaterThan(0)
             expect(messages[0].type).toBe('Error')
@@ -271,7 +269,7 @@ describe('The eslint provider for Linter', () => {
             if (messagesAfterFixing) {
               // There is still one linting error, `semi` which was disabled during fixing
               expect(messagesAfterFixing.length).toBe(1)
-              expect(messagesAfterFixing[0].html).toBe('<a href=http://eslint.org/docs/rules/semi class="badge badge-flexible eslint">semi</a> Extra semicolon.')
+              expect(messagesAfterFixing[0].html).toBe('Extra semicolon. (<a href="http://eslint.org/docs/rules/semi">semi</a>)')
               doneCheckingFixes = true
             }
           })
@@ -289,9 +287,8 @@ describe('The eslint provider for Linter', () => {
   })
 
   describe('Ignores specified rules when editing', () => {
-    const expected = '<a href=http://eslint.org/docs/rules/no-trailing-spaces ' +
-      'class="badge badge-flexible eslint">no-trailing-spaces</a> ' +
-      'Trailing spaces not allowed.'
+    const expected = 'Trailing spaces not allowed. ' +
+      '(<a href="http://eslint.org/docs/rules/no-trailing-spaces">no-trailing-spaces</a>)'
     it('does nothing on saved files', () => {
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
       waitsForPromise(() =>
@@ -414,9 +411,8 @@ describe('The eslint provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(endRangePath).then(editor =>
         lint(editor).then((messages) => {
-          const expected = '<a href=http://eslint.org/docs/rules/no-unreachable ' +
-            'class="badge badge-flexible eslint">no-unreachable</a> ' +
-            'Unreachable code.'
+          const expected = 'Unreachable code. ' +
+            '(<a href="http://eslint.org/docs/rules/no-unreachable">no-unreachable</a>)'
           expect(messages[0].type).toBe('Error')
           expect(messages[0].text).not.toBeDefined()
           expect(messages[0].html).toBe(expected)
@@ -454,8 +450,8 @@ describe('The eslint provider for Linter', () => {
         .then((messages) => {
           // Older versions of ESLint will report an error
           // (or if current user running tests has a config in their home directory)
-          const expectedHtml = '<a href=http://eslint.org/docs/rules/no-undef ' +
-            'class="badge badge-flexible eslint">no-undef</a> &#39;foo&#39; is not defined.'
+          const expectedHtml = '&#39;foo&#39; is not defined. ' +
+            '(<a href="http://eslint.org/docs/rules/no-undef">no-undef</a>)'
           expect(messages.length).toBe(1)
           expect(messages[0].html).toBe(expectedHtml)
           gotLintingErrors = true
