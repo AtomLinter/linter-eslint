@@ -236,9 +236,8 @@ export async function processESLintMessages(response, textEditor, showRule, work
 
       if (showRule) {
         const elName = ruleId ? 'a' : 'span'
-        const href = ruleId ? ` href=${ruleURI(ruleId).url}` : ''
-        ret.html = `<${elName}${href} class="badge badge-flexible eslint">` +
-          `${ruleId || 'Fatal'}</${elName}> ${escapeHTML(message)}`
+        const href = ruleId ? ` href="${ruleURI(ruleId).url}"` : ''
+        ret.html = `${escapeHTML(message)} (<${elName}${href}>${ruleId || 'Fatal'}</${elName}>)`
       } else {
         ret.text = message
       }
