@@ -1,5 +1,13 @@
 # Changelog
 
+## v8.1.1
+
+*   Exclude `.babelrc` from releases ([#809](https://github.com/AtomLinter/linter-eslint/pull/809))
+*   Use cursor scope instead of file when checking fix-on-save ([#811](https://github.com/AtomLinter/linter-eslint/pull/811))
+*   Handle undefined package path ([#812](https://github.com/AtomLinter/linter-eslint/pull/812))
+*   Temporarily disable an intermittent spec ([#813](https://github.com/AtomLinter/linter-eslint/pull/813))
+*   Remove custom styling on rules ([#814](https://github.com/AtomLinter/linter-eslint/pull/814))
+
 ## v8.1.0
 
 *   Handle invalid points gracefully ([#761](https://github.com/AtomLinter/linter-eslint/pull/761))
