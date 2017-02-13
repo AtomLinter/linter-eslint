@@ -5,7 +5,7 @@ import { createFromProcess } from 'process-communication'
 import { join } from 'path'
 import escapeHTML from 'escape-html'
 import ruleURI from 'eslint-rule-documentation'
-import { rangeFromLineNumber } from 'atom-linter'
+import { generateRange } from 'atom-linter'
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Disposable, Range } from 'atom'
@@ -151,7 +151,7 @@ const generateInvalidTrace = async (
     html: `${escapeHTML(titleText)}. See the trace for details. ` +
       `<a href="${newIssueURL}">Report this!</a>`,
     filePath,
-    range: rangeFromLineNumber(textEditor, 0),
+    range: generateRange(textEditor, 0),
     trace: [
       {
         type: 'Trace',
@@ -214,7 +214,7 @@ export async function processESLintMessages(response, textEditor, showRule, work
       msgEndCol = endColumn - 1
     } else {
       // We want msgCol to remain undefined if it was initially so
-      // `rangeFromLineNumber` will give us a range over the entire line
+      // `generateRange` will give us a range over the entire line
       msgCol = typeof column !== 'undefined' ? column - 1 : column
     }
 
@@ -226,7 +226,7 @@ export async function processESLintMessages(response, textEditor, showRule, work
         validatePoint(textEditor, msgEndLine, msgEndCol)
         range = [[msgLine, msgCol], [msgEndLine, msgEndCol]]
       } else {
-        range = rangeFromLineNumber(textEditor, msgLine, msgCol)
+        range = generateRange(textEditor, msgLine, msgCol)
       }
       ret = {
         filePath,
@@ -248,7 +248,7 @@ export async function processESLintMessages(response, textEditor, showRule, work
       if (!err.message.startsWith('Line number ') &&
         !err.message.startsWith('Column start ')
       ) {
-        // This isn't an invalid point error from `rangeFromLineNumber`, re-throw it
+        // This isn't an invalid point error from `generateRange`, re-throw it
         throw err
       }
       ret = await generateInvalidTrace(
