@@ -1,5 +1,9 @@
 # Changelog
 
+## v8.1.2
+
+*   Update `atom-linter` bringing in a fix for #765 ([#817](https://github.com/AtomLinter/linter-eslint/pull/817))
+
 ## v8.1.1
 
 *   Exclude `.babelrc` from releases ([#809](https://github.com/AtomLinter/linter-eslint/pull/809))
