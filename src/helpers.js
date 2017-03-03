@@ -70,7 +70,13 @@ function validatePoint(textEditor, line, col) {
 
 export async function getDebugInfo(worker) {
   const textEditor = atom.workspace.getActiveTextEditor()
-  const filePath = textEditor.getPath()
+  let filePath
+  if (atom.workspace.isTextEditor(textEditor)) {
+    filePath = textEditor.getPath()
+  } else {
+    // Somehow this can be called with no active TextEditor, impossible I know...
+    filePath = 'unknown'
+  }
   const packagePath = atom.packages.resolvePackagePath('linter-eslint')
   let linterEslintMeta
   if (packagePath === undefined) {
