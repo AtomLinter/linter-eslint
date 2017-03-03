@@ -9,9 +9,6 @@ matrix:
     - os: linux
       env: ATOM_CHANNEL=beta
 
-    - os: osx
-      env: ATOM_CHANNEL=stable
-
 ### Generic setup follows ###
 script: 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
 
