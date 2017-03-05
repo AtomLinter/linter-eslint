@@ -70,7 +70,16 @@ function validatePoint(textEditor, line, col) {
 
 export async function getDebugInfo(worker) {
   const textEditor = atom.workspace.getActiveTextEditor()
-  const filePath = textEditor.getPath()
+  let filePath
+  let editorScopes
+  if (atom.workspace.isTextEditor(textEditor)) {
+    filePath = textEditor.getPath()
+    editorScopes = textEditor.getLastCursor().getScopeDescriptor().getScopesArray()
+  } else {
+    // Somehow this can be called with no active TextEditor, impossible I know...
+    filePath = 'unknown'
+    editorScopes = ['unknown']
+  }
   const packagePath = atom.packages.resolvePackagePath('linter-eslint')
   let linterEslintMeta
   if (packagePath === undefined) {
@@ -99,6 +108,7 @@ export async function getDebugInfo(worker) {
       platform: process.platform,
       eslintType: response.type,
       eslintPath: response.path,
+      editorScopes,
     }
   } catch (error) {
     atom.notifications.addError(`${error}`)
@@ -114,7 +124,8 @@ export async function generateDebugString(worker) {
     `ESLint version: ${debug.eslintVersion}`,
     `Hours since last Atom restart: ${debug.hoursSinceRestart}`,
     `Platform: ${debug.platform}`,
-    `Using ${debug.eslintType} ESLint from ${debug.eslintPath}`,
+    `Using ${debug.eslintType} ESLint from: ${debug.eslintPath}`,
+    `Current file's scopes: ${JSON.stringify(debug.editorScopes, null, 2)}`,
     `linter-eslint configuration: ${JSON.stringify(debug.linterEslintConfig, null, 2)}`
   ]
   return details.join('\n')
