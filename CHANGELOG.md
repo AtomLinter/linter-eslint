@@ -1,5 +1,11 @@
 # Changelog
 
+## v8.1.3
+
+*   Log the file scope in debug command ([#835](https://github.com/AtomLinter/linter-eslint/pull/835))
+*   Don't specify rulesDir if not found ([#843](https://github.com/AtomLinter/linter-eslint/pull/843))
+*   Update specs for ESLint v3.17.0 ([#844](https://github.com/AtomLinter/linter-eslint/pull/844))
+
 ## v8.1.2
 
 *   Update `atom-linter` bringing in a fix for #765 ([#817](https://github.com/AtomLinter/linter-eslint/pull/817))
