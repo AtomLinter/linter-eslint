@@ -120,8 +120,8 @@ describe('The eslint provider for Linter', () => {
       atom.workspace.open(fixPath).then(editor =>
         lint(editor)
       ).then((messages) => {
-        expect(messages[0].fix.range).toEqual([[0, 11], [0, 12]])
-        expect(messages[0].fix.newText).toBe('')
+        expect(messages[0].fix.range).toEqual([[0, 10], [1, 8]])
+        expect(messages[0].fix.newText).toBe('6\nfunction')
 
         expect(messages[1].fix.range).toEqual([[2, 0], [2, 1]])
         expect(messages[1].fix.newText).toBe('  ')
