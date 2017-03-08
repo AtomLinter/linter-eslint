@@ -155,7 +155,9 @@ export function getArgv(type, config, rules, filePath, fileDir, givenConfigPath)
     if (!Path.isAbsolute(rulesDir)) {
       rulesDir = findCached(fileDir, rulesDir)
     }
-    argv.push('--rulesdir', rulesDir)
+    if (rulesDir) {
+      argv.push('--rulesdir', rulesDir)
+    }
   }
   if (configPath) {
     argv.push('--config', resolveEnv(configPath))
