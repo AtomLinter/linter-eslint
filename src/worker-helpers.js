@@ -104,16 +104,17 @@ export function getESLintInstance(fileDir, config, projectPath) {
 export function getConfigPath(fileDir) {
   const configFile =
     findCached(fileDir, [
-      '.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc'
+      '.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc', 'package.json'
     ])
   if (configFile) {
-    return configFile
-  }
-
-  const packagePath = findCached(fileDir, 'package.json')
-  // eslint-disable-next-line import/no-dynamic-require
-  if (packagePath && Boolean(require(packagePath).eslintConfig)) {
-    return packagePath
+    if (Path.basename(configFile) === 'package.json') {
+      // eslint-disable-next-line import/no-dynamic-require
+      if (require(configFile).eslintConfig) {
+        return configFile
+      }
+    } else {
+      return configFile
+    }
   }
   return null
 }

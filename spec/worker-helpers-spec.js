@@ -141,6 +141,11 @@ describe('Worker Helpers', () => {
       const expectedPath = Path.join(fileDir, '.eslintrc.json')
       expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
     })
+    it('finds package.json with an eslintConfig property', () => {
+      const fileDir = getFixturesPath(Path.join('configs', 'package-json'))
+      const expectedPath = Path.join(fileDir, 'package.json')
+      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+    })
   })
 
   describe('getRelativePath', () => {
