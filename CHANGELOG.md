@@ -1,5 +1,9 @@
 # Changelog
 
+## v8.1.4
+
+*   Improve package.json eslintConfig support ([#848](https://github.com/AtomLinter/linter-eslint/pull/848))
+
 ## v8.1.3
 
 *   Log the file scope in debug command ([#835](https://github.com/AtomLinter/linter-eslint/pull/835))
