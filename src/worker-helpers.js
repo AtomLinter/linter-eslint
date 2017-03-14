@@ -112,9 +112,13 @@ export function getConfigPath(fileDir) {
       if (require(configFile).eslintConfig) {
         return configFile
       }
-    } else {
-      return configFile
+      // If we are here, we found a package.json without an eslint config
+      // in a dir without any other eslint config files
+      // (because 'package.json' is last in the call to findCached)
+      // So, keep looking from the parent directory
+      return getConfigPath(Path.resolve(Path.dirname(configFile), '..'))
     }
+    return configFile
   }
   return null
 }

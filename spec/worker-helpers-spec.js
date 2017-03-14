@@ -146,6 +146,11 @@ describe('Worker Helpers', () => {
       const expectedPath = Path.join(fileDir, 'package.json')
       expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
     })
+    it('ignores package.json with no eslintConfig property', () => {
+      const fileDir = getFixturesPath(Path.join('configs', 'package-json', 'nested'))
+      const expectedPath = getFixturesPath(Path.join('configs', 'package-json', 'package.json'))
+      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+    })
   })
 
   describe('getRelativePath', () => {
