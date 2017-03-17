@@ -66,12 +66,15 @@ module.exports = {
             rules = ignoredRulesWhenFixing
           }
 
+          const cursorPosition = editor.getCursorBufferPosition()
           this.worker.request('job', {
             type: 'fix',
             config: atom.config.get('linter-eslint'),
             rules,
             filePath,
             projectPath
+          }).then(() => {
+            editor.setCursorBufferPosition(cursorPosition)
           }).catch((err) => {
             atom.notifications.addWarning(err.message)
           })
@@ -104,6 +107,7 @@ module.exports = {
           rules = ignoredRulesWhenFixing
         }
 
+        const cursorPosition = textEditor.getCursorBufferPosition()
         this.worker.request('job', {
           type: 'fix',
           config: atom.config.get('linter-eslint'),
@@ -112,7 +116,9 @@ module.exports = {
           projectPath
         }).then(response =>
           atom.notifications.addSuccess(response)
-        ).catch((err) => {
+        ).then(() => {
+          textEditor.setCursorBufferPosition(cursorPosition)
+        }).catch((err) => {
           atom.notifications.addWarning(err.message)
         })
       }
