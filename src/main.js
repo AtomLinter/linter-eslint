@@ -66,12 +66,18 @@ module.exports = {
             rules = ignoredRulesWhenFixing
           }
 
+          // The fix replaces the file content and the cursor jumps automatically
+          // to the beginning of the file, so save current cursor position
+          const cursorPosition = editor.getCursorBufferPosition()
           this.worker.request('job', {
             type: 'fix',
             config: atom.config.get('linter-eslint'),
             rules,
             filePath,
             projectPath
+          }).then(() => {
+            // set cursor to the position before fix job
+            editor.setCursorBufferPosition(cursorPosition)
           }).catch((err) => {
             atom.notifications.addWarning(err.message)
           })
@@ -104,6 +110,9 @@ module.exports = {
           rules = ignoredRulesWhenFixing
         }
 
+        // The fix replaces the file content and the cursor jumps automatically
+        // to the beginning of the file, so save current cursor position
+        const cursorPosition = textEditor.getCursorBufferPosition()
         this.worker.request('job', {
           type: 'fix',
           config: atom.config.get('linter-eslint'),
@@ -112,7 +121,10 @@ module.exports = {
           projectPath
         }).then(response =>
           atom.notifications.addSuccess(response)
-        ).catch((err) => {
+        ).then(() => {
+          // set cursor to the position before fix job
+          textEditor.setCursorBufferPosition(cursorPosition)
+        }).catch((err) => {
           atom.notifications.addWarning(err.message)
         })
       }
