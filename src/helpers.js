@@ -155,28 +155,22 @@ const generateInvalidTrace = async (
     JSON.stringify(await getDebugInfo(worker), null, 2),
     '```'
   ].join('\n'))
+
+  const location = {
+    file: filePath,
+    position: generateRange(textEditor, 0),
+  }
   const newIssueURL = `${issueURL}?title=${title}&body=${body}`
+
   return {
-    type: 'Error',
     severity: 'error',
-    html: `${escapeHTML(titleText)}. See the trace for details. ` +
-      `<a href="${newIssueURL}">Report this!</a>`,
-    filePath,
-    range: generateRange(textEditor, 0),
-    trace: [
-      {
-        type: 'Trace',
-        text: `Original message: ${ruleId} - ${message}`,
-        filePath,
-        severity: 'info',
-      },
-      {
-        type: 'Trace',
-        text: rangeText,
-        filePath,
-        severity: 'info',
-      },
-    ]
+    excerpt: `${escapeHTML(titleText)}. See the trace for details. ` +
+      `[Report this!](${newIssueURL})`,
+    location,
+    description: rangeText,
+    reference: {
+      file: filePath,
+    }
   }
 }
 
@@ -202,8 +196,8 @@ export async function processESLintMessages(response, textEditor, showRule, work
         textBuffer.positionForCharacterIndex(fix.range[1])
       )
       linterFix = {
-        range: fixRange,
-        newText: fix.text
+        position: fixRange,
+        replaceWith: fix.text
       }
     }
     let msgCol
@@ -240,20 +234,23 @@ export async function processESLintMessages(response, textEditor, showRule, work
         range = generateRange(textEditor, msgLine, msgCol)
       }
       ret = {
-        filePath,
-        type: severity === 1 ? 'Warning' : 'Error',
-        range
+        severity: severity === 1 ? 'warning' : 'error',
+        location: {
+          file: filePath,
+          position: range
+        }
       }
 
       if (showRule) {
-        const elName = ruleId ? 'a' : 'span'
-        const href = ruleId ? ` href="${ruleURI(ruleId).url}"` : ''
-        ret.html = `${escapeHTML(message)} (<${elName}${href}>${ruleId || 'Fatal'}</${elName}>)`
+        const url = ruleId ? ruleURI(ruleId).url : ''
+        // TODO: fetch rule Markdown from eslint
+        ret.url = url
+        ret.description = `${escapeHTML(message)} ([${ruleId || 'Fatal'}](${url}))`
       } else {
-        ret.text = message
+        ret.description = message
       }
       if (linterFix) {
-        ret.fix = linterFix
+        ret.solutions = [linterFix]
       }
     } catch (err) {
       if (!err.message.startsWith('Line number ') &&
