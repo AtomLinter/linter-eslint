@@ -114,7 +114,7 @@
   },
   "dependencies": {
     "atom-linter": "^9.0.0",
-    "atom-package-deps": "^4.0.1",
+    "atom-package-deps": "^4.5.0",
     "consistent-path": "^2.0.1",
     "eslint": "^3.6.0",
     "eslint-rule-documentation": "^1.0.0",
@@ -131,7 +131,7 @@
     "rimraf": "^2.5.4"
   },
   "package-deps": [
-    "linter"
+    "linter:2.0.0"
   ],
   "providedServices": {
     "linter": {
