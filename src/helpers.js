@@ -3,7 +3,6 @@
 import ChildProcess from 'child_process'
 import { createFromProcess } from 'process-communication'
 import { join } from 'path'
-import escapeHTML from 'escape-html'
 import ruleURI from 'eslint-rule-documentation'
 import { generateRange } from 'atom-linter'
 
@@ -164,13 +163,11 @@ const generateInvalidTrace = async (
 
   return {
     severity: 'error',
-    excerpt: `${escapeHTML(titleText)}. See the trace for details. ` +
-      `[Report this!](${newIssueURL})`,
+    excerpt: `${titleText}. See the description for details. ` +
+      'Click to open a new issue!',
+    url: newIssueURL,
     location,
-    description: rangeText,
-    reference: {
-      file: filePath,
-    }
+    description: rangeText
   }
 }
 
@@ -241,14 +238,14 @@ export async function processESLintMessages(response, textEditor, showRule, work
         }
       }
 
-      if (showRule) {
-        const url = ruleId ? ruleURI(ruleId).url : ''
-        // TODO: fetch rule Markdown from eslint
-        ret.url = url
-        ret.description = `${escapeHTML(message)} ([${ruleId || 'Fatal'}](${url}))`
-      } else {
-        ret.description = message
-      }
+      // Fallback to ruleId for triggering a Google search
+      // Useful for custom rules, that are not matched by `ruleURI`
+      const url = ruleId ? ruleURI(ruleId).url : ruleId
+      ret.url = url
+
+      const ruleAppendix = showRule ? ` (${ruleId || 'Fatal'})` : ''
+      ret.excerpt = `${message}${ruleAppendix}`
+
       if (linterFix) {
         ret.solutions = [linterFix]
       }
