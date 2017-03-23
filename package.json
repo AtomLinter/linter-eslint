@@ -45,7 +45,7 @@
     },
     "advancedLocalNodeModules": {
       "title": "Path to the local node_modules folder",
-      "description": "Optionally specify the path to the local node_modules folder",
+      "description": "Optionally specify the path to the local node_modules folder (separate multiple paths with a comma)",
       "type": "string",
       "default": ""
     },

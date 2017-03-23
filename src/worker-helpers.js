@@ -44,12 +44,17 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
   } else if (!config.advancedLocalNodeModules) {
     locationType = 'local project'
     eslintDir = Path.join(modulesDir || '', 'eslint')
-  } else if (Path.isAbsolute(config.advancedLocalNodeModules)) {
-    locationType = 'advanced specified'
-    eslintDir = Path.join(config.advancedLocalNodeModules || '', 'eslint')
   } else {
-    locationType = 'advanced specified'
-    eslintDir = Path.join(projectPath, config.advancedLocalNodeModules, 'eslint')
+    config.advancedLocalNodeModules.split(',').some((localNodeModulePath) => {
+      if (Path.isAbsolute(localNodeModulePath)) {
+        locationType = 'advanced specified'
+        eslintDir = Path.join(localNodeModulePath || '', 'eslint')
+      } else {
+        locationType = 'advanced specified'
+        eslintDir = Path.join(projectPath, localNodeModulePath, 'eslint')
+      }
+      return fs.existsSync(eslintDir)
+    })
   }
   try {
     if (fs.statSync(eslintDir).isDirectory()) {
