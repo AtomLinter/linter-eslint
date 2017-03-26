@@ -76,6 +76,17 @@ describe('Worker Helpers', () => {
 
       expect(eslint).toBe('located')
     })
+    it('tries to find an indirect local eslint using comma separated absolute paths', () => {
+      const path1 = Path.join(
+        getFixturesPath('indirect-local-eslint'), 'testing-non-existing', 'eslint', 'node_modules')
+      const path2 = Path.join(
+        getFixturesPath('indirect-local-eslint'), 'testing', 'eslint', 'node_modules')
+      const eslint = Helpers.getESLintInstance('', {
+        useGlobalEslint: false,
+        advancedLocalNodeModules: [path1, path2].join(',')
+      })
+      expect(eslint).toBe('located')
+    })
     it('tries to find a local eslint', () => {
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), {})
       expect(eslint).toBe('located')
