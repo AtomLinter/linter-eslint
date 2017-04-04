@@ -75,7 +75,7 @@ export function getESLintFromDirectory(modulesDir, config, projectPath) {
   const { path: ESLintDirectory } = findESLintDirectory(modulesDir, config, projectPath)
   try {
     // eslint-disable-next-line import/no-dynamic-require
-    return require(Path.join(ESLintDirectory, 'lib', 'cli.js'))
+    return require(ESLintDirectory)
   } catch (e) {
     if (config.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
       throw new Error(
@@ -83,7 +83,7 @@ export function getESLintFromDirectory(modulesDir, config, projectPath) {
       )
     }
     // eslint-disable-next-line import/no-dynamic-require
-    return require(Path.join(Cache.ESLINT_LOCAL_PATH, 'lib', 'cli.js'))
+    return require(Cache.ESLINT_LOCAL_PATH)
   }
 }
 
@@ -135,24 +135,21 @@ export function getRelativePath(fileDir, filePath, config) {
   return Path.basename(filePath)
 }
 
-export function getArgv(type, config, rules, filePath, fileDir, givenConfigPath) {
+export function getCLIEngineOptions(type, config, rules, filePath, fileDir, givenConfigPath) {
   let configPath
   if (givenConfigPath === null) {
     configPath = config.eslintrcPath || null
   } else configPath = givenConfigPath
 
-  const argv = [
-    process.execPath,
-    'a-b-c' // dummy value for eslint executable
-  ]
-  if (type === 'lint') {
-    argv.push('--stdin')
+  const cliEngineConfig = {
+    rules,
+    ignore: !config.disableEslintIgnore,
+    fix: type === 'fix'
   }
-  argv.push('--format', Path.join(__dirname, 'reporter.js'))
 
   const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
   if (ignoreFile) {
-    argv.push('--ignore-path', ignoreFile)
+    cliEngineConfig.ignorePath = ignoreFile
   }
 
   if (config.eslintRulesDir) {
@@ -161,24 +158,12 @@ export function getArgv(type, config, rules, filePath, fileDir, givenConfigPath)
       rulesDir = findCached(fileDir, rulesDir)
     }
     if (rulesDir) {
-      argv.push('--rulesdir', rulesDir)
+      cliEngineConfig.rulePaths = [rulesDir]
     }
   }
   if (configPath) {
-    argv.push('--config', resolveEnv(configPath))
-  }
-  if (rules && Object.keys(rules).length > 0) {
-    argv.push('--rule', JSON.stringify(rules))
-  }
-  if (config.disableEslintIgnore) {
-    argv.push('--no-ignore')
-  }
-  if (type === 'lint') {
-    argv.push('--stdin-filename', filePath)
-  } else if (type === 'fix') {
-    argv.push(filePath)
-    argv.push('--fix')
+    cliEngineConfig.configFile = resolveEnv(configPath)
   }
 
-  return argv
+  return cliEngineConfig
 }
