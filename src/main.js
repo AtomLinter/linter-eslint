@@ -20,7 +20,8 @@ let disableWhenNoEslintConfig
 
 module.exports = {
   activate() {
-    require('atom-package-deps').install('linter-eslint')
+    const installLinterEslintDeps = () => require('atom-package-deps').install('linter-eslint')
+    window.requestIdleCallback(installLinterEslintDeps)
 
     this.subscriptions = new CompositeDisposable()
     this.active = true
