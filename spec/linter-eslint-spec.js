@@ -5,7 +5,6 @@ import * as fs from 'fs'
 import { tmpdir } from 'os'
 import rimraf from 'rimraf'
 import linter from '../lib/main'
-import { idsToIgnoredRules } from '../lib/helpers'
 
 const fixturesDir = path.join(__dirname, 'fixtures')
 
@@ -45,13 +44,19 @@ describe('The eslint provider for Linter', () => {
 
   const worker = spawnWorker()
   const lint = linter.provideLinter.call(worker).lint
-  const fix = textEditor =>
-    worker.worker.request('job', {
+  const fix = (textEditor) => {
+    const ignoredRules = atom.config.get('linter-eslint.rulesToDisableWhileFixing')
+      .reduce((ids, id) => {
+        ids[id] = 0 // 0 is the severity to turn off a rule
+        return ids
+      }, {})
+    return worker.worker.request('job', {
       type: 'fix',
-      rules: idsToIgnoredRules(atom.config.get('linter-eslint.rulesToDisableWhileFixing')),
+      rules: ignoredRules,
       config: atom.config.get('linter-eslint'),
       filePath: textEditor.getPath()
     })
+  }
 
   beforeEach(() => {
     atom.config.set('linter-eslint.disableFSCache', false)

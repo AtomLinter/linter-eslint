@@ -1,14 +1,12 @@
 'use babel'
 
-import Path from 'path'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { CompositeDisposable, } from 'atom'
+import { CompositeDisposable } from 'atom'
 
-import {
-  spawnWorker, showError, idsToIgnoredRules, processESLintMessages,
-  generateDebugString,
-} from './helpers'
-import { getConfigPath } from './worker-helpers'
+// Dependencies
+let path
+let helpers
+let workerHelpers
 let isConfigAtHomeRoot
 
 // Configuration
@@ -17,6 +15,13 @@ let showRule
 let ignoredRulesWhenModified
 let ignoredRulesWhenFixing
 let disableWhenNoEslintConfig
+
+// Internal functions
+const idsToIgnoredRules = ruleIds =>
+  ruleIds.reduce((ids, id) => {
+    ids[id] = 0 // 0 is the severity to turn off a rule
+    return ids
+  }, {})
 
 module.exports = {
   activate() {
@@ -27,12 +32,15 @@ module.exports = {
     this.active = true
     this.worker = null
     const initializeWorker = () => {
-      const { worker, subscription } = spawnWorker()
+      if (!helpers) {
+        helpers = require('./helpers')
+      }
+      const { worker, subscription } = helpers.spawnWorker()
       this.worker = worker
       this.subscriptions.add(subscription)
       worker.onDidExit(() => {
         if (this.active) {
-          showError('Worker died unexpectedly', 'Check your console for more ' +
+          helpers.showError('Worker died unexpectedly', 'Check your console for more ' +
           'info. A new worker will be spawned instantly.')
           setTimeout(initializeWorker, 1000)
         }
@@ -68,15 +76,21 @@ module.exports = {
           if (this.worker === null) {
             initializeWorker()
           }
+          if (!path) {
+            path = require('path')
+          }
           if (!isConfigAtHomeRoot) {
             isConfigAtHomeRoot = require('./is-config-at-home-root')
+          }
+          if (!workerHelpers) {
+            workerHelpers = require('./worker-helpers')
           }
           const filePath = editor.getPath()
           const projectPath = atom.project.relativizePath(filePath)[0]
 
           // Do not try to fix if linting should be disabled
-          const fileDir = Path.dirname(filePath)
-          const configPath = getConfigPath(fileDir)
+          const fileDir = path.dirname(filePath)
+          const configPath = workerHelpers.getConfigPath(fileDir)
           const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
           if (noProjectConfig && disableWhenNoEslintConfig) return
 
@@ -109,7 +123,10 @@ module.exports = {
         if (this.worker === null) {
           initializeWorker()
         }
-        const debugString = await generateDebugString(this.worker)
+        if (!helpers) {
+          helpers = require('./helpers')
+        }
+        const debugString = await helpers.generateDebugString(this.worker)
         const notificationOptions = { detail: debugString, dismissable: true }
         atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
       }
@@ -222,7 +239,10 @@ module.exports = {
              */
             return null
           }
-          return processESLintMessages(response, textEditor, showRule, this.worker)
+          if (!helpers) {
+            helpers = require('./helpers')
+          }
+          return helpers.processESLintMessages(response, textEditor, showRule, this.worker)
         })
       }
     }
