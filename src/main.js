@@ -26,6 +26,18 @@ module.exports = {
     this.subscriptions = new CompositeDisposable()
     this.active = true
     this.worker = null
+    const initializeWorker = () => {
+      const { worker, subscription } = spawnWorker()
+      this.worker = worker
+      this.subscriptions.add(subscription)
+      worker.onDidExit(() => {
+        if (this.active) {
+          showError('Worker died unexpectedly', 'Check your console for more ' +
+          'info. A new worker will be spawned instantly.')
+          setTimeout(initializeWorker, 1000)
+        }
+      })
+    }
 
     this.subscriptions.add(
       atom.config.observe('linter-eslint.scopes', (value) => {
@@ -53,6 +65,9 @@ module.exports = {
           cursor.getScopeDescriptor().getScopesArray().some(scope =>
             scopes.includes(scope)))
         if (validScope && atom.config.get('linter-eslint.fixOnSave')) {
+          if (this.worker === null) {
+            initializeWorker()
+          }
           const filePath = editor.getPath()
           const projectPath = atom.project.relativizePath(filePath)[0]
 
@@ -88,6 +103,9 @@ module.exports = {
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
+        if (this.worker === null) {
+          initializeWorker()
+        }
         const debugString = await generateDebugString(this.worker)
         const notificationOptions = { detail: debugString, dismissable: true }
         atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
@@ -96,6 +114,9 @@ module.exports = {
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:fix-file': () => {
+        if (this.worker === null) {
+          initializeWorker()
+        }
         const textEditor = atom.workspace.getActiveTextEditor()
         const filePath = textEditor.getPath()
         const projectPath = atom.project.relativizePath(filePath)[0]
@@ -151,19 +172,7 @@ module.exports = {
       ignoredRulesWhenFixing = idsToIgnoredRules(ids)
     }))
 
-    const initializeWorker = () => {
-      const { worker, subscription } = spawnWorker()
-      this.worker = worker
-      this.subscriptions.add(subscription)
-      worker.onDidExit(() => {
-        if (this.active) {
-          showError('Worker died unexpectedly', 'Check your console for more ' +
-          'info. A new worker will be spawned instantly.')
-          setTimeout(initializeWorker, 1000)
-        }
-      })
-    }
-    initializeWorker()
+    window.requestIdleCallback(initializeWorker)
   },
   deactivate() {
     this.active = false
@@ -185,6 +194,12 @@ module.exports = {
         let rules = {}
         if (textEditor.isModified() && Object.keys(ignoredRulesWhenModified).length > 0) {
           rules = ignoredRulesWhenModified
+        }
+
+        if (this.worker === null) {
+          // The worker hasn't gotten a chance to initialize yet from the idle
+          // callback, return [] for now
+          return []
         }
 
         return this.worker.request('job', {
