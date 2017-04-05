@@ -11,6 +11,6 @@ import { dirname } from 'path'
  * @param  {string}  configPath - The path of the config file being checked
  * @return {Boolean}              True if the file is directly in the current user's home
  */
-export function isConfigAtHomeRoot(configPath) {
+export default function isConfigAtHomeRoot(configPath) {
   return (dirname(configPath) === userHome)
 }

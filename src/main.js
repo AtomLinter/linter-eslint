@@ -9,7 +9,7 @@ import {
   generateDebugString,
 } from './helpers'
 import { getConfigPath } from './worker-helpers'
-import { isConfigAtHomeRoot } from './is-config-at-home-root'
+let isConfigAtHomeRoot
 
 // Configuration
 const scopes = []
@@ -67,6 +67,9 @@ module.exports = {
         if (validScope && atom.config.get('linter-eslint.fixOnSave')) {
           if (this.worker === null) {
             initializeWorker()
+          }
+          if (!isConfigAtHomeRoot) {
+            isConfigAtHomeRoot = require('./is-config-at-home-root')
           }
           const filePath = editor.getPath()
           const projectPath = atom.project.relativizePath(filePath)[0]
