@@ -39,8 +39,9 @@ create().onRequest('job', ({ contents, type, config, filePath, projectPath, rule
   const configPath = Helpers.getConfigPath(fileDir)
   const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config)
 
-  const cliEngineOptions =
-    Helpers.getCLIEngineOptions(type, config, rules, relativeFilePath, fileDir, configPath)
+  const cliEngineOptions = Helpers.getCLIEngineOptions(
+    type, config, rules, relativeFilePath, fileDir, configPath
+  )
 
   const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
   if (noProjectConfig && config.disableWhenNoEslintConfig) {
