@@ -162,10 +162,18 @@ describe('The eslint provider for Linter', () => {
     beforeEach(() => {
       atom.config.set('linter-eslint.disableEslintIgnore', false)
     })
-    it('will not give warnings for the file', () => {
+    it('will not give warnings when linting the file', () => {
       waitsForPromise(() =>
         atom.workspace.open(ignoredPath).then(editor =>
           lint(editor).then(messages => expect(messages.length).toBe(0))
+        )
+      )
+    })
+
+    it('will not give warnings when autofixing the file', () => {
+      waitsForPromise(() =>
+        atom.workspace.open(ignoredPath).then(editor =>
+          fix(editor).then(result => expect(result).toBe('Linter-ESLint: Fix complete.'))
         )
       )
     })
