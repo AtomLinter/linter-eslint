@@ -28,11 +28,11 @@ const idsToIgnoredRules = ruleIds =>
     return ids
   }, {})
 
-const waitOnIdle = () =>
+// Worker still hasn't initialized, since the queued idle callbacks are
+// done in order, waiting on a newly queued idle callback will ensure that
+// the worker has been initialized
+const waitOnIdle = async () =>
   new Promise((resolve) => {
-    // The worker is initialized during an idle time, since the queued idle
-    // callbacks are done in order, waiting on a newly queued idle callback will
-    // ensure that the worker has been initialized
     const callbackID = window.requestIdleCallback(() => {
       idleCallbacks.delete(callbackID)
       resolve()
@@ -81,8 +81,8 @@ module.exports = {
     )
 
     const embeddedScope = 'source.js.embedded.html'
-    this.subscriptions.add(
-      atom.config.observe('linter-eslint.lintHtmlFiles', (lintHtmlFiles) => {
+    this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles',
+      (lintHtmlFiles) => {
         if (lintHtmlFiles) {
           scopes.push(embeddedScope)
         } else if (scopes.indexOf(embeddedScope) !== -1) {
@@ -196,14 +196,14 @@ module.exports = {
       }
     }))
 
-    this.subscriptions.add(
-      atom.config.observe('linter-eslint.showRuleIdInMessage', (value) => {
+    this.subscriptions.add(atom.config.observe('linter-eslint.showRuleIdInMessage',
+      (value) => {
         showRule = value
       })
     )
 
-    this.subscriptions.add(
-      atom.config.observe('linter-eslint.disableWhenNoEslintConfig', (value) => {
+    this.subscriptions.add(atom.config.observe('linter-eslint.disableWhenNoEslintConfig',
+      (value) => {
         disableWhenNoEslintConfig = value
       })
     )
@@ -219,12 +219,14 @@ module.exports = {
     // Initialize the worker during an idle time, with a maximum wait of 5 seconds
     window.requestIdleCallback(initializeWorker, { timeout: 5000 })
   },
+
   deactivate() {
     idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
     idleCallbacks.clear()
     this.active = false
     this.subscriptions.dispose()
   },
+
   provideLinter() {
     return {
       name: 'ESLint',
@@ -234,7 +236,7 @@ module.exports = {
       lint: async (textEditor) => {
         const text = textEditor.getText()
         if (text.length === 0) {
-          return Promise.resolve([])
+          return []
         }
         const filePath = textEditor.getPath()
 
