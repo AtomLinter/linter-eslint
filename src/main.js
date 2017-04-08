@@ -23,10 +23,20 @@ const idsToIgnoredRules = ruleIds =>
     return ids
   }, {})
 
+const waitOnIdle = () =>
+  new Promise((resolve) => {
+    // The worker is initialized during an idle time, since the queued idle
+    // callbacks are done in order, waiting on a newly queued idle callback will
+    // ensure that the worker has been initialized
+    window.requestIdleCallback(resolve)
+  })
+
 module.exports = {
   activate() {
     const installLinterEslintDeps = () => require('atom-package-deps').install('linter-eslint')
-    window.requestIdleCallback(installLinterEslintDeps)
+    if (!atom.inSpecMode()) {
+      window.requestIdleCallback(installLinterEslintDeps)
+    }
 
     this.subscriptions = new CompositeDisposable()
     this.active = true
@@ -68,13 +78,13 @@ module.exports = {
     )
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
-      editor.onDidSave(() => {
+      editor.onDidSave(async () => {
         const validScope = editor.getCursors().some(cursor =>
           cursor.getScopeDescriptor().getScopesArray().some(scope =>
             scopes.includes(scope)))
         if (validScope && atom.config.get('linter-eslint.fixOnSave')) {
           if (this.worker === null) {
-            initializeWorker()
+            await waitOnIdle()
           }
           if (!path) {
             path = require('path')
@@ -121,7 +131,7 @@ module.exports = {
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
         if (this.worker === null) {
-          initializeWorker()
+          await waitOnIdle()
         }
         if (!helpers) {
           helpers = require('./helpers')
@@ -133,9 +143,9 @@ module.exports = {
     }))
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
-      'linter-eslint:fix-file': () => {
+      'linter-eslint:fix-file': async () => {
         if (this.worker === null) {
-          initializeWorker()
+          await waitOnIdle()
         }
         const textEditor = atom.workspace.getActiveTextEditor()
         const filePath = textEditor.getPath()
@@ -192,7 +202,8 @@ module.exports = {
       ignoredRulesWhenFixing = idsToIgnoredRules(ids)
     }))
 
-    window.requestIdleCallback(initializeWorker)
+    // Initialize the worker during an idle time, with a maximum wait of 5 seconds
+    window.requestIdleCallback(initializeWorker, { timeout: 5000 })
   },
   deactivate() {
     this.active = false
@@ -204,7 +215,7 @@ module.exports = {
       grammarScopes: scopes,
       scope: 'file',
       lintOnFly: true,
-      lint: (textEditor) => {
+      lint: async (textEditor) => {
         const text = textEditor.getText()
         if (text.length === 0) {
           return Promise.resolve([])
@@ -217,9 +228,7 @@ module.exports = {
         }
 
         if (this.worker === null) {
-          // The worker hasn't gotten a chance to initialize yet from the idle
-          // callback, return [] for now
-          return []
+          await waitOnIdle()
         }
 
         return this.worker.request('job', {
