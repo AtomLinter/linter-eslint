@@ -1,5 +1,10 @@
 # Changelog
 
+## v8.1.5
+
+*   Move to the `CLIEngine` API ([#873](https://github.com/AtomLinter/linter-eslint/pull/873))
+*   Attempt to restore cursor position after fixing ([#853](https://github.com/AtomLinter/linter-eslint/pull/853))
+
 ## v8.1.4
 
 *   Improve package.json eslintConfig support ([#848](https://github.com/AtomLinter/linter-eslint/pull/848))
