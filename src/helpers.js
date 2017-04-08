@@ -1,38 +1,68 @@
 'use babel'
 
-import ChildProcess from 'child_process'
-import { createFromProcess } from 'process-communication'
 import { join } from 'path'
 import escapeHTML from 'escape-html'
 import ruleURI from 'eslint-rule-documentation'
 import { generateRange } from 'atom-linter'
+import cryptoRandomString from 'crypto-random-string'
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { Disposable, Range } from 'atom'
+import { Range } from 'atom'
 
-export function spawnWorker() {
-  const env = Object.create(process.env)
-
-  delete env.NODE_PATH
-  delete env.NODE_ENV
-  delete env.OS
-
-  const child = ChildProcess.fork(join(__dirname, 'worker.js'), [], { env, silent: true })
-  const worker = createFromProcess(child)
-
-  child.stdout.on('data', (chunk) => {
-    console.log('[Linter-ESLint] STDOUT', chunk.toString())
-  })
-  child.stderr.on('data', (chunk) => {
-    console.log('[Linter-ESLint] STDERR', chunk.toString())
-  })
-
-  return {
-    worker,
-    subscription: new Disposable(() => {
-      worker.kill()
-    })
+/**
+ * Start the worker process if it hasn't already been started
+ * @param  {Task} worker The worker process reference to act on
+ * @return {undefined}
+ */
+const startWorker = (worker) => {
+  if (worker.started) {
+    // Worker start request has already been sent
+    return
   }
+  // Send empty arguments as we don't use them in the worker
+  worker.start([])
+  // NOTE: Modifies the Task of the worker, but it's the only clean way to track this
+  worker.started = true
+}
+
+/**
+ * Send a job to the worker and return the results
+ * @param  {Task} worker The worker Task to use
+ * @param  {Object} config Configuration for the job to send to the worker
+ * @return {Object|String|Error}        The data returned from the worker
+ */
+export async function sendJob(worker, config) {
+  // Ensure the worker is started
+  try {
+    startWorker(worker)
+  } catch (e) {
+    throw e
+  }
+  // Expand the config with a unique ID to emit on
+  // NOTE: Jobs _must_ have a unique ID as they are completely async and results
+  // can arrive back in any order.
+  config.emitKey = cryptoRandomString(10)
+
+  return new Promise((resolve, reject) => {
+    const errSub = worker.on('task:error', (...err) => {
+      // Re-throw errors from the task
+      const error = new Error(err[0])
+      // Set the stack to the one given to us by the worker
+      error.stack = err[1]
+      reject(error)
+    })
+    const responseSub = worker.on(config.emitKey, (data) => {
+      errSub.dispose()
+      responseSub.dispose()
+      resolve(data)
+    })
+    // Send the job on to the worker
+    try {
+      worker.send(config)
+    } catch (e) {
+      console.error(e)
+    }
+  })
 }
 
 export function showError(givenMessage, givenDetail = null) {
@@ -84,7 +114,7 @@ export async function getDebugInfo(worker) {
   const hoursSinceRestart = Math.round((process.uptime() / 3600) * 10) / 10
   let returnVal
   try {
-    const response = await worker.request('job', {
+    const response = await sendJob(worker, {
       type: 'debug',
       config,
       filePath
@@ -177,7 +207,7 @@ const generateInvalidTrace = async (
  * @param  {Object}     response   The raw response from ESLint
  * @param  {TextEditor} textEditor The Atom::TextEditor of the file the messages belong to
  * @param  {bool}       showRule   Whether to show the rule in the messages
- * @param  {Object}     worker     The current Worker process to send Debug jobs to
+ * @param  {Object}     worker     The current Worker Task to send Debug jobs to
  * @return {Promise}               The messages transformed into Linter messages
  */
 export async function processESLintMessages(response, textEditor, showRule, worker) {

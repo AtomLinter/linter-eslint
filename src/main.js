@@ -1,7 +1,7 @@
 'use babel'
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { CompositeDisposable } from 'atom'
+import { CompositeDisposable, Task } from 'atom'
 
 // Dependencies
 // NOTE: We are not directly requiring these in order to reduce the time it
@@ -53,23 +53,7 @@ module.exports = {
     idleCallbacks.add(callbackID)
 
     this.subscriptions = new CompositeDisposable()
-    this.active = true
     this.worker = null
-    const initializeWorker = () => {
-      if (!helpers) {
-        helpers = require('./helpers')
-      }
-      const { worker, subscription } = helpers.spawnWorker()
-      this.worker = worker
-      this.subscriptions.add(subscription)
-      worker.onDidExit(() => {
-        if (this.active) {
-          helpers.showError('Worker died unexpectedly', 'Check your console for more ' +
-          'info. A new worker will be spawned instantly.')
-          setTimeout(initializeWorker, 1000)
-        }
-      })
-    }
 
     this.subscriptions.add(
       atom.config.observe('linter-eslint.scopes', (value) => {
@@ -97,58 +81,18 @@ module.exports = {
           cursor.getScopeDescriptor().getScopesArray().some(scope =>
             scopes.includes(scope)))
         if (validScope && atom.config.get('linter-eslint.fixOnSave')) {
-          if (this.worker === null) {
-            await waitOnIdle()
-          }
-          if (!path) {
-            path = require('path')
-          }
-          if (!isConfigAtHomeRoot) {
-            isConfigAtHomeRoot = require('./is-config-at-home-root')
-          }
-          if (!workerHelpers) {
-            workerHelpers = require('./worker-helpers')
-          }
-          const filePath = editor.getPath()
-          const projectPath = atom.project.relativizePath(filePath)[0]
-
-          // Do not try to fix if linting should be disabled
-          const fileDir = path.dirname(filePath)
-          const configPath = workerHelpers.getConfigPath(fileDir)
-          const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
-          if (noProjectConfig && disableWhenNoEslintConfig) return
-
-          let rules = {}
-          if (Object.keys(ignoredRulesWhenFixing).length > 0) {
-            rules = ignoredRulesWhenFixing
-          }
-
-          // The fix replaces the file content and the cursor jumps automatically
-          // to the beginning of the file, so save current cursor position
-          const cursorPosition = editor.getCursorBufferPosition()
-          this.worker.request('job', {
-            type: 'fix',
-            config: atom.config.get('linter-eslint'),
-            rules,
-            filePath,
-            projectPath
-          }).then(() => {
-            // set cursor to the position before fix job
-            editor.setCursorBufferPosition(cursorPosition)
-          }).catch((err) => {
-            atom.notifications.addWarning(err.message)
-          })
+          await this.fixJob(true)
         }
       })
     }))
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
-        if (this.worker === null) {
-          await waitOnIdle()
-        }
         if (!helpers) {
           helpers = require('./helpers')
+        }
+        if (!this.worker) {
+          await waitOnIdle()
         }
         const debugString = await helpers.generateDebugString(this.worker)
         const notificationOptions = { detail: debugString, dismissable: true }
@@ -158,41 +102,7 @@ module.exports = {
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:fix-file': async () => {
-        if (this.worker === null) {
-          await waitOnIdle()
-        }
-        const textEditor = atom.workspace.getActiveTextEditor()
-        const filePath = textEditor.getPath()
-        const projectPath = atom.project.relativizePath(filePath)[0]
-
-        if (!textEditor || textEditor.isModified()) {
-          // Abort for invalid or unsaved text editors
-          atom.notifications.addError('Linter-ESLint: Please save before fixing')
-          return
-        }
-
-        let rules = {}
-        if (textEditor.isModified() && Object.keys(ignoredRulesWhenFixing).length > 0) {
-          rules = ignoredRulesWhenFixing
-        }
-
-        // The fix replaces the file content and the cursor jumps automatically
-        // to the beginning of the file, so save current cursor position
-        const cursorPosition = textEditor.getCursorBufferPosition()
-        this.worker.request('job', {
-          type: 'fix',
-          config: atom.config.get('linter-eslint'),
-          rules,
-          filePath,
-          projectPath
-        }).then(response =>
-          atom.notifications.addSuccess(response)
-        ).then(() => {
-          // set cursor to the position before fix job
-          textEditor.setCursorBufferPosition(cursorPosition)
-        }).catch((err) => {
-          atom.notifications.addWarning(err.message)
-        })
+        await this.fixJob()
       }
     }))
 
@@ -216,14 +126,20 @@ module.exports = {
       ignoredRulesWhenFixing = idsToIgnoredRules(ids)
     }))
 
-    // Initialize the worker during an idle time, with a maximum wait of 5 seconds
-    window.requestIdleCallback(initializeWorker, { timeout: 5000 })
+    const initializeESLintWorker = () => {
+      this.worker = new Task(require.resolve('./worker.js'))
+    }
+    // Initialize the worker during an idle time
+    window.requestIdleCallback(initializeESLintWorker)
   },
 
   deactivate() {
+    if (this.worker !== null) {
+      this.worker.terminate()
+      this.worker = null
+    }
     idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
     idleCallbacks.clear()
-    this.active = false
     this.subscriptions.dispose()
   },
 
@@ -245,33 +161,102 @@ module.exports = {
           rules = ignoredRulesWhenModified
         }
 
-        if (this.worker === null) {
+        if (!helpers) {
+          helpers = require('./helpers')
+        }
+
+        if (!this.worker) {
           await waitOnIdle()
         }
 
-        return this.worker.request('job', {
-          type: 'lint',
-          contents: text,
-          config: atom.config.get('linter-eslint'),
-          rules,
-          filePath,
-          projectPath: atom.project.relativizePath(filePath)[0] || ''
-        }).then((response) => {
-          if (textEditor.getText() !== text) {
-            /*
-               The editor text has been modified since the lint was triggered,
-               as we can't be sure that the results will map properly back to
-               the new contents, simply return `null` to tell the
-               `provideLinter` consumer not to update the saved results.
-             */
-            return null
-          }
-          if (!helpers) {
-            helpers = require('./helpers')
-          }
-          return helpers.processESLintMessages(response, textEditor, showRule, this.worker)
-        })
+        let response
+        try {
+          response = await helpers.sendJob(this.worker, {
+            type: 'lint',
+            contents: text,
+            config: atom.config.get('linter-eslint'),
+            rules,
+            filePath,
+            projectPath: atom.project.relativizePath(filePath)[0] || ''
+          })
+        } catch (e) {
+          throw e
+        }
+
+        if (textEditor.getText() !== text) {
+          /*
+             The editor text has been modified since the lint was triggered,
+             as we can't be sure that the results will map properly back to
+             the new contents, simply return `null` to tell the
+             `provideLinter` consumer not to update the saved results.
+           */
+          return null
+        }
+        return helpers.processESLintMessages(response, textEditor, showRule, this.worker)
       }
     }
-  }
+  },
+
+  async fixJob(isSave = false) {
+    const textEditor = atom.workspace.getActiveTextEditor()
+
+    if (!textEditor || textEditor.isModified()) {
+      // Abort for invalid or unsaved text editors
+      const message = 'Linter-ESLint: Please save before fixing'
+      atom.notifications.addError(message)
+    }
+
+    if (!path) {
+      path = require('path')
+    }
+    if (!isConfigAtHomeRoot) {
+      isConfigAtHomeRoot = require('./is-config-at-home-root')
+    }
+    if (!workerHelpers) {
+      workerHelpers = require('./worker-helpers')
+    }
+
+    const filePath = textEditor.getPath()
+    const fileDir = path.dirname(filePath)
+    const projectPath = atom.project.relativizePath(filePath)[0]
+
+    // Do not try to fix if linting should be disabled
+    const configPath = workerHelpers.getConfigPath(fileDir)
+    const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
+    if (noProjectConfig && disableWhenNoEslintConfig) {
+      return
+    }
+
+    let rules = {}
+    if (Object.keys(ignoredRulesWhenFixing).length > 0) {
+      rules = ignoredRulesWhenFixing
+    }
+
+    // The fix replaces the file content and the cursor jumps automatically
+    // to the beginning of the file, so save current cursor position
+    const cursorPosition = textEditor.getCursorBufferPosition()
+    if (!helpers) {
+      helpers = require('./helpers')
+    }
+    if (!this.worker) {
+      await waitOnIdle()
+    }
+
+    try {
+      const response = await helpers.sendJob(this.worker, {
+        type: 'fix',
+        config: atom.config.get('linter-eslint'),
+        rules,
+        filePath,
+        projectPath
+      })
+      if (!isSave) {
+        atom.notifications.addSuccess(response)
+      }
+      // Set cursor to the position before fix job
+      textEditor.setCursorBufferPosition(cursorPosition)
+    } catch (err) {
+      atom.notifications.addWarning(err.message)
+    }
+  },
 }

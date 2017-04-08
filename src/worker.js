@@ -1,9 +1,8 @@
 'use babel'
 
-// Note: 'use babel' doesn't work in forked processes
+/* global emit */
 
 import Path from 'path'
-import { create } from 'process-communication'
 import { FindCache, findCached } from 'atom-linter'
 import * as Helpers from './worker-helpers'
 import isConfigAtHomeRoot from './is-config-at-home-root'
@@ -47,30 +46,38 @@ function fixJob({ cliEngineOptions, eslint, filePath }) {
   return 'Linter-ESLint: Fix attempt complete, but linting errors remain.'
 }
 
-create().onRequest('job', ({ contents, type, config, filePath, projectPath, rules }, job) => {
-  if (config.disableFSCache) {
-    FindCache.clear()
-  }
+module.exports = async function () {
+  process.on('message', (jobConfig) => {
+    const { contents, type, config, filePath, projectPath, rules, emitKey } = jobConfig
+    if (config.disableFSCache) {
+      FindCache.clear()
+    }
 
-  const fileDir = Path.dirname(filePath)
-  const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
-  const configPath = Helpers.getConfigPath(fileDir)
-  const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config)
+    const fileDir = Path.dirname(filePath)
+    const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
+    const configPath = Helpers.getConfigPath(fileDir)
+    const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
+    if (noProjectConfig && config.disableWhenNoEslintConfig) {
+      emit(emitKey, [])
+      return
+    }
 
-  const cliEngineOptions = Helpers.getCLIEngineOptions(
-    type, config, rules, relativeFilePath, fileDir, configPath
-  )
+    const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config)
 
-  const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
-  if (noProjectConfig && config.disableWhenNoEslintConfig) {
-    job.response = []
-  } else if (type === 'lint') {
-    const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
-    job.response = report.results.length ? report.results[0].messages.filter(shouldBeReported) : []
-  } else if (type === 'fix') {
-    job.response = fixJob({ cliEngineOptions, eslint, filePath })
-  } else if (type === 'debug') {
-    const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
-    job.response = Helpers.findESLintDirectory(modulesDir, config)
-  }
-})
+    const cliEngineOptions = Helpers.getCLIEngineOptions(
+      type, config, rules, relativeFilePath, fileDir, configPath
+    )
+
+    let response
+    if (type === 'lint') {
+      const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
+      response = report.results.length ? report.results[0].messages.filter(shouldBeReported) : []
+    } else if (type === 'fix') {
+      response = fixJob({ cliEngineOptions, eslint, filePath })
+    } else if (type === 'debug') {
+      const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
+      response = Helpers.findESLintDirectory(modulesDir, config)
+    }
+    emit(emitKey, response)
+  })
+}
