@@ -12,6 +12,7 @@ import { getConfigPath } from './worker-helpers'
 import { isConfigAtHomeRoot } from './is-config-at-home-root'
 
 // Configuration
+const editorClass = 'javascript-editor'
 const scopes = []
 let showRule
 let ignoredRulesWhenModified
@@ -93,7 +94,16 @@ module.exports = {
       }
     }))
 
-    this.subscriptions.add(atom.commands.add('atom-text-editor', {
+    // Marks each JavaScript editor with a CSS class so that
+    // we can enable commands only for JavaScript editors.
+    this.subscriptions.add(atom.workspace.observeTextEditors((textEditor) => {
+      if (textEditor.getRootScopeDescriptor().scopes
+        .some(fileScope => scopes.some(lintScope => lintScope === fileScope))) {
+        textEditor.element.classList.add(editorClass)
+      }
+    }))
+
+    this.subscriptions.add(atom.commands.add(`atom-text-editor.${editorClass}`, {
       'linter-eslint:fix-file': () => {
         const textEditor = atom.workspace.getActiveTextEditor()
         const filePath = textEditor.getPath()
