@@ -4,6 +4,8 @@
 import { CompositeDisposable } from 'atom'
 
 // Dependencies
+// NOTE: We are not directly requiring these in order to reduce the time it
+// takes to require this file as that causes delays in Atom loading this package
 let path
 let helpers
 let workerHelpers
