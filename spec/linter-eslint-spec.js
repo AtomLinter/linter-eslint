@@ -62,14 +62,18 @@ describe('The eslint provider for Linter', () => {
     atom.config.set('linter-eslint.disableFSCache', false)
     atom.config.set('linter-eslint.disableEslintIgnore', true)
 
+    // Info about this beforeEach() implementation:
+    // https://github.com/AtomLinter/Meta/issues/15
+    const activationPromise =
+      atom.packages.activatePackage('linter-eslint')
+
     waitsForPromise(() =>
-      Promise.all([
-        atom.packages.activatePackage('language-javascript'),
-        atom.packages.activatePackage('linter-eslint'),
-      ]).then(() =>
-        atom.workspace.open(goodPath)
-      )
+      atom.packages.activatePackage('language-javascript').then(() =>
+        atom.workspace.open(goodPath))
     )
+
+    atom.packages.triggerDeferredActivationHooks()
+    waitsForPromise(() => activationPromise)
   })
 
   describe('checks bad.js and', () => {
