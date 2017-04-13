@@ -1,5 +1,11 @@
 # Changelog
 
+## v8.1.6
+
+*   Reduce package activation time ([#875](https://github.com/AtomLinter/linter-eslint/pull/875))
+*   Async-ify the specs ([#878](https://github.com/AtomLinter/linter-eslint/pull/878))
+*   Cancel pending idle callbacks on deactivate ([#880](https://github.com/AtomLinter/linter-eslint/pull/880))
+
 ## v8.1.5
 
 *   Move to the `CLIEngine` API ([#873](https://github.com/AtomLinter/linter-eslint/pull/873))
