@@ -18,6 +18,9 @@ let ignoredRulesWhenModified
 let ignoredRulesWhenFixing
 let disableWhenNoEslintConfig
 
+// Internal variables
+const idleCallbacks = new Set()
+
 // Internal functions
 const idsToIgnoredRules = ruleIds =>
   ruleIds.reduce((ids, id) => {
@@ -30,15 +33,24 @@ const waitOnIdle = () =>
     // The worker is initialized during an idle time, since the queued idle
     // callbacks are done in order, waiting on a newly queued idle callback will
     // ensure that the worker has been initialized
-    window.requestIdleCallback(resolve)
+    const callbackID = window.requestIdleCallback(() => {
+      idleCallbacks.delete(callbackID)
+      resolve()
+    })
+    idleCallbacks.add(callbackID)
   })
 
 module.exports = {
   activate() {
-    const installLinterEslintDeps = () => require('atom-package-deps').install('linter-eslint')
-    if (!atom.inSpecMode()) {
-      window.requestIdleCallback(installLinterEslintDeps)
+    let callbackID
+    const installLinterEslintDeps = () => {
+      idleCallbacks.delete(callbackID)
+      if (!atom.inSpecMode()) {
+        require('atom-package-deps').install('linter-eslint')
+      }
     }
+    callbackID = window.requestIdleCallback(installLinterEslintDeps)
+    idleCallbacks.add(callbackID)
 
     this.subscriptions = new CompositeDisposable()
     this.active = true
@@ -208,6 +220,8 @@ module.exports = {
     window.requestIdleCallback(initializeWorker, { timeout: 5000 })
   },
   deactivate() {
+    idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
+    idleCallbacks.clear()
     this.active = false
     this.subscriptions.dispose()
   },
