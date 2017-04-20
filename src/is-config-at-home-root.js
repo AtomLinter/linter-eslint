@@ -1,3 +1,5 @@
+'use babel'
+
 /* eslint-disable import/prefer-default-export */
 
 import userHome from 'user-home'
