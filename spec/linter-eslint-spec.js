@@ -4,8 +4,8 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { tmpdir } from 'os'
 import rimraf from 'rimraf'
-import { beforeEach, it } from 'jasmine-fix'
-// NOTE: If using fit you must add it to the list above!
+// eslint-disable-next-line no-unused-vars
+import { beforeEach, it, fit } from 'jasmine-fix'
 import linterEslint from '../lib/main'
 
 const fixturesDir = path.join(__dirname, 'fixtures')
@@ -26,6 +26,7 @@ const modifiedIgnorePath = path.join(fixturesDir,
 const modifiedIgnoreSpacePath = path.join(fixturesDir,
   'modified-ignore-rule', 'foo-space.js')
 const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
+const badCachePath = path.join(fixturesDir, 'badCache')
 
 function copyFileToTempDir(fileToCopyPath) {
   return new Promise((resolve) => {
@@ -388,6 +389,72 @@ describe('The eslint provider for Linter', () => {
       const messages = await lint(editor)
 
       expect(messages.length).toBe(0)
+    })
+  })
+
+  describe('lets ESLint handle configuration', () => {
+    it('works when the cache fails', async () => {
+      // Ensure the cache is enabled, since we will be taking advantage of
+      // a failing in it's operation
+      atom.config.set('linter-eslint.disableFSCache', false)
+      const fooPath = path.join(badCachePath, 'temp', 'foo.js')
+      const newConfigPath = path.join(badCachePath, 'temp', '.eslintrc.js')
+      const editor = await atom.workspace.open(fooPath)
+      function undefMsg(varName) {
+        return `&#39;${varName}&#39; is not defined. `
+          + '(<a href="http://eslint.org/docs/rules/no-undef">no-undef</a>)'
+      }
+
+      // Trigger a first lint to warm up the cache with the first config result
+      let messages = await lint(editor)
+      expect(messages.length).toBe(2)
+      expect(messages[0].type).toBe('Error')
+      expect(messages[0].text).not.toBeDefined()
+      expect(messages[0].html).toBe(undefMsg('console'))
+      expect(messages[0].filePath).toBe(fooPath)
+      expect(messages[0].range).toEqual([[1, 2], [1, 9]])
+      expect(messages[1].type).toBe('Error')
+      expect(messages[1].text).not.toBeDefined()
+      expect(messages[1].html).toBe(undefMsg('bar'))
+      expect(messages[1].filePath).toBe(fooPath)
+      expect(messages[1].range).toEqual([[1, 14], [1, 17]])
+
+      // Write the new configuration file
+      const newConfig = {
+        env: {
+          browser: true,
+        },
+      }
+      let configContents = `module.exports = ${JSON.stringify(newConfig, null, 2)}\n`
+      fs.writeFileSync(newConfigPath, configContents)
+
+      // Lint again, ESLint should recognise the new configuration
+      // The cached config results are still pointing at the _parent_ file. ESLint
+      // would partially handle this situation if the config file was specified
+      // from the cache.
+      messages = await lint(editor)
+      expect(messages.length).toBe(1)
+      expect(messages[0].type).toBe('Error')
+      expect(messages[0].text).not.toBeDefined()
+      expect(messages[0].html).toBe(undefMsg('bar'))
+      expect(messages[0].filePath).toBe(fooPath)
+      expect(messages[0].range).toEqual([[1, 14], [1, 17]])
+
+      // Update the configuration
+      newConfig.rules = {
+        'no-undef': 'off',
+      }
+      configContents = `module.exports = ${JSON.stringify(newConfig, null, 2)}\n`
+      fs.writeFileSync(newConfigPath, configContents)
+
+      // Lint again, if the cache was specifying the file ESLint at this point
+      // would fail to update the configuration fully, and would still report a
+      // no-undef error.
+      messages = await lint(editor)
+      expect(messages.length).toBe(0)
+
+      // Delete the temporary configuration file
+      fs.unlinkSync(newConfigPath)
     })
   })
 })
