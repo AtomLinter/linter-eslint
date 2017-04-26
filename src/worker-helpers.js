@@ -136,11 +136,6 @@ export function getRelativePath(fileDir, filePath, config) {
 }
 
 export function getCLIEngineOptions(type, config, rules, filePath, fileDir, givenConfigPath) {
-  let configPath
-  if (givenConfigPath === null) {
-    configPath = config.eslintrcPath || null
-  } else configPath = givenConfigPath
-
   const cliEngineConfig = {
     rules,
     ignore: !config.disableEslintIgnore,
@@ -161,8 +156,10 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
       cliEngineConfig.rulePaths = [rulesDir]
     }
   }
-  if (configPath) {
-    cliEngineConfig.configFile = resolveEnv(configPath)
+
+  if (givenConfigPath === null && config.eslintrcPath) {
+    // If we didn't find a configuration use the fallback from the settings
+    cliEngineConfig.configFile = resolveEnv(config.eslintrcPath)
   }
 
   return cliEngineConfig
