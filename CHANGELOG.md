@@ -1,5 +1,9 @@
 # Changelog
 
+## v8.1.7
+
+*   Let ESLint handle configuration where possible ([#896](https://github.com/AtomLinter/linter-eslint/pull/896))
+
 ## v8.1.6
 
 *   Reduce package activation time ([#875](https://github.com/AtomLinter/linter-eslint/pull/875))
