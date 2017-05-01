@@ -28,17 +28,25 @@ const modifiedIgnoreSpacePath = path.join(fixturesDir,
 const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
 const badCachePath = path.join(fixturesDir, 'badCache')
 
-function copyFileToTempDir(fileToCopyPath) {
+/**
+ * Async helper to copy a file from one place to another on the filesystem.
+ * @param  {string} fileToCopyPath  Path of the file to be copied
+ * @param  {string} destinationDir  Directory to paste the file into
+ * @return {string}                 Full path of the file in copy destination
+ */
+function copyFileToDir(fileToCopyPath, destinationDir) {
   return new Promise((resolve) => {
-    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
-    const tempFixturePath = path.join(tempFixtureDir, path.basename(fileToCopyPath))
-    const ws = fs.createWriteStream(tempFixturePath)
-    ws.on('close', () =>
-      atom.workspace.open(tempFixturePath).then((openEditor) => {
-        resolve({ openEditor, tempDir: tempFixtureDir })
-      })
-    )
+    const destinationPath = path.join(destinationDir, path.basename(fileToCopyPath))
+    const ws = fs.createWriteStream(destinationPath)
+    ws.on('close', () => resolve(destinationPath))
     fs.createReadStream(fileToCopyPath).pipe(ws)
+  })
+}
+
+function copyFileToTempDir(fileToCopyPath) {
+  return new Promise(async (resolve) => {
+    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+    resolve(await copyFileToDir(fileToCopyPath, tempFixtureDir))
   })
 }
 
@@ -175,25 +183,20 @@ describe('The eslint provider for Linter', () => {
 
   describe('fixes errors', () => {
     let editor
-    let tempFixtureDir
+    let tempDir
 
     beforeEach(async () => {
       // Copy the file to a temporary folder
-      const { openEditor, tempDir } = await copyFileToTempDir(fixPath)
-      editor = openEditor
-      tempFixtureDir = tempDir
+      const tempFixturePath = await copyFileToTempDir(fixPath)
+      editor = await atom.workspace.open(tempFixturePath)
+      tempDir = path.dirname(tempFixturePath)
       // Copy the config to the same temporary directory
-      return new Promise((resolve) => {
-        const configWritePath = path.join(tempDir, path.basename(configPath))
-        const wr = fs.createWriteStream(configWritePath)
-        wr.on('close', () => resolve())
-        fs.createReadStream(configPath).pipe(wr)
-      })
+      await copyFileToDir(configPath, tempDir)
     })
 
     afterEach(() => {
       // Remove the temporary directory
-      rimraf.sync(tempFixtureDir)
+      rimraf.sync(tempDir)
     })
 
     async function firstLint(textEditor) {
@@ -336,9 +339,9 @@ describe('The eslint provider for Linter', () => {
     beforeEach(async () => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', false)
 
-      const { openEditor, tempDir } = await copyFileToTempDir(badInlinePath)
-      editor = openEditor
-      tempFixtureDir = tempDir
+      const tempFilePath = await copyFileToTempDir(badInlinePath)
+      editor = await atom.workspace.open(tempFilePath)
+      tempFixtureDir = path.dirname(tempFilePath)
     })
 
     afterEach(() => {
@@ -376,9 +379,9 @@ describe('The eslint provider for Linter', () => {
     beforeEach(async () => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', true)
 
-      const { openEditor, tempDir } = await copyFileToTempDir(badInlinePath)
-      editor = openEditor
-      tempFixtureDir = tempDir
+      const tempFilePath = await copyFileToTempDir(badInlinePath)
+      editor = await atom.workspace.open(tempFilePath)
+      tempFixtureDir = path.dirname(tempFilePath)
     })
 
     afterEach(() => {
