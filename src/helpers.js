@@ -33,11 +33,7 @@ const startWorker = (worker) => {
  */
 export async function sendJob(worker, config) {
   // Ensure the worker is started
-  try {
-    startWorker(worker)
-  } catch (e) {
-    throw e
-  }
+  startWorker(worker)
   // Expand the config with a unique ID to emit on
   // NOTE: Jobs _must_ have a unique ID as they are completely async and results
   // can arrive back in any order.

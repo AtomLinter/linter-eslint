@@ -169,19 +169,14 @@ module.exports = {
           await waitOnIdle()
         }
 
-        let response
-        try {
-          response = await helpers.sendJob(this.worker, {
-            type: 'lint',
-            contents: text,
-            config: atom.config.get('linter-eslint'),
-            rules,
-            filePath,
-            projectPath: atom.project.relativizePath(filePath)[0] || ''
-          })
-        } catch (e) {
-          throw e
-        }
+        const response = await helpers.sendJob(this.worker, {
+          type: 'lint',
+          contents: text,
+          config: atom.config.get('linter-eslint'),
+          rules,
+          filePath,
+          projectPath: atom.project.relativizePath(filePath)[0] || ''
+        })
 
         if (textEditor.getText() !== text) {
           /*
