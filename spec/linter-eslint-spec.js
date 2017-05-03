@@ -120,7 +120,7 @@ describe('The eslint provider for Linter', () => {
       const messages = await lint(editor)
       expect(messages.length).toBe(2)
 
-      const expected0 = '\'foo\' is not defined. (no-undef)'
+      const expected0 = "'foo' is not defined. (no-undef)"
       const expected0Url = 'http://eslint.org/docs/rules/no-undef'
       const expected1 = 'Extra semicolon. (semi)'
       const expected1Url = 'http://eslint.org/docs/rules/semi'
