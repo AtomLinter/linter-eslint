@@ -15,6 +15,7 @@ const badPath = path.join(fixturesDir, 'files', 'bad.js')
 const badInlinePath = path.join(fixturesDir, 'files', 'badInline.js')
 const emptyPath = path.join(fixturesDir, 'files', 'empty.js')
 const fixPath = path.join(fixturesDir, 'files', 'fix.js')
+const cachePath = path.join(fixturesDir, 'files', '.eslintcache')
 const configPath = path.join(fixturesDir, 'configs', '.eslintrc.yml')
 const importingpath = path.join(fixturesDir,
   'import-resolution', 'nested', 'importing.js')
@@ -28,17 +29,31 @@ const modifiedIgnoreSpacePath = path.join(fixturesDir,
 const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
 const badCachePath = path.join(fixturesDir, 'badCache')
 
-function copyFileToTempDir(fileToCopyPath) {
+/**
+ * Async helper to copy a file from one place to another on the filesystem.
+ * @param  {string} fileToCopyPath  Path of the file to be copied
+ * @param  {string} destinationDir  Directory to paste the file into
+ * @return {string}                 Full path of the file in copy destination
+ */
+function copyFileToDir(fileToCopyPath, destinationDir) {
   return new Promise((resolve) => {
-    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
-    const tempFixturePath = path.join(tempFixtureDir, path.basename(fileToCopyPath))
-    const ws = fs.createWriteStream(tempFixturePath)
-    ws.on('close', () =>
-      atom.workspace.open(tempFixturePath).then((openEditor) => {
-        resolve({ openEditor, tempDir: tempFixtureDir })
-      })
-    )
+    const destinationPath = path.join(destinationDir, path.basename(fileToCopyPath))
+    const ws = fs.createWriteStream(destinationPath)
+    ws.on('close', () => resolve(destinationPath))
     fs.createReadStream(fileToCopyPath).pipe(ws)
+  })
+}
+
+/**
+ * Utility helper to copy a file into the OS temp directory.
+ *
+ * @param  {string} fileToCopyPath  Path of the file to be copied
+ * @return {string}                 Full path of the file in copy destination
+ */
+function copyFileToTempDir(fileToCopyPath) {
+  return new Promise(async (resolve) => {
+    const tempFixtureDir = fs.mkdtempSync(tmpdir() + path.sep)
+    resolve(await copyFileToDir(fileToCopyPath, tempFixtureDir))
   })
 }
 
@@ -52,6 +67,25 @@ async function getNotification() {
     }
     // Subscribe to Atom's notifications
     notificationSub = atom.notifications.onDidAddNotification(newNotification)
+  })
+}
+
+async function makeFixes(textEditor) {
+  return new Promise(async (resolve) => {
+    // Subscribe to the file reload event
+    const editorReloadSub = textEditor.getBuffer().onDidReload(async () => {
+      editorReloadSub.dispose()
+      // File has been reloaded in Atom, notification checking will happen
+      // async either way, but should already be finished at this point
+      resolve()
+    })
+
+    // Now that all the required subscriptions are active, send off a fix request
+    atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
+    const notification = await getNotification()
+
+    expect(notification.getMessage()).toBe('Linter-ESLint: Fix complete.')
+    expect(notification.getType()).toBe('success')
   })
 }
 
@@ -175,50 +209,26 @@ describe('The eslint provider for Linter', () => {
 
   describe('fixes errors', () => {
     let editor
-    let tempFixtureDir
+    let tempDir
 
     beforeEach(async () => {
       // Copy the file to a temporary folder
-      const { openEditor, tempDir } = await copyFileToTempDir(fixPath)
-      editor = openEditor
-      tempFixtureDir = tempDir
+      const tempFixturePath = await copyFileToTempDir(fixPath)
+      editor = await atom.workspace.open(tempFixturePath)
+      tempDir = path.dirname(tempFixturePath)
       // Copy the config to the same temporary directory
-      return new Promise((resolve) => {
-        const configWritePath = path.join(tempDir, path.basename(configPath))
-        const wr = fs.createWriteStream(configWritePath)
-        wr.on('close', () => resolve())
-        fs.createReadStream(configPath).pipe(wr)
-      })
+      await copyFileToDir(configPath, tempDir)
     })
 
     afterEach(() => {
       // Remove the temporary directory
-      rimraf.sync(tempFixtureDir)
+      rimraf.sync(tempDir)
     })
 
     async function firstLint(textEditor) {
       const messages = await lint(textEditor)
       // The original file has two errors
       expect(messages.length).toBe(2)
-    }
-
-    async function makeFixes(textEditor) {
-      return new Promise(async (resolve) => {
-        // Subscribe to the file reload event
-        const editorReloadSub = textEditor.getBuffer().onDidReload(async () => {
-          editorReloadSub.dispose()
-          // File has been reloaded in Atom, notification checking will happen
-          // async either way, but should already be finished at this point
-          resolve()
-        })
-
-        // Now that all the required subscriptions are active, send off a fix request
-        atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
-        const notification = await getNotification()
-
-        expect(notification.getMessage()).toBe('Linter-ESLint: Fix complete.')
-        expect(notification.getType()).toBe('success')
-      })
     }
 
     it('should fix linting errors', async () => {
@@ -242,6 +252,35 @@ describe('The eslint provider for Linter', () => {
 
       expect(messagesAfterFixing.length).toBe(1)
       expect(messagesAfterFixing[0].html).toBe(messageHTML)
+    })
+  })
+
+  describe('when an eslint cache file is present', () => {
+    let editor
+    let tempDir
+
+    beforeEach(async () => {
+      // Copy the file to a temporary folder
+      const tempFixturePath = await copyFileToTempDir(fixPath)
+      editor = await atom.workspace.open(tempFixturePath)
+      tempDir = path.dirname(tempFixturePath)
+      // Copy the config to the same temporary directory
+      await copyFileToDir(configPath, tempDir)
+    })
+
+    afterEach(() => {
+      // Remove the temporary directory
+      rimraf.sync(tempDir)
+    })
+
+    it('does not delete the cache file when performing fixes', async () => {
+      const tempCacheFile = await copyFileToDir(cachePath, tempDir)
+      const checkCachefileExists = () => {
+        fs.statSync(tempCacheFile)
+      }
+      expect(checkCachefileExists).not.toThrow()
+      await makeFixes(editor)
+      expect(checkCachefileExists).not.toThrow()
     })
   })
 
@@ -336,9 +375,9 @@ describe('The eslint provider for Linter', () => {
     beforeEach(async () => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', false)
 
-      const { openEditor, tempDir } = await copyFileToTempDir(badInlinePath)
-      editor = openEditor
-      tempFixtureDir = tempDir
+      const tempFilePath = await copyFileToTempDir(badInlinePath)
+      editor = await atom.workspace.open(tempFilePath)
+      tempFixtureDir = path.dirname(tempFilePath)
     })
 
     afterEach(() => {
@@ -376,9 +415,9 @@ describe('The eslint provider for Linter', () => {
     beforeEach(async () => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', true)
 
-      const { openEditor, tempDir } = await copyFileToTempDir(badInlinePath)
-      editor = openEditor
-      tempFixtureDir = tempDir
+      const tempFilePath = await copyFileToTempDir(badInlinePath)
+      editor = await atom.workspace.open(tempFilePath)
+      tempFixtureDir = path.dirname(tempFilePath)
     })
 
     afterEach(() => {

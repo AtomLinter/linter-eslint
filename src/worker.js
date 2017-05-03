@@ -29,14 +29,11 @@ function shouldBeReported(problem) {
 
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
-
-  return typeof contents === 'string'
-    ? cliEngine.executeOnText(contents, filePath)
-    : cliEngine.executeOnFiles([filePath])
+  return cliEngine.executeOnText(contents, filePath)
 }
 
-function fixJob({ cliEngineOptions, eslint, filePath }) {
-  const report = lintJob({ cliEngineOptions, eslint, filePath })
+function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
+  const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
 
   eslint.CLIEngine.outputFixes(report)
 
@@ -73,7 +70,7 @@ module.exports = async function () {
       const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
       response = report.results.length ? report.results[0].messages.filter(shouldBeReported) : []
     } else if (type === 'fix') {
-      response = fixJob({ cliEngineOptions, eslint, filePath })
+      response = fixJob({ cliEngineOptions, contents, eslint, filePath })
     } else if (type === 'debug') {
       const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
       response = Helpers.findESLintDirectory(modulesDir, config)

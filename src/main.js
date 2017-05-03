@@ -215,6 +215,13 @@ module.exports = {
     const fileDir = path.dirname(filePath)
     const projectPath = atom.project.relativizePath(filePath)[0]
 
+    // Get the text from the editor, so we can use executeOnText
+    const text = textEditor.getText()
+    // Do not try to make fixes on an empty file
+    if (text.length === 0) {
+      return
+    }
+
     // Do not try to fix if linting should be disabled
     const configPath = workerHelpers.getConfigPath(fileDir)
     const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
@@ -241,6 +248,7 @@ module.exports = {
       const response = await helpers.sendJob(this.worker, {
         type: 'fix',
         config: atom.config.get('linter-eslint'),
+        contents: text,
         rules,
         filePath,
         projectPath
