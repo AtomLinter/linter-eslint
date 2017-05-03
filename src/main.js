@@ -148,7 +148,7 @@ module.exports = {
       name: 'ESLint',
       grammarScopes: scopes,
       scope: 'file',
-      lintOnFly: true,
+      lintsOnChange: true,
       lint: async (textEditor) => {
         const text = textEditor.getText()
         if (text.length === 0) {
