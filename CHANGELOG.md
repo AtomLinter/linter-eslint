@@ -1,5 +1,20 @@
 # Changelog
 
+## v8.1.7
+
+*   Let ESLint handle configuration where possible ([#896](https://github.com/AtomLinter/linter-eslint/pull/896))
+
+## v8.1.6
+
+*   Reduce package activation time ([#875](https://github.com/AtomLinter/linter-eslint/pull/875))
+*   Async-ify the specs ([#878](https://github.com/AtomLinter/linter-eslint/pull/878))
+*   Cancel pending idle callbacks on deactivate ([#880](https://github.com/AtomLinter/linter-eslint/pull/880))
+
+## v8.1.5
+
+*   Move to the `CLIEngine` API ([#873](https://github.com/AtomLinter/linter-eslint/pull/873))
+*   Attempt to restore cursor position after fixing ([#853](https://github.com/AtomLinter/linter-eslint/pull/853))
+
 ## v8.1.4
 
 *   Improve package.json eslintConfig support ([#848](https://github.com/AtomLinter/linter-eslint/pull/848))
