@@ -255,10 +255,9 @@ export async function processESLintMessages(response, textEditor, showRule, work
         }
       }
 
-      // Fallback to ruleId for triggering a Google search
-      // Useful for custom rules, that are not matched by `ruleURI`
-      const url = ruleId ? ruleURI(ruleId).url : ruleId
-      ret.url = url
+      if (ruleId) {
+        ret.url = ruleURI(ruleId).url
+      }
 
       const ruleAppendix = showRule ? ` (${ruleId || 'Fatal'})` : ''
       ret.excerpt = `${message}${ruleAppendix}`
