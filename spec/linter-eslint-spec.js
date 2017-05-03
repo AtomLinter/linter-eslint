@@ -57,10 +57,16 @@ function copyFileToTempDir(fileToCopyPath) {
   })
 }
 
-async function getNotification() {
+async function getNotification(expectedMessage) {
   return new Promise((resolve) => {
     let notificationSub
     const newNotification = (notification) => {
+      if (notification.getMessage() !== expectedMessage) {
+        // As the specs execute asynchronously, it's possible a notification
+        // from a different spec was grabbed, if the message doesn't match what
+        // is expected simply return and keep waiting for the next message.
+        return
+      }
       // Dispose of the notificaiton subscription
       notificationSub.dispose()
       resolve(notification)
@@ -82,9 +88,10 @@ async function makeFixes(textEditor) {
 
     // Now that all the required subscriptions are active, send off a fix request
     atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
-    const notification = await getNotification()
+    const expectedMessage = 'Linter-ESLint: Fix complete.'
+    const notification = await getNotification(expectedMessage)
 
-    expect(notification.getMessage()).toBe('Linter-ESLint: Fix complete.')
+    expect(notification.getMessage()).toBe(expectedMessage)
     expect(notification.getType()).toBe('success')
   })
 }
@@ -201,9 +208,10 @@ describe('The eslint provider for Linter', () => {
     it('will not give warnings when autofixing the file', async () => {
       const editor = await atom.workspace.open(ignoredPath)
       atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:fix-file')
-      const notification = await getNotification()
+      const expectedMessage = 'Linter-ESLint: Fix complete.'
+      const notification = await getNotification(expectedMessage)
 
-      expect(notification.getMessage()).toBe('Linter-ESLint: Fix complete.')
+      expect(notification.getMessage()).toBe(expectedMessage)
     })
   })
 
@@ -330,21 +338,22 @@ describe('The eslint provider for Linter', () => {
 
   describe('prints debugging information with the `debug` command', () => {
     let editor
+    const expectedMessage = 'linter-eslint debugging information'
     beforeEach(async () => {
       editor = await atom.workspace.open(goodPath)
     })
 
     it('shows an info notification', async () => {
       atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
-      const notification = await getNotification()
+      const notification = await getNotification(expectedMessage)
 
-      expect(notification.getMessage()).toBe('linter-eslint debugging information')
+      expect(notification.getMessage()).toBe(expectedMessage)
       expect(notification.getType()).toEqual('info')
     })
 
     it('includes debugging information in the details', async () => {
       atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
-      const notification = await getNotification()
+      const notification = await getNotification(expectedMessage)
       const detail = notification.getDetail()
 
       expect(detail.includes(`Atom version: ${atom.getVersion()}`)).toBe(true)
