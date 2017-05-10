@@ -39,7 +39,7 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
     if (process.platform === 'win32') {
       eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
     } else {
-      eslintDir = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
+      eslintDir = _path2.default.join(prefixPath, 'node_modules', '.bin', '..', 'eslint');
     }
   } else if (!config.advancedLocalNodeModules) {
     locationType = 'local project'
