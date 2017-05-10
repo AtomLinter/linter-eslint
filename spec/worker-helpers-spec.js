@@ -5,6 +5,11 @@ import * as Helpers from '../src/worker-helpers'
 
 const getFixturesPath = path => Path.join(__dirname, 'fixtures', path)
 
+
+const globalNodePath = process.platform === 'win32' ?
+  Path.join(getFixturesPath('global-eslint'), 'lib') :
+  getFixturesPath('global-eslint')
+
 describe('Worker Helpers', () => {
   describe('findESLintDirectory', () => {
     it('returns an object with path and type keys', () => {
@@ -25,7 +30,6 @@ describe('Worker Helpers', () => {
 
     it('does not find a local eslint when useGlobalEslint is true', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const globalNodePath = getFixturesPath('global-eslint')
       const config = { useGlobalEslint: true, globalNodePath }
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedEslintPath = Path.join(getFixturesPath('local-eslint'), 'node_modules', 'eslint')
@@ -35,7 +39,6 @@ describe('Worker Helpers', () => {
 
     it('finds a global eslint when useGlobalEslint is true and a valid globalNodePath is provided', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const globalNodePath = getFixturesPath('global-eslint')
       const config = { useGlobalEslint: true, globalNodePath }
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedEslintPath = process.platform === 'win32'
@@ -65,6 +68,7 @@ describe('Worker Helpers', () => {
       })
       expect(eslint).toBe('located')
     })
+
     it('tries to find an indirect local eslint using a relative path', () => {
       const path = Path.join(
         getFixturesPath('indirect-local-eslint'), 'testing', 'eslint', 'node_modules')
@@ -77,10 +81,12 @@ describe('Worker Helpers', () => {
 
       expect(eslint).toBe('located')
     })
+
     it('tries to find a local eslint', () => {
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), {})
       expect(eslint).toBe('located')
     })
+
     it('cries if local eslint is not found', () => {
       expect(() => {
         Helpers.getESLintInstance(getFixturesPath('files', {}))
@@ -88,18 +94,13 @@ describe('Worker Helpers', () => {
     })
 
     it('tries to find a global eslint if config is specified', () => {
-      let globalPath = ''
-      if (process.platform === 'win32') {
-        globalPath = getFixturesPath(Path.join('global-eslint', 'lib'))
-      } else {
-        globalPath = getFixturesPath('global-eslint')
-      }
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), {
         useGlobalEslint: true,
-        globalNodePath: globalPath
+        globalNodePath
       })
       expect(eslint).toBe('located')
     })
+
     it('cries if global eslint is not found', () => {
       expect(() => {
         Helpers.getESLintInstance(getFixturesPath('local-eslint'), {
@@ -122,31 +123,37 @@ describe('Worker Helpers', () => {
       const expectedPath = Path.join(fileDir, '.eslintrc')
       expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
     })
+
     it('finds .eslintrc.yaml', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'yaml'))
       const expectedPath = Path.join(fileDir, '.eslintrc.yaml')
       expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
     })
+
     it('finds .eslintrc.yml', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'yml'))
       const expectedPath = Path.join(fileDir, '.eslintrc.yml')
       expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
     })
+
     it('finds .eslintrc.js', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'js'))
       const expectedPath = Path.join(fileDir, '.eslintrc.js')
       expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
     })
+
     it('finds .eslintrc.json', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'json'))
       const expectedPath = Path.join(fileDir, '.eslintrc.json')
       expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
     })
+
     it('finds package.json with an eslintConfig property', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'package-json'))
       const expectedPath = Path.join(fileDir, 'package.json')
       expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
     })
+
     it('ignores package.json with no eslintConfig property', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'package-json', 'nested'))
       const expectedPath = getFixturesPath(Path.join('configs', 'package-json', 'package.json'))
@@ -162,6 +169,7 @@ describe('Worker Helpers', () => {
       const expectedPath = Path.relative(Path.join(__dirname, '..'), fixtureFile)
       expect(relativePath).toBe(expectedPath)
     })
+
     it('does not return path relative to ignore file if config overrides it', () => {
       const fixtureDir = getFixturesPath('eslintignore')
       const fixtureFile = Path.join(fixtureDir, 'ignored.js')
