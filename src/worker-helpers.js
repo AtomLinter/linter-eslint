@@ -23,11 +23,21 @@ export function getNodePrefixPath() {
         }).output[1].toString().trim()
     } catch (e) {
       throw new Error(
-        'Unable to execute `npm get prefix`. Please make sure Atom is getting $PATH correctly'
+        'Unable to execute `npm get prefix`. Please make sure Atom is getting $PATH correctly.'
       )
     }
   }
   return Cache.NODE_PREFIX_PATH
+}
+
+function isDirectory(dirPath) {
+  let isDir
+  try {
+    isDir = fs.statSync(dirPath).isDirectory()
+  } catch (e) {
+    isDir = false
+  }
+  return isDir
 }
 
 export function findESLintDirectory(modulesDir, config, projectPath) {
@@ -36,9 +46,10 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
   if (config.useGlobalEslint) {
     locationType = 'global'
     const prefixPath = config.globalNodePath || getNodePrefixPath()
-    if (process.platform === 'win32') {
-      eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
-    } else {
+    // NPM on Windows and Yarn on all platforms
+    eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
+    if (!isDirectory(eslintDir)) {
+      // NPM on platforms other than Windows
       eslintDir = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
   } else if (!config.advancedLocalNodeModules) {
@@ -51,19 +62,13 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
     locationType = 'advanced specified'
     eslintDir = Path.join(projectPath, config.advancedLocalNodeModules, 'eslint')
   }
-  try {
-    if (fs.statSync(eslintDir).isDirectory()) {
-      return {
-        path: eslintDir,
-        type: locationType,
-      }
+  if (isDirectory(eslintDir)) {
+    return {
+      path: eslintDir,
+      type: locationType,
     }
-  } catch (e) {
-    if (config.useGlobalEslint && e.code === 'ENOENT') {
-      throw new Error(
-          'ESLint not found, Please install or make sure Atom is getting $PATH correctly'
-        )
-    }
+  } else if (config.useGlobalEslint) {
+    throw new Error('ESLint not found, please ensure the global Node path is set correctly.')
   }
   return {
     path: Cache.ESLINT_LOCAL_PATH,
@@ -78,9 +83,7 @@ export function getESLintFromDirectory(modulesDir, config, projectPath) {
     return require(ESLintDirectory)
   } catch (e) {
     if (config.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
-      throw new Error(
-        'ESLint not found, Please install or make sure Atom is getting $PATH correctly'
-      )
+      throw new Error('ESLint not found, try restarting Atom to clear caches.')
     }
     // eslint-disable-next-line import/no-dynamic-require
     return require(Cache.ESLINT_LOCAL_PATH)
