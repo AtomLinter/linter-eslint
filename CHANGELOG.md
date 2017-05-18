@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+*   Fix handling of Fatal errors
+
 ## v8.1.7
 
 *   Let ESLint handle configuration where possible ([#896](https://github.com/AtomLinter/linter-eslint/pull/896))
