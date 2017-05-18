@@ -1,5 +1,6 @@
 ### Project specific config ###
 language: generic
+dist: trusty
 
 matrix:
   include:
