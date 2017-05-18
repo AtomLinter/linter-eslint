@@ -4,8 +4,8 @@
 
 import Path from 'path'
 import { FindCache, findCached } from 'atom-linter'
-import * as Helpers from './worker-helpers'
-import isConfigAtHomeRoot from './is-config-at-home-root'
+import * as Helpers from './helpers'
+import isConfigAtHomeRoot from '../is-config-at-home-root'
 
 process.title = 'linter-eslint helper'
 
