@@ -208,8 +208,9 @@ const generateInvalidTrace = async (
  */
 export async function processESLintMessages(response, textEditor, showRule, worker) {
   return Promise.all(response.map(async ({
-    message, line, severity, ruleId, column, fix, endLine, endColumn
+    fatal, message: originalMessage, line, severity, ruleId, column, fix, endLine, endColumn
   }) => {
+    const message = fatal ? originalMessage.split('\n')[0] : originalMessage
     const filePath = textEditor.getPath()
     const textBuffer = textEditor.getBuffer()
     let linterFix = null
