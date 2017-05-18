@@ -127,7 +127,7 @@ module.exports = {
     }))
 
     const initializeESLintWorker = () => {
-      this.worker = new Task(require.resolve('./worker.js'))
+      this.worker = new Task(require.resolve('./worker'))
     }
     // Initialize the worker during an idle time
     window.requestIdleCallback(initializeESLintWorker)
