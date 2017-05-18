@@ -1,7 +1,7 @@
 'use babel'
 
 import * as Path from 'path'
-import * as Helpers from '../src/worker-helpers'
+import * as Helpers from '../src/worker/helpers'
 
 const getFixturesPath = path => Path.join(__dirname, 'fixtures', path)
 
