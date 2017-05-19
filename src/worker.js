@@ -9,24 +9,6 @@ import isConfigAtHomeRoot from './is-config-at-home-root'
 
 process.title = 'linter-eslint helper'
 
-const ignoredMessages = [
-  // V1
-  'File ignored because of your .eslintignore file. Use --no-ignore to override.',
-  // V2
-  'File ignored because of a matching ignore pattern. Use --no-ignore to override.',
-  // V2.11.1
-  'File ignored because of a matching ignore pattern. Use "--no-ignore" to override.',
-  // supress warning that the current file is ignored by eslint by default
-  'File ignored by default.  Use a negated ignore pattern (like "--ignore-pattern \'!<relative'
-    + '/path/to/filename>\'") to override.',
-  'File ignored by default. Use "--ignore-pattern \'!node_modules/*\'" to override.',
-  'File ignored by default. Use "--ignore-pattern \'!bower_components/*\'" to override.',
-]
-
-function shouldBeReported(problem) {
-  return !ignoredMessages.includes(problem.message)
-}
-
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   return cliEngine.executeOnText(contents, filePath)
@@ -37,7 +19,7 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
 
   eslint.CLIEngine.outputFixes(report)
 
-  if (!report.results.length || !report.results[0].messages.filter(shouldBeReported).length) {
+  if (!report.results.length || !report.results[0].messages.length) {
     return 'Linter-ESLint: Fix complete.'
   }
   return 'Linter-ESLint: Fix attempt complete, but linting errors remain.'
@@ -68,7 +50,7 @@ module.exports = async function () {
     let response
     if (type === 'lint') {
       const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
-      response = report.results.length ? report.results[0].messages.filter(shouldBeReported) : []
+      response = report.results.length ? report.results[0].messages : []
     } else if (type === 'fix') {
       response = fixJob({ cliEngineOptions, contents, eslint, filePath })
     } else if (type === 'debug') {

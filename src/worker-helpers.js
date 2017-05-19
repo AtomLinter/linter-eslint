@@ -142,6 +142,7 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
   const cliEngineConfig = {
     rules,
     ignore: !config.disableEslintIgnore,
+    warnIgnored: false,
     fix: type === 'fix'
   }
 
