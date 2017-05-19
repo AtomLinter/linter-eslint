@@ -14,6 +14,7 @@ let isConfigAtHomeRoot
 // Configuration
 const scopes = []
 let showRule
+let lintHtmlFiles
 let ignoredRulesWhenModified
 let ignoredRulesWhenFixing
 let disableWhenNoEslintConfig
@@ -55,22 +56,27 @@ module.exports = {
     this.subscriptions = new CompositeDisposable()
     this.worker = null
 
+    const embeddedScope = 'source.js.embedded.html'
+    this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles',
+      (value) => {
+        lintHtmlFiles = value
+        if (lintHtmlFiles) {
+          scopes.push(embeddedScope)
+        } else if (scopes.indexOf(embeddedScope) !== -1) {
+          scopes.splice(scopes.indexOf(embeddedScope), 1)
+        }
+      })
+    )
+
     this.subscriptions.add(
       atom.config.observe('linter-eslint.scopes', (value) => {
         // Remove any old scopes
         scopes.splice(0, scopes.length)
         // Add the current scopes
         Array.prototype.push.apply(scopes, value)
-      })
-    )
-
-    const embeddedScope = 'source.js.embedded.html'
-    this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles',
-      (lintHtmlFiles) => {
-        if (lintHtmlFiles) {
+        // Ensure HTML linting still works if the setting is updated
+        if (lintHtmlFiles && !scopes.includes(embeddedScope)) {
           scopes.push(embeddedScope)
-        } else if (scopes.indexOf(embeddedScope) !== -1) {
-          scopes.splice(scopes.indexOf(embeddedScope), 1)
         }
       })
     )
