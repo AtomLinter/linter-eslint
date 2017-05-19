@@ -120,26 +120,26 @@ describe('The eslint provider for Linter', () => {
       const messages = await lint(editor)
       expect(messages.length).toBe(2)
 
-      const expected0 = '&#39;foo&#39; is not defined. ' +
-      '(<a href="http://eslint.org/docs/rules/no-undef">no-undef</a>)'
-      const expected1 = 'Extra semicolon. ' +
-        '(<a href="http://eslint.org/docs/rules/semi">semi</a>)'
+      const expected0 = "'foo' is not defined. (no-undef)"
+      const expected0Url = 'http://eslint.org/docs/rules/no-undef'
+      const expected1 = 'Extra semicolon. (semi)'
+      const expected1Url = 'http://eslint.org/docs/rules/semi'
 
-      expect(messages[0].type).toBe('Error')
-      expect(messages[0].text).not.toBeDefined()
-      expect(messages[0].html).toBe(expected0)
-      expect(messages[0].filePath).toBe(badPath)
-      expect(messages[0].range).toEqual([[0, 0], [0, 3]])
-      expect(messages[0].fix).not.toBeDefined()
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(expected0)
+      expect(messages[0].url).toBe(expected0Url)
+      expect(messages[0].location.file).toBe(badPath)
+      expect(messages[0].location.position).toEqual([[0, 0], [0, 3]])
+      expect(messages[0].solutions).not.toBeDefined()
 
-      expect(messages[1].type).toBe('Error')
-      expect(messages[1].text).not.toBeDefined()
-      expect(messages[1].html).toBe(expected1)
-      expect(messages[1].filePath).toBe(badPath)
-      expect(messages[1].range).toEqual([[0, 8], [0, 9]])
-      expect(messages[1].fix).toBeDefined()
-      expect(messages[1].fix.range).toEqual([[0, 6], [0, 9]])
-      expect(messages[1].fix.newText).toBe('42')
+      expect(messages[1].severity).toBe('error')
+      expect(messages[1].excerpt).toBe(expected1)
+      expect(messages[1].url).toBe(expected1Url)
+      expect(messages[1].location.file).toBe(badPath)
+      expect(messages[1].location.position).toEqual([[0, 8], [0, 9]])
+      expect(messages[1].solutions.length).toBe(1)
+      expect(messages[1].solutions[0].position).toEqual([[0, 6], [0, 9]])
+      expect(messages[1].solutions[0].replaceWith).toBe('42')
     })
   })
 
@@ -161,11 +161,11 @@ describe('The eslint provider for Linter', () => {
     const editor = await atom.workspace.open(fixPath)
     const messages = await lint(editor)
 
-    expect(messages[0].fix.range).toEqual([[0, 10], [1, 8]])
-    expect(messages[0].fix.newText).toBe('6\nfunction')
+    expect(messages[0].solutions[0].position).toEqual([[0, 10], [1, 8]])
+    expect(messages[0].solutions[0].replaceWith).toBe('6\nfunction')
 
-    expect(messages[1].fix.range).toEqual([[2, 0], [2, 1]])
-    expect(messages[1].fix.newText).toBe('  ')
+    expect(messages[1].solutions[0].position).toEqual([[2, 0], [2, 1]])
+    expect(messages[1].solutions[0].replaceWith).toBe('  ')
   })
 
   describe('when resolving import paths using eslint-plugin-import', () => {
@@ -179,17 +179,16 @@ describe('The eslint provider for Linter', () => {
     it('shows a message for an invalid import', async () => {
       const editor = await atom.workspace.open(badImportPath)
       const messages = await lint(editor)
-      const expected = 'Unable to resolve path to module &#39;../nonexistent&#39;. ' +
-        '(<a href="https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md">' +
-        'import/no-unresolved</a>)'
+      const expected = "Unable to resolve path to module '../nonexistent'. (import/no-unresolved)"
+      const expectedUrl = 'https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md'
 
       expect(messages.length).toBe(1)
-      expect(messages[0].type).toBe('Error')
-      expect(messages[0].text).not.toBeDefined()
-      expect(messages[0].html).toBe(expected)
-      expect(messages[0].filePath).toBe(badImportPath)
-      expect(messages[0].range).toEqual([[0, 24], [0, 39]])
-      expect(messages[0].fix).not.toBeDefined()
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(expected)
+      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].location.file).toBe(badImportPath)
+      expect(messages[0].location.position).toEqual([[0, 24], [0, 39]])
+      expect(messages[0].solutions).not.toBeDefined()
     })
   })
 
@@ -256,10 +255,12 @@ describe('The eslint provider for Linter', () => {
       await firstLint(editor)
       await makeFixes(editor)
       const messagesAfterFixing = await lint(editor)
-      const messageHTML = 'Extra semicolon. (<a href="http://eslint.org/docs/rules/semi">semi</a>)'
+      const expected = 'Extra semicolon. (semi)'
+      const expectedUrl = 'http://eslint.org/docs/rules/semi'
 
       expect(messagesAfterFixing.length).toBe(1)
-      expect(messagesAfterFixing[0].html).toBe(messageHTML)
+      expect(messagesAfterFixing[0].excerpt).toBe(expected)
+      expect(messagesAfterFixing[0].url).toBe(expectedUrl)
     })
   })
 
@@ -293,19 +294,20 @@ describe('The eslint provider for Linter', () => {
   })
 
   describe('Ignores specified rules when editing', () => {
-    const expected = 'Trailing spaces not allowed. ' +
-      '(<a href="http://eslint.org/docs/rules/no-trailing-spaces">no-trailing-spaces</a>)'
+    const expected = 'Trailing spaces not allowed. (no-trailing-spaces)'
+    const expectedUrl = 'http://eslint.org/docs/rules/no-trailing-spaces'
+
     it('does nothing on saved files', async () => {
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
       const editor = await atom.workspace.open(modifiedIgnoreSpacePath)
       const messages = await lint(editor)
 
       expect(messages.length).toBe(1)
-      expect(messages[0].type).toBe('Error')
-      expect(messages[0].text).not.toBeDefined()
-      expect(messages[0].html).toBe(expected)
-      expect(messages[0].filePath).toBe(modifiedIgnoreSpacePath)
-      expect(messages[0].range).toEqual([[0, 9], [0, 10]])
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(expected)
+      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].location.file).toBe(modifiedIgnoreSpacePath)
+      expect(messages[0].location.position).toEqual([[0, 9], [0, 10]])
     })
 
     it('works when the file is modified', async () => {
@@ -321,11 +323,11 @@ describe('The eslint provider for Linter', () => {
       // Verify the space is showing an error
       const messages = await lint(editor)
       expect(messages.length).toBe(1)
-      expect(messages[0].type).toBe('Error')
-      expect(messages[0].text).not.toBeDefined()
-      expect(messages[0].html).toBe(expected)
-      expect(messages[0].filePath).toBe(modifiedIgnorePath)
-      expect(messages[0].range).toEqual([[0, 9], [0, 10]])
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(expected)
+      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].location.file).toBe(modifiedIgnorePath)
+      expect(messages[0].location.position).toEqual([[0, 9], [0, 10]])
 
       // Enable the option under test
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
@@ -367,14 +369,14 @@ describe('The eslint provider for Linter', () => {
   it('handles ranges in messages', async () => {
     const editor = await atom.workspace.open(endRangePath)
     const messages = await lint(editor)
-    const expected = 'Unreachable code. ' +
-      '(<a href="http://eslint.org/docs/rules/no-unreachable">no-unreachable</a>)'
+    const expected = 'Unreachable code. (no-unreachable)'
+    const expectedUrl = 'http://eslint.org/docs/rules/no-unreachable'
 
-    expect(messages[0].type).toBe('Error')
-    expect(messages[0].text).not.toBeDefined()
-    expect(messages[0].html).toBe(expected)
-    expect(messages[0].filePath).toBe(endRangePath)
-    expect(messages[0].range).toEqual([[5, 2], [6, 15]])
+    expect(messages[0].severity).toBe('error')
+    expect(messages[0].excerpt).toBe(expected)
+    expect(messages[0].url).toBe(expectedUrl)
+    expect(messages[0].location.file).toBe(endRangePath)
+    expect(messages[0].location.position).toEqual([[5, 2], [6, 15]])
   })
 
   describe('when setting `disableWhenNoEslintConfig` is false', () => {
@@ -401,11 +403,11 @@ describe('The eslint provider for Linter', () => {
         const messages = await lint(editor)
         // Older versions of ESLint will report an error
         // (or if current user running tests has a config in their home directory)
-        const expectedHtml = '&#39;foo&#39; is not defined. ' +
-        '(<a href="http://eslint.org/docs/rules/no-undef">no-undef</a>)'
-
+        const expected = "'foo' is not defined. (no-undef)"
+        const expectedUrl = 'http://eslint.org/docs/rules/no-undef'
         expect(messages.length).toBe(1)
-        expect(messages[0].html).toBe(expectedHtml)
+        expect(messages[0].excerpt).toBe(expected)
+        expect(messages[0].url).toBe(expectedUrl)
         gotLintingErrors = true
       } catch (err) {
         // Newer versions of ESLint will throw an exception
@@ -449,23 +451,23 @@ describe('The eslint provider for Linter', () => {
       const newConfigPath = path.join(badCachePath, 'temp', '.eslintrc.js')
       const editor = await atom.workspace.open(fooPath)
       function undefMsg(varName) {
-        return `&#39;${varName}&#39; is not defined. `
-          + '(<a href="http://eslint.org/docs/rules/no-undef">no-undef</a>)'
+        return `'${varName}' is not defined. (no-undef)`
       }
+      const expectedUrl = 'http://eslint.org/docs/rules/no-undef'
 
       // Trigger a first lint to warm up the cache with the first config result
       let messages = await lint(editor)
       expect(messages.length).toBe(2)
-      expect(messages[0].type).toBe('Error')
-      expect(messages[0].text).not.toBeDefined()
-      expect(messages[0].html).toBe(undefMsg('console'))
-      expect(messages[0].filePath).toBe(fooPath)
-      expect(messages[0].range).toEqual([[1, 2], [1, 9]])
-      expect(messages[1].type).toBe('Error')
-      expect(messages[1].text).not.toBeDefined()
-      expect(messages[1].html).toBe(undefMsg('bar'))
-      expect(messages[1].filePath).toBe(fooPath)
-      expect(messages[1].range).toEqual([[1, 14], [1, 17]])
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(undefMsg('console'))
+      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].location.file).toBe(fooPath)
+      expect(messages[0].location.position).toEqual([[1, 2], [1, 9]])
+      expect(messages[1].severity).toBe('error')
+      expect(messages[1].excerpt).toBe(undefMsg('bar'))
+      expect(messages[1].url).toBe(expectedUrl)
+      expect(messages[1].location.file).toBe(fooPath)
+      expect(messages[1].location.position).toEqual([[1, 14], [1, 17]])
 
       // Write the new configuration file
       const newConfig = {
@@ -482,11 +484,11 @@ describe('The eslint provider for Linter', () => {
       // from the cache.
       messages = await lint(editor)
       expect(messages.length).toBe(1)
-      expect(messages[0].type).toBe('Error')
-      expect(messages[0].text).not.toBeDefined()
-      expect(messages[0].html).toBe(undefMsg('bar'))
-      expect(messages[0].filePath).toBe(fooPath)
-      expect(messages[0].range).toEqual([[1, 14], [1, 17]])
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(undefMsg('bar'))
+      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].location.file).toBe(fooPath)
+      expect(messages[0].location.position).toEqual([[1, 14], [1, 17]])
 
       // Update the configuration
       newConfig.rules = {
