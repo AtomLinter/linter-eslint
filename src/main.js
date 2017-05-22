@@ -240,9 +240,6 @@ module.exports = {
       rules = ignoredRulesWhenFixing
     }
 
-    // The fix replaces the file content and the cursor jumps automatically
-    // to the beginning of the file, so save current cursor position
-    const cursorPosition = textEditor.getCursorBufferPosition()
     if (!helpers) {
       helpers = require('./helpers')
     }
@@ -262,8 +259,6 @@ module.exports = {
       if (!isSave) {
         atom.notifications.addSuccess(response)
       }
-      // Set cursor to the position before fix job
-      textEditor.setCursorBufferPosition(cursorPosition)
     } catch (err) {
       atom.notifications.addWarning(err.message)
     }
