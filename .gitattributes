@@ -3,6 +3,3 @@
 
 # (binary is a macro for -text -diff)
 *.png binary
-
-# Exclude build-time .babelrc config from APM pkg (#796)
-.babelrc export-ignore
