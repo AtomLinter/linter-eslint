@@ -8,9 +8,10 @@ If you would like to contribute enhancements or fixes, please do the following:
 2.  Run `npm install` to setup all dependencies.
 3.  Hack on a separate topic branch created from the latest `master`.
 4.  Check for lint errors with `npm run lint` or use `linter-eslint` within Atom.
-5.  Commit the changes and push the topic branch to your fork.
-6.  Make a pull request to the main repo.
-7.  Welcome to the club!
+5.  Run the package specs.
+6.  Commit the changes and push the topic branch to your fork.
+7.  Make a pull request to the main repo.
+8.  Welcome to the club!
 
 ## Guidelines
 
@@ -19,6 +20,12 @@ Please note that modifications should follow these coding guidelines:
 *   Indent is 2 spaces.
 *   Code should pass the `eslint` linter.
 *   Vertical whitespace helps readability, don’t be afraid to use it!
+
+## Testing
+
+You can run the specs for this package locally by either running `apm test` from
+the project directory, or from within Atom by going to View -> Developer -> Run
+Package Specs.
 
 ## Discussion
 If you have any questions during development you can join the #linter-plugin-dev
