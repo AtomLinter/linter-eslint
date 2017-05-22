@@ -507,4 +507,25 @@ describe('The eslint provider for Linter', () => {
       fs.unlinkSync(newConfigPath)
     })
   })
+
+  describe('works with HTML files', () => {
+    const embeddedScope = 'source.js.embedded.html'
+    const scopes = linterProvider.grammarScopes
+
+    it('adds the HTML scope when the setting is enabled', () => {
+      expect(scopes.includes(embeddedScope)).toBe(false)
+      atom.config.set('linter-eslint.lintHtmlFiles', true)
+      expect(scopes.includes(embeddedScope)).toBe(true)
+      atom.config.set('linter-eslint.lintHtmlFiles', false)
+      expect(scopes.includes(embeddedScope)).toBe(false)
+    })
+
+    it('keeps the HTML scope with custom scopes', () => {
+      expect(scopes.includes(embeddedScope)).toBe(false)
+      atom.config.set('linter-eslint.lintHtmlFiles', true)
+      expect(scopes.includes(embeddedScope)).toBe(true)
+      atom.config.set('linter-eslint.scopes', ['foo.bar'])
+      expect(scopes.includes(embeddedScope)).toBe(true)
+    })
+  })
 })
