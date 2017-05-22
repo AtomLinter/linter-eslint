@@ -528,4 +528,38 @@ describe('The eslint provider for Linter', () => {
       expect(scopes.includes(embeddedScope)).toBe(true)
     })
   })
+
+  describe('handles the Show Rule ID in Messages option', () => {
+    const expectedUrl = 'https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md'
+
+    it('shows the rule ID when enabled', async () => {
+      atom.config.set('linter-eslint.showRuleIdInMessage', true)
+      const editor = await atom.workspace.open(badImportPath)
+      const messages = await lint(editor)
+      const expected = "Unable to resolve path to module '../nonexistent'. (import/no-unresolved)"
+
+      expect(messages.length).toBe(1)
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(expected)
+      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].location.file).toBe(badImportPath)
+      expect(messages[0].location.position).toEqual([[0, 24], [0, 39]])
+      expect(messages[0].solutions).not.toBeDefined()
+    })
+
+    it("doesn't show the rule ID when disabled", async () => {
+      atom.config.set('linter-eslint.showRuleIdInMessage', false)
+      const editor = await atom.workspace.open(badImportPath)
+      const messages = await lint(editor)
+      const expected = "Unable to resolve path to module '../nonexistent'."
+
+      expect(messages.length).toBe(1)
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(expected)
+      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].location.file).toBe(badImportPath)
+      expect(messages[0].location.position).toEqual([[0, 24], [0, 39]])
+      expect(messages[0].solutions).not.toBeDefined()
+    })
+  })
 })
