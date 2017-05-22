@@ -1,5 +1,20 @@
 # Changelog
 
+## v8.2.0
+
+*   Linter API v2 ([#855](https://github.com/AtomLinter/linter-eslint/pull/855))
+*   Support global Yarn installs and better errors ([#907](https://github.com/AtomLinter/linter-eslint/pull/907))
+*   Preserve `.eslintcache` on fixes ([#898](https://github.com/AtomLinter/linter-eslint/pull/898))
+*   Handle parse errors better ([#911](https://github.com/AtomLinter/linter-eslint/pull/911))
+*   Move to the Task API ([#889](https://github.com/AtomLinter/linter-eslint/pull/889))
+*   Use Atom's per-package transpilation ([#890](https://github.com/AtomLinter/linter-eslint/pull/890))
+*   Wait on specific Notifications in the specs ([#902](https://github.com/AtomLinter/linter-eslint/pull/902))
+*   Fix builds of Atom beta ([#913](https://github.com/AtomLinter/linter-eslint/pull/913))
+*   Fix embedded HTML scope with custom scopes ([#914](https://github.com/AtomLinter/linter-eslint/pull/914))
+*   Utilize `warnIgnored` instead of filtering messages ([#915](https://github.com/AtomLinter/linter-eslint/pull/915))
+*   Remove attempt to reset cursor position ([#876](https://github.com/AtomLinter/linter-eslint/pull/876))
+*   Add specs for `showRuleIdInMessage` ([#916](https://github.com/AtomLinter/linter-eslint/pull/916))
+
 ## v8.1.7
 
 *   Let ESLint handle configuration where possible ([#896](https://github.com/AtomLinter/linter-eslint/pull/896))
