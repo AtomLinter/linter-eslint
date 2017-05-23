@@ -1,5 +1,9 @@
 # Changelog
 
+## v8.2.1
+
+*   Prevent users `.babelrc` from breaking building the package ([#922](https://github.com/AtomLinter/linter-eslint/pull/922))
+
 ## v8.2.0
 
 *   Linter API v2 ([#855](https://github.com/AtomLinter/linter-eslint/pull/855))
