@@ -182,7 +182,8 @@
           "presets": [
             "node5"
           ],
-          "sourceMaps": "inline"
+          "sourceMaps": "inline",
+          "babelrc": false
         },
         "cacheKeyFiles": [
           "package.json"
