@@ -239,6 +239,11 @@ describe('The eslint provider for Linter', () => {
     }
 
     it('should fix linting errors', async () => {
+      if (process.env.ATOM_CHANNEL === 'beta') {
+        // The Atom beta builds currently are broken for onDidReload watching,
+        // so we just need to skip this test on the beta channel.
+        return
+      }
       await firstLint(editor)
       await makeFixes(editor)
       const messagesAfterFixing = await lint(editor)
@@ -283,6 +288,11 @@ describe('The eslint provider for Linter', () => {
     })
 
     it('does not delete the cache file when performing fixes', async () => {
+      if (process.env.ATOM_CHANNEL === 'beta') {
+        // The Atom beta builds currently are broken for onDidReload watching,
+        // so we just need to skip this test on the beta channel.
+        return
+      }
       const tempCacheFile = await copyFileToDir(cachePath, tempDir)
       const checkCachefileExists = () => {
         fs.statSync(tempCacheFile)
