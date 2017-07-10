@@ -56,6 +56,22 @@ describe('Worker Helpers', () => {
       expect(foundEslint.path).toEqual(expectedBundledPath)
       expect(foundEslint.type).toEqual('bundled fallback')
     })
+
+    it('should handle a null projectPath when resolving path', () => {
+      const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
+      const config = {
+        advancedLocalNodeModules: '../node_modules',
+        useGlobalEslint: false
+      }
+
+      const findEslint = () => Helpers.findESLintDirectory(modulesDir, config, null)
+      expect(findEslint).not.toThrow()
+
+      const foundEslint = findEslint()
+      const expectedBundledPath = Path.join(__dirname, config.advancedLocalNodeModules, 'eslint')
+      expect(foundEslint.path).toEqual(expectedBundledPath)
+      expect(foundEslint.type).toEqual('advanced specified')
+    })
   })
 
   describe('getESLintInstance && getESLintFromDirectory', () => {
