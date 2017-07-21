@@ -60,7 +60,7 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
     eslintDir = Path.join(config.advancedLocalNodeModules || '', 'eslint')
   } else {
     locationType = 'advanced specified'
-    eslintDir = Path.join(projectPath, config.advancedLocalNodeModules, 'eslint')
+    eslintDir = Path.join(projectPath || '', config.advancedLocalNodeModules, 'eslint')
   }
   if (isDirectory(eslintDir)) {
     return {
@@ -101,7 +101,7 @@ export function refreshModulesPath(modulesDir) {
 export function getESLintInstance(fileDir, config, projectPath) {
   const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
   refreshModulesPath(modulesDir)
-  return getESLintFromDirectory(modulesDir, config, projectPath || '')
+  return getESLintFromDirectory(modulesDir, config, projectPath)
 }
 
 export function getConfigPath(fileDir) {

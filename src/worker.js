@@ -55,7 +55,7 @@ module.exports = async function () {
       response = fixJob({ cliEngineOptions, contents, eslint, filePath })
     } else if (type === 'debug') {
       const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
-      response = Helpers.findESLintDirectory(modulesDir, config)
+      response = Helpers.findESLintDirectory(modulesDir, config, projectPath)
     }
     emit(emitKey, response)
   })
