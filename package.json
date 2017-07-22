@@ -178,6 +178,7 @@
       "glob": "{src,spec}/*.js",
       "transpiler": "atom-babel6-transpiler",
       "options": {
+        "setBabelEnv": false,
         "babel": {
           "presets": [
             "node5"
