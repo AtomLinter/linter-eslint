@@ -41,7 +41,7 @@ module.exports = async function () {
       return
     }
 
-    const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config)
+    const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config, projectPath)
 
     const cliEngineOptions = Helpers.getCLIEngineOptions(
       type, config, rules, relativeFilePath, fileDir, configPath
