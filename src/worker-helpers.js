@@ -126,14 +126,22 @@ export function getConfigPath(fileDir) {
   return null
 }
 
-export function getRelativePath(fileDir, filePath, config) {
+export function getRelativePath(fileDir, filePath, config, projectPath) {
   const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
 
+  // If we can find an .eslintignore file, we can set cwd there
+  // (because they are expected to be at the project root)
   if (ignoreFile) {
     const ignoreDir = Path.dirname(ignoreFile)
     process.chdir(ignoreDir)
     return Path.relative(ignoreDir, filePath)
   }
+  // Otherwise, we'll set the cwd to the atom project root as long as that exists
+  if (projectPath) {
+    process.chdir(projectPath)
+    return Path.relative(projectPath, filePath)
+  }
+  // If all else fails, use the file location itself
   process.chdir(fileDir)
   return Path.basename(filePath)
 }
