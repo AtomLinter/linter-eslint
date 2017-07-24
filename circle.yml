@@ -1,7 +1,11 @@
-test:
-  override:
-    - curl -s https://raw.githubusercontent.com/Arcanemagus/ci/atomlinter/build-package.sh | sh
-
 dependencies:
   override:
-    - echo "Managed in the script"
+    - curl -s -O https://raw.githubusercontent.com/atom/ci/master/build-package.sh
+    - chmod u+x build-package.sh
+
+test:
+  override:
+    - ./build-package.sh
+    # The Atom CI script doesn't support having ESLint as a direct dependency,
+    # as such it doesn't run linting automatically for us.
+    - npm run lint
