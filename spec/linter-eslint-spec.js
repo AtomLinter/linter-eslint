@@ -573,4 +573,21 @@ describe('The eslint provider for Linter', () => {
       expect(messages[0].solutions).not.toBeDefined()
     })
   })
+
+  describe("registers an 'ESLint Fix' right click menu command", () => {
+    // NOTE: Reaches into the private data of the ContextMenuManager, there is
+    // no public method to check this though so...
+    expect(atom.contextMenu.itemSets.some(itemSet =>
+      // Matching selector...
+      itemSet.selector === 'atom-text-editor:not(.mini), .overlayer' &&
+      itemSet.items.some(item =>
+        // Matching command...
+        item.command === 'linter-eslint:fix-file' &&
+        // Matching label
+        item.label === 'ESLint Fix' &&
+        // And has a function controlling display
+        typeof item.shouldDisplay === 'function'
+      )
+    ))
+  })
 })

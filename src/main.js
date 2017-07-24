@@ -41,6 +41,10 @@ const waitOnIdle = async () =>
     idleCallbacks.add(callbackID)
   })
 
+const validScope = editor => editor.getCursors().some(cursor =>
+  cursor.getScopeDescriptor().getScopesArray().some(scope =>
+    scopes.includes(scope)))
+
 module.exports = {
   activate() {
     let callbackID
@@ -83,10 +87,7 @@ module.exports = {
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(async () => {
-        const validScope = editor.getCursors().some(cursor =>
-          cursor.getScopeDescriptor().getScopesArray().some(scope =>
-            scopes.includes(scope)))
-        if (validScope && atom.config.get('linter-eslint.fixOnSave')) {
+        if (validScope(editor) && atom.config.get('linter-eslint.fixOnSave')) {
           await this.fixJob(true)
         }
       })
@@ -130,6 +131,31 @@ module.exports = {
 
     this.subscriptions.add(atom.config.observe('linter-eslint.rulesToDisableWhileFixing', (ids) => {
       ignoredRulesWhenFixing = idsToIgnoredRules(ids)
+    }))
+
+    this.subscriptions.add(atom.contextMenu.add({
+      'atom-text-editor:not(.mini), .overlayer': [{
+        label: 'ESLint Fix',
+        command: 'linter-eslint:fix-file',
+        shouldDisplay: (evt) => {
+          const activeEditor = atom.workspace.getActiveTextEditor()
+          if (!activeEditor) {
+            return false
+          }
+          // Black magic!
+          // Compares the private component property of the active TextEditor
+          //   against the components of the elements
+          const evtIsActiveEditor = evt.path.some(elem =>
+            // Atom v1.19.0
+            (elem.component && activeEditor.component &&
+              elem.component === activeEditor.component) ||
+            // Atom v1.18.0
+            (activeEditor.editorElement === elem)
+          )
+          // Only show if it was the active editor and it is a valid scope
+          return evtIsActiveEditor && validScope(activeEditor)
+        }
+      }]
     }))
 
     const initializeESLintWorker = () => {
