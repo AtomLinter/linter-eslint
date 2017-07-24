@@ -28,6 +28,7 @@ const modifiedIgnoreSpacePath = path.join(fixturesDir,
   'modified-ignore-rule', 'foo-space.js')
 const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
 const badCachePath = path.join(fixturesDir, 'badCache')
+const invalidRulePath = path.join(fixturesDir, 'configs', 'invalid-rule', 'foo.js')
 
 /**
  * Async helper to copy a file from one place to another on the filesystem.
@@ -589,5 +590,23 @@ describe('The eslint provider for Linter', () => {
         typeof item.shouldDisplay === 'function'
       )
     ))
+  })
+
+  describe('handles root node reports nicely', () => {
+    it("doesn't highlight the entire file", async () => {
+      const editor = await atom.workspace.open(invalidRulePath)
+      const messages = await lint(editor)
+      expect(messages.length).toBe(1)
+
+      const expected0 = "Definition for rule 'foo-bar' was not found (foo-bar)"
+      const expected0Url = 'http://eslint.org/docs/rules/foo-bar'
+
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(expected0)
+      expect(messages[0].url).toBe(expected0Url)
+      expect(messages[0].location.file).toBe(invalidRulePath)
+      expect(messages[0].location.position).toEqual([[0, 0], [0, 13]])
+      expect(messages[0].solutions).not.toBeDefined()
+    })
   })
 })

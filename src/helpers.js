@@ -199,7 +199,8 @@ const generateInvalidTrace = async (
  */
 export async function processESLintMessages(response, textEditor, showRule, worker) {
   return Promise.all(response.map(async ({
-    fatal, message: originalMessage, line, severity, ruleId, column, fix, endLine, endColumn
+    fatal, message: originalMessage, severity, ruleId, fix,
+    line, column, endLine, endColumn
   }) => {
     const message = fatal ? originalMessage.split('\n')[0] : originalMessage
     const filePath = textEditor.getPath()
@@ -232,6 +233,18 @@ export async function processESLintMessages(response, textEditor, showRule, work
       msgCol = Math.max(0, column - 1)
       msgEndLine = endLine - 1
       msgEndCol = endColumn - 1
+
+      // Check for an "all file" marker and convert to the first line
+      if (msgLine === 0 && msgCol === 0 &&
+        // Find the last non-blank row number
+        msgEndLine === (textBuffer.previousNonBlankRow(Infinity)) &&
+        msgEndCol === (textBuffer.lineLengthForRow(msgEndLine))
+      ) {
+        // Set the full range to false and column to undefined
+        // generateRange will then use the entire first line
+        eslintFullRange = false
+        msgCol = undefined
+      }
     } else {
       // We want msgCol to remain undefined if it was initially so
       // `generateRange` will give us a range over the entire line
