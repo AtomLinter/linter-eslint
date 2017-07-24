@@ -4,12 +4,6 @@ environment:
   - ATOM_CHANNEL: stable
   - ATOM_CHANNEL: beta
 
-after_build:
-  # The Atom CI script doesn't support having ESLint as a direct dependency,
-  # as such it doesn't run linting automatically for us.
-  - cinst nodejs
-  - npm run lint
-
 ### Generic setup follows ###
 build_script:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/atom/ci/master/build-package.ps1'))
