@@ -239,12 +239,9 @@ describe('The eslint provider for Linter', () => {
       expect(messages.length).toBe(2)
     }
 
-    it('should fix linting errors', async () => {
-      if (process.env.ATOM_CHANNEL === 'beta') {
-        // The Atom beta builds currently are broken for onDidReload watching,
-        // so we just need to skip this test on the beta channel.
-        return
-      }
+    // This spec is broken on Atom v1.19.0!
+    // See https://github.com/atom/atom/issues/15200 for details
+    xit('should fix linting errors', async () => {
       await firstLint(editor)
       await makeFixes(editor)
       const messagesAfterFixing = await lint(editor)
@@ -288,12 +285,9 @@ describe('The eslint provider for Linter', () => {
       rimraf.sync(tempDir)
     })
 
-    it('does not delete the cache file when performing fixes', async () => {
-      if (process.env.ATOM_CHANNEL === 'beta') {
-        // The Atom beta builds currently are broken for onDidReload watching,
-        // so we just need to skip this test on the beta channel.
-        return
-      }
+    // This spec is broken on Atom v1.19.0!
+    // See https://github.com/atom/atom/issues/15200 for details
+    xit('does not delete the cache file when performing fixes', async () => {
       const tempCacheFile = await copyFileToDir(cachePath, tempDir)
       const checkCachefileExists = () => {
         fs.statSync(tempCacheFile)
