@@ -109,6 +109,9 @@ describe('The eslint provider for Linter', () => {
     await atom.packages.activatePackage('language-javascript')
     // Activate the provider
     await atom.packages.activatePackage('linter-eslint')
+
+    // Stop Jasmine from spying on Date.now to fix TextBuffer::onDidReload in specs
+    jasmine.unspy(Date, 'now')
   })
 
   describe('checks bad.js and', () => {
@@ -239,9 +242,7 @@ describe('The eslint provider for Linter', () => {
       expect(messages.length).toBe(2)
     }
 
-    // This spec is broken on Atom v1.19.0!
-    // See https://github.com/atom/atom/issues/15200 for details
-    xit('should fix linting errors', async () => {
+    it('should fix linting errors', async () => {
       await firstLint(editor)
       await makeFixes(editor)
       const messagesAfterFixing = await lint(editor)
@@ -249,10 +250,7 @@ describe('The eslint provider for Linter', () => {
       expect(messagesAfterFixing.length).toBe(0)
     })
 
-    // NOTE: This actually works, but if both specs in this describe() are enabled
-    // a bug within Atom is somewhat reliably triggered, so this needs to stay
-    // disabled for now
-    xit('should not fix linting errors for rules that are disabled with rulesToDisableWhileFixing', async () => {
+    it('should not fix linting errors for rules that are disabled with rulesToDisableWhileFixing', async () => {
       atom.config.set('linter-eslint.rulesToDisableWhileFixing', ['semi'])
 
       await firstLint(editor)
@@ -285,9 +283,7 @@ describe('The eslint provider for Linter', () => {
       rimraf.sync(tempDir)
     })
 
-    // This spec is broken on Atom v1.19.0!
-    // See https://github.com/atom/atom/issues/15200 for details
-    xit('does not delete the cache file when performing fixes', async () => {
+    it('does not delete the cache file when performing fixes', async () => {
       const tempCacheFile = await copyFileToDir(cachePath, tempDir)
       const checkCachefileExists = () => {
         fs.statSync(tempCacheFile)
