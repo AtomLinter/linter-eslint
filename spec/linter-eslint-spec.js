@@ -109,9 +109,6 @@ describe('The eslint provider for Linter', () => {
     await atom.packages.activatePackage('language-javascript')
     // Activate the provider
     await atom.packages.activatePackage('linter-eslint')
-
-    // Stop Jasmine from spying on Date.now to fix TextBuffer::onDidReload in specs
-    jasmine.unspy(Date, 'now')
   })
 
   describe('checks bad.js and', () => {
