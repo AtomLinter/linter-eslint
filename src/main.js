@@ -227,7 +227,12 @@ module.exports = {
   async fixJob(isSave = false) {
     const textEditor = atom.workspace.getActiveTextEditor()
 
-    if (!textEditor || textEditor.isModified()) {
+    if (!textEditor || !atom.workspace.isTextEditor(textEditor)) {
+      // Silently return if the TextEditor is invalid
+      return
+    }
+
+    if (textEditor.isModified()) {
       // Abort for invalid or unsaved text editors
       const message = 'Linter-ESLint: Please save before fixing'
       atom.notifications.addError(message)
