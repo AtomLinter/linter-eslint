@@ -180,6 +180,7 @@ module.exports = {
       name: 'ESLint',
       grammarScopes: scopes,
       scope: 'file',
+      lintsProject: true,
       lintsOnChange: true,
       lint: async (textEditor) => {
         const text = textEditor.getText()
