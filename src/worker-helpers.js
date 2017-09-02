@@ -154,6 +154,14 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
     fix: type === 'fix'
   }
 
+  const ignorePattern = config.disableEslintIgnore ? null :
+  // eslint-disable-next-line import/no-dynamic-require
+    require(findCached(fileDir, 'package.json')).eslintIgnore
+
+  if (ignorePattern) {
+    cliEngineConfig.ignorePattern = ignorePattern
+  }
+
   const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
   if (ignoreFile) {
     cliEngineConfig.ignorePath = ignoreFile
