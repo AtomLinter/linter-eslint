@@ -116,7 +116,7 @@
     "babel-preset-node5": "^12.0.0",
     "consistent-path": "^2.0.1",
     "crypto-random-string": "^1.0.0",
-    "eslint": "^4.3.0",
+    "eslint": "^4.6.0",
     "eslint-rule-documentation": "^1.0.18",
     "resolve-env": "^1.0.0",
     "user-home": "^2.0.0"
