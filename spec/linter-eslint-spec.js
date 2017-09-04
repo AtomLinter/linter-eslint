@@ -122,9 +122,9 @@ describe('The eslint provider for Linter', () => {
       expect(messages.length).toBe(2)
 
       const expected0 = "'foo' is not defined. (no-undef)"
-      const expected0Url = 'http://eslint.org/docs/rules/no-undef'
+      const expected0Url = 'https://eslint.org/docs/rules/no-undef'
       const expected1 = 'Extra semicolon. (semi)'
-      const expected1Url = 'http://eslint.org/docs/rules/semi'
+      const expected1Url = 'https://eslint.org/docs/rules/semi'
 
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected0)
@@ -254,7 +254,7 @@ describe('The eslint provider for Linter', () => {
       await makeFixes(editor)
       const messagesAfterFixing = await lint(editor)
       const expected = 'Extra semicolon. (semi)'
-      const expectedUrl = 'http://eslint.org/docs/rules/semi'
+      const expectedUrl = 'https://eslint.org/docs/rules/semi'
 
       expect(messagesAfterFixing.length).toBe(1)
       expect(messagesAfterFixing[0].excerpt).toBe(expected)
@@ -293,7 +293,7 @@ describe('The eslint provider for Linter', () => {
 
   describe('Ignores specified rules when editing', () => {
     const expected = 'Trailing spaces not allowed. (no-trailing-spaces)'
-    const expectedUrl = 'http://eslint.org/docs/rules/no-trailing-spaces'
+    const expectedUrl = 'https://eslint.org/docs/rules/no-trailing-spaces'
 
     it('does nothing on saved files', async () => {
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
@@ -368,7 +368,7 @@ describe('The eslint provider for Linter', () => {
     const editor = await atom.workspace.open(endRangePath)
     const messages = await lint(editor)
     const expected = 'Unreachable code. (no-unreachable)'
-    const expectedUrl = 'http://eslint.org/docs/rules/no-unreachable'
+    const expectedUrl = 'https://eslint.org/docs/rules/no-unreachable'
 
     expect(messages[0].severity).toBe('error')
     expect(messages[0].excerpt).toBe(expected)
@@ -402,7 +402,7 @@ describe('The eslint provider for Linter', () => {
         // Older versions of ESLint will report an error
         // (or if current user running tests has a config in their home directory)
         const expected = "'foo' is not defined. (no-undef)"
-        const expectedUrl = 'http://eslint.org/docs/rules/no-undef'
+        const expectedUrl = 'https://eslint.org/docs/rules/no-undef'
         expect(messages.length).toBe(1)
         expect(messages[0].excerpt).toBe(expected)
         expect(messages[0].url).toBe(expectedUrl)
@@ -451,7 +451,7 @@ describe('The eslint provider for Linter', () => {
       function undefMsg(varName) {
         return `'${varName}' is not defined. (no-undef)`
       }
-      const expectedUrl = 'http://eslint.org/docs/rules/no-undef'
+      const expectedUrl = 'https://eslint.org/docs/rules/no-undef'
 
       // Trigger a first lint to warm up the cache with the first config result
       let messages = await lint(editor)
