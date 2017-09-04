@@ -22,9 +22,9 @@ export function getNodePrefixPath() {
           env: Object.assign(Object.assign({}, process.env), { PATH: getPath() })
         }).output[1].toString().trim()
     } catch (e) {
-      throw new Error(
-        'Unable to execute `npm get prefix`. Please make sure Atom is getting $PATH correctly.'
-      )
+      const errMsg = 'Unable to execute `npm get prefix`. Please make sure ' +
+        'Atom is getting $PATH correctly.'
+      throw new Error(errMsg)
     }
   }
   return Cache.NODE_PREFIX_PATH

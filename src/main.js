@@ -61,7 +61,8 @@ module.exports = {
     this.worker = null
 
     const embeddedScope = 'source.js.embedded.html'
-    this.subscriptions.add(atom.config.observe('linter-eslint.lintHtmlFiles',
+    this.subscriptions.add(atom.config.observe(
+      'linter-eslint.lintHtmlFiles',
       (value) => {
         lintHtmlFiles = value
         if (lintHtmlFiles) {
@@ -69,11 +70,12 @@ module.exports = {
         } else if (scopes.indexOf(embeddedScope) !== -1) {
           scopes.splice(scopes.indexOf(embeddedScope), 1)
         }
-      })
-    )
+      }
+    ))
 
-    this.subscriptions.add(
-      atom.config.observe('linter-eslint.scopes', (value) => {
+    this.subscriptions.add(atom.config.observe(
+      'linter-eslint.scopes',
+      (value) => {
         // Remove any old scopes
         scopes.splice(0, scopes.length)
         // Add the current scopes
@@ -82,8 +84,8 @@ module.exports = {
         if (lintHtmlFiles && !scopes.includes(embeddedScope)) {
           scopes.push(embeddedScope)
         }
-      })
-    )
+      }
+    ))
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(async () => {
@@ -113,25 +115,25 @@ module.exports = {
       }
     }))
 
-    this.subscriptions.add(atom.config.observe('linter-eslint.showRuleIdInMessage',
-      (value) => {
-        showRule = value
-      })
-    )
+    this.subscriptions.add(atom.config.observe(
+      'linter-eslint.showRuleIdInMessage',
+      (value) => { showRule = value }
+    ))
 
-    this.subscriptions.add(atom.config.observe('linter-eslint.disableWhenNoEslintConfig',
-      (value) => {
-        disableWhenNoEslintConfig = value
-      })
-    )
+    this.subscriptions.add(atom.config.observe(
+      'linter-eslint.disableWhenNoEslintConfig',
+      (value) => { disableWhenNoEslintConfig = value }
+    ))
 
-    this.subscriptions.add(atom.config.observe('linter-eslint.rulesToSilenceWhileTyping', (ids) => {
-      ignoredRulesWhenModified = idsToIgnoredRules(ids)
-    }))
+    this.subscriptions.add(atom.config.observe(
+      'linter-eslint.rulesToSilenceWhileTyping',
+      (ids) => { ignoredRulesWhenModified = idsToIgnoredRules(ids) }
+    ))
 
-    this.subscriptions.add(atom.config.observe('linter-eslint.rulesToDisableWhileFixing', (ids) => {
-      ignoredRulesWhenFixing = idsToIgnoredRules(ids)
-    }))
+    this.subscriptions.add(atom.config.observe(
+      'linter-eslint.rulesToDisableWhileFixing',
+      (ids) => { ignoredRulesWhenFixing = idsToIgnoredRules(ids) }
+    ))
 
     this.subscriptions.add(atom.contextMenu.add({
       'atom-text-editor:not(.mini), .overlayer': [{
@@ -150,8 +152,7 @@ module.exports = {
             (elem.component && activeEditor.component &&
               elem.component === activeEditor.component) ||
             // Atom v1.18.0
-            (activeEditor.editorElement === elem)
-          )
+            (activeEditor.editorElement === elem))
           // Only show if it was the active editor and it is a valid scope
           return evtIsActiveEditor && validScope(activeEditor)
         }

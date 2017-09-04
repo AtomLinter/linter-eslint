@@ -17,15 +17,13 @@ const emptyPath = path.join(fixturesDir, 'files', 'empty.js')
 const fixPath = path.join(fixturesDir, 'files', 'fix.js')
 const cachePath = path.join(fixturesDir, 'files', '.eslintcache')
 const configPath = path.join(fixturesDir, 'configs', '.eslintrc.yml')
-const importingpath = path.join(fixturesDir,
-  'import-resolution', 'nested', 'importing.js')
-const badImportPath = path.join(fixturesDir,
-  'import-resolution', 'nested', 'badImport.js')
+const importResPath = path.join(fixturesDir, 'import-resolution')
+const importingpath = path.join(importResPath, 'nested', 'importing.js')
+const badImportPath = path.join(importResPath, 'nested', 'badImport.js')
 const ignoredPath = path.join(fixturesDir, 'eslintignore', 'ignored.js')
-const modifiedIgnorePath = path.join(fixturesDir,
-  'modified-ignore-rule', 'foo.js')
-const modifiedIgnoreSpacePath = path.join(fixturesDir,
-  'modified-ignore-rule', 'foo-space.js')
+const modIgnorePath = path.join(fixturesDir, 'modified-ignore-rule')
+const modifiedIgnorePath = path.join(modIgnorePath, 'foo.js')
+const modifiedIgnoreSpacePath = path.join(modIgnorePath, 'foo-space.js')
 const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
 const badCachePath = path.join(fixturesDir, 'badCache')
 
@@ -99,7 +97,7 @@ async function makeFixes(textEditor) {
 
 describe('The eslint provider for Linter', () => {
   const linterProvider = linterEslint.provideLinter()
-  const lint = linterProvider.lint
+  const { lint } = linterProvider
 
   beforeEach(async () => {
     atom.config.set('linter-eslint.disableFSCache', false)
@@ -573,8 +571,6 @@ describe('The eslint provider for Linter', () => {
         // Matching label
         item.label === 'ESLint Fix' &&
         // And has a function controlling display
-        typeof item.shouldDisplay === 'function'
-      )
-    ))
+        typeof item.shouldDisplay === 'function')))
   })
 })

@@ -61,9 +61,10 @@ describe('Worker Helpers', () => {
   })
 
   describe('getESLintInstance && getESLintFromDirectory', () => {
+    const pathPart = Path.join('testing', 'eslint', 'node_modules')
+
     it('tries to find an indirect local eslint using an absolute path', () => {
-      const path = Path.join(
-        getFixturesPath('indirect-local-eslint'), 'testing', 'eslint', 'node_modules')
+      const path = Path.join(getFixturesPath('indirect-local-eslint'), pathPart)
       const eslint = Helpers.getESLintInstance('', {
         useGlobalEslint: false,
         advancedLocalNodeModules: path
@@ -72,8 +73,7 @@ describe('Worker Helpers', () => {
     })
 
     it('tries to find an indirect local eslint using a relative path', () => {
-      const path = Path.join(
-        getFixturesPath('indirect-local-eslint'), 'testing', 'eslint', 'node_modules')
+      const path = Path.join(getFixturesPath('indirect-local-eslint'), pathPart)
       const [projectPath, relativePath] = atom.project.relativizePath(path)
 
       const eslint = Helpers.getESLintInstance('', {

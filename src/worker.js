@@ -9,13 +9,19 @@ import isConfigAtHomeRoot from './is-config-at-home-root'
 
 process.title = 'linter-eslint helper'
 
-function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
+function lintJob({
+  cliEngineOptions, contents, eslint, filePath
+}) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   return cliEngine.executeOnText(contents, filePath)
 }
 
-function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
-  const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
+function fixJob({
+  cliEngineOptions, contents, eslint, filePath
+}) {
+  const report = lintJob({
+    cliEngineOptions, contents, eslint, filePath
+  })
 
   eslint.CLIEngine.outputFixes(report)
 
@@ -27,7 +33,9 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
 
 module.exports = async function () {
   process.on('message', (jobConfig) => {
-    const { contents, type, config, filePath, projectPath, rules, emitKey } = jobConfig
+    const {
+      contents, type, config, filePath, projectPath, rules, emitKey
+    } = jobConfig
     if (config.disableFSCache) {
       FindCache.clear()
     }
@@ -43,16 +51,19 @@ module.exports = async function () {
 
     const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config, projectPath)
 
-    const cliEngineOptions = Helpers.getCLIEngineOptions(
-      type, config, rules, relativeFilePath, fileDir, configPath
-    )
+    const cliEngineOptions = Helpers
+      .getCLIEngineOptions(type, config, rules, relativeFilePath, fileDir, configPath)
 
     let response
     if (type === 'lint') {
-      const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
+      const report = lintJob({
+        cliEngineOptions, contents, eslint, filePath
+      })
       response = report.results.length ? report.results[0].messages : []
     } else if (type === 'fix') {
-      response = fixJob({ cliEngineOptions, contents, eslint, filePath })
+      response = fixJob({
+        cliEngineOptions, contents, eslint, filePath
+      })
     } else if (type === 'debug') {
       const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
       response = Helpers.findESLintDirectory(modulesDir, config, projectPath)

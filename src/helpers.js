@@ -40,10 +40,11 @@ export async function sendJob(worker, config) {
 
   return new Promise((resolve, reject) => {
     const errSub = worker.on('task:error', (...err) => {
+      const [msg, stack] = err
       // Re-throw errors from the task
-      const error = new Error(err[0])
+      const error = new Error(msg)
       // Set the stack to the one given to us by the worker
-      error.stack = err[1]
+      error.stack = stack
       reject(error)
     })
     const responseSub = worker.on(config.emitKey, (data) => {
@@ -63,9 +64,10 @@ export async function sendJob(worker, config) {
 export function showError(givenMessage, givenDetail = null) {
   let detail
   let message
-  if (message instanceof Error) {
-    detail = message.stack
-    message = message.message
+  if (givenMessage instanceof Error) {
+    const { stack, msg } = givenMessage
+    detail = stack
+    message = msg
   } else {
     detail = givenDetail
     message = givenMessage
