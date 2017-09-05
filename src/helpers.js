@@ -65,9 +65,7 @@ export function showError(givenMessage, givenDetail = null) {
   let detail
   let message
   if (givenMessage instanceof Error) {
-    const { stack, msg } = givenMessage
-    detail = stack
-    message = msg
+    ({ stack: detail, message } = givenMessage)
   } else {
     detail = givenDetail
     message = givenMessage
