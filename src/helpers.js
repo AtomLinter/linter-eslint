@@ -21,6 +21,7 @@ const startWorker = (worker) => {
   // Send empty arguments as we don't use them in the worker
   worker.start([])
   // NOTE: Modifies the Task of the worker, but it's the only clean way to track this
+  // eslint-disable-next-line no-param-reassign
   worker.started = true
 }
 
@@ -36,6 +37,7 @@ export async function sendJob(worker, config) {
   // Expand the config with a unique ID to emit on
   // NOTE: Jobs _must_ have a unique ID as they are completely async and results
   // can arrive back in any order.
+  // eslint-disable-next-line no-param-reassign
   config.emitKey = cryptoRandomString(10)
 
   return new Promise((resolve, reject) => {

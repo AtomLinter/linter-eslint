@@ -144,12 +144,6 @@
         "error",
         "never"
       ],
-      "no-param-reassign": [
-        "error",
-        {
-          "props": false
-        }
-      ],
       "comma-dangle": "off",
       "global-require": "off",
       "import/no-unresolved": [

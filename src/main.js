@@ -25,6 +25,7 @@ const idleCallbacks = new Set()
 // Internal functions
 const idsToIgnoredRules = ruleIds =>
   ruleIds.reduce((ids, id) => {
+    // eslint-disable-next-line no-param-reassign
     ids[id] = 0 // 0 is the severity to turn off a rule
     return ids
   }, {})
