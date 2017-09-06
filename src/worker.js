@@ -9,19 +9,13 @@ import isConfigAtHomeRoot from './is-config-at-home-root'
 
 process.title = 'linter-eslint helper'
 
-function lintJob({
-  cliEngineOptions, contents, eslint, filePath
-}) {
+function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   return cliEngine.executeOnText(contents, filePath)
 }
 
-function fixJob({
-  cliEngineOptions, contents, eslint, filePath
-}) {
-  const report = lintJob({
-    cliEngineOptions, contents, eslint, filePath
-  })
+function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
+  const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
 
   eslint.CLIEngine.outputFixes(report)
 
@@ -56,14 +50,10 @@ module.exports = async () => {
 
     let response
     if (type === 'lint') {
-      const report = lintJob({
-        cliEngineOptions, contents, eslint, filePath
-      })
+      const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
       response = report.results.length ? report.results[0].messages : []
     } else if (type === 'fix') {
-      response = fixJob({
-        cliEngineOptions, contents, eslint, filePath
-      })
+      response = fixJob({ cliEngineOptions, contents, eslint, filePath })
     } else if (type === 'debug') {
       const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
       response = Helpers.findESLintDirectory(modulesDir, config, projectPath)
