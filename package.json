@@ -144,7 +144,6 @@
         "error",
         "never"
       ],
-      "func-names": "off",
       "no-param-reassign": [
         "error",
         {

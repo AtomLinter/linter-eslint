@@ -31,7 +31,7 @@ function fixJob({
   return 'Linter-ESLint: Fix attempt complete, but linting errors remain.'
 }
 
-module.exports = async function () {
+module.exports = async () => {
   process.on('message', (jobConfig) => {
     const {
       contents, type, config, filePath, projectPath, rules, emitKey
