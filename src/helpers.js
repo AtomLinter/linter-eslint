@@ -67,6 +67,7 @@ export function showError(givenMessage, givenDetail = null) {
   let detail
   let message
   if (givenMessage instanceof Error) {
+    // mdn.io/Destructuring_assignment#Assignment_without_declaration
     ({ stack: detail, message } = givenMessage)
   } else {
     detail = givenDetail
