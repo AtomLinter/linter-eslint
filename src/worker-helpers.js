@@ -154,17 +154,24 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
     fix: type === 'fix'
   }
 
-  const ignorePattern = config.disableEslintIgnore ? null :
-  // eslint-disable-next-line import/no-dynamic-require
-    require(findCached(fileDir, 'package.json')).eslintIgnore
-
-  if (ignorePattern) {
-    cliEngineConfig.ignorePattern = ignorePattern
-  }
-
   const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
   if (ignoreFile) {
     cliEngineConfig.ignorePath = ignoreFile
+  }
+
+  // This ignorePattern honors `eslintIgnore`` property in
+  //  `package.json`. It basically amounts to hack because
+  //   `eslint` should pull this property on it's own if
+  //   `.eslintignore` file does not exist. We should
+  //   eliminate this block as soon as we can determine
+  //   why that does not happen.
+  //
+  const ignorePattern =
+    (ignoreFile || config.disableEslintIgnore) ? null :
+      // eslint-disable-next-line import/no-dynamic-require
+      require(findCached(fileDir, 'package.json')).eslintIgnore
+  if (ignorePattern) {
+    cliEngineConfig.ignorePattern = ignorePattern
   }
 
   if (config.eslintRulesDir) {

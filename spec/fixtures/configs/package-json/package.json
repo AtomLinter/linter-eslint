@@ -6,6 +6,11 @@
   "author": "",
   "license": "",
   "eslintConfig": {
-    "semi": [2, "never"]
-  }
+    "rules": {
+      "semi": ["error", "never"]
+    }
+  },
+  "eslintIgnore": [
+    "**/ignore.js"
+  ]
 }
