@@ -17,6 +17,7 @@ const emptyPath = path.join(fixturesDir, 'files', 'empty.js')
 const fixPath = path.join(fixturesDir, 'files', 'fix.js')
 const cachePath = path.join(fixturesDir, 'files', '.eslintcache')
 const configPath = path.join(fixturesDir, 'configs', '.eslintrc.yml')
+const eslintIgnoreKeyPath = path.join(fixturesDir, 'configs', 'package-json', 'ignored.js')
 const importingpath = path.join(fixturesDir,
   'import-resolution', 'nested', 'importing.js')
 const badImportPath = path.join(fixturesDir,
@@ -212,6 +213,16 @@ describe('The eslint provider for Linter', () => {
       const notification = await getNotification(expectedMessage)
 
       expect(notification.getMessage()).toBe(expectedMessage)
+    })
+  })
+
+  describe('when a file is specified in an eslintIgnore key in package.json', () => {
+    it('will not give warnings when linting the file', async () => {
+      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      const editor = await atom.workspace.open(eslintIgnoreKeyPath)
+      const messages = await lint(editor)
+
+      expect(messages.length).toBe(0)
     })
   })
 
