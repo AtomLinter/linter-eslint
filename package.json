@@ -139,23 +139,23 @@
   },
   "eslintConfig": {
     "rules": {
-      "no-console": 0,
+      "no-console": "off",
       "semi": [
-        2,
+        "error",
         "never"
       ],
-      "func-names": 0,
+      "func-names": "off",
       "no-param-reassign": [
-        2,
+        "error",
         {
           "props": false
         }
       ],
-      "comma-dangle": 0,
-      "no-underscore-dangle": 0,
-      "global-require": 0,
+      "comma-dangle": "off",
+      "no-underscore-dangle": "off",
+      "global-require": "off",
       "import/no-unresolved": [
-        2,
+        "error",
         {
           "ignore": [
             "atom"
