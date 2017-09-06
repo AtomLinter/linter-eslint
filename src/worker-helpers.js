@@ -94,6 +94,7 @@ export function refreshModulesPath(modulesDir) {
   if (Cache.LAST_MODULES_PATH !== modulesDir) {
     Cache.LAST_MODULES_PATH = modulesDir
     process.env.NODE_PATH = modulesDir || ''
+    // eslint-disable-next-line no-underscore-dangle
     require('module').Module._initPaths()
   }
 }

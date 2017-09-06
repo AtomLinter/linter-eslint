@@ -152,7 +152,6 @@
         }
       ],
       "comma-dangle": "off",
-      "no-underscore-dangle": "off",
       "global-require": "off",
       "import/no-unresolved": [
         "error",
