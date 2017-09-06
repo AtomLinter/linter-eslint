@@ -21,6 +21,7 @@ const startWorker = (worker) => {
   // Send empty arguments as we don't use them in the worker
   worker.start([])
   // NOTE: Modifies the Task of the worker, but it's the only clean way to track this
+  // eslint-disable-next-line no-param-reassign
   worker.started = true
 }
 
@@ -36,14 +37,16 @@ export async function sendJob(worker, config) {
   // Expand the config with a unique ID to emit on
   // NOTE: Jobs _must_ have a unique ID as they are completely async and results
   // can arrive back in any order.
+  // eslint-disable-next-line no-param-reassign
   config.emitKey = cryptoRandomString(10)
 
   return new Promise((resolve, reject) => {
     const errSub = worker.on('task:error', (...err) => {
+      const [msg, stack] = err
       // Re-throw errors from the task
-      const error = new Error(err[0])
+      const error = new Error(msg)
       // Set the stack to the one given to us by the worker
-      error.stack = err[1]
+      error.stack = stack
       reject(error)
     })
     const responseSub = worker.on(config.emitKey, (data) => {
@@ -63,9 +66,9 @@ export async function sendJob(worker, config) {
 export function showError(givenMessage, givenDetail = null) {
   let detail
   let message
-  if (message instanceof Error) {
-    detail = message.stack
-    message = message.message
+  if (givenMessage instanceof Error) {
+    // mdn.io/Destructuring_assignment#Assignment_without_declaration
+    ({ stack: detail, message } = givenMessage)
   } else {
     detail = givenDetail
     message = givenMessage

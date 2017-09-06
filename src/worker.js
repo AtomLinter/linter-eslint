@@ -25,9 +25,11 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
   return 'Linter-ESLint: Fix attempt complete, but linting errors remain.'
 }
 
-module.exports = async function () {
+module.exports = async () => {
   process.on('message', (jobConfig) => {
-    const { contents, type, config, filePath, projectPath, rules, emitKey } = jobConfig
+    const {
+      contents, type, config, filePath, projectPath, rules, emitKey
+    } = jobConfig
     if (config.disableFSCache) {
       FindCache.clear()
     }
@@ -43,9 +45,8 @@ module.exports = async function () {
 
     const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config, projectPath)
 
-    const cliEngineOptions = Helpers.getCLIEngineOptions(
-      type, config, rules, relativeFilePath, fileDir, configPath
-    )
+    const cliEngineOptions = Helpers
+      .getCLIEngineOptions(type, config, rules, relativeFilePath, fileDir, configPath)
 
     let response
     if (type === 'lint') {
