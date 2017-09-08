@@ -10,22 +10,29 @@ import linterEslint from '../src/main'
 
 const fixturesDir = path.join(__dirname, 'fixtures')
 
-const goodPath = path.join(fixturesDir, 'files', 'good.js')
-const badPath = path.join(fixturesDir, 'files', 'bad.js')
-const badInlinePath = path.join(fixturesDir, 'files', 'badInline.js')
-const emptyPath = path.join(fixturesDir, 'files', 'empty.js')
-const fixPath = path.join(fixturesDir, 'files', 'fix.js')
-const cachePath = path.join(fixturesDir, 'files', '.eslintcache')
-const configPath = path.join(fixturesDir, 'configs', '.eslintrc.yml')
-const importResPath = path.join(fixturesDir, 'import-resolution')
-const importingpath = path.join(importResPath, 'nested', 'importing.js')
-const badImportPath = path.join(importResPath, 'nested', 'badImport.js')
-const ignoredPath = path.join(fixturesDir, 'eslintignore', 'ignored.js')
-const modIgnorePath = path.join(fixturesDir, 'modified-ignore-rule')
-const modifiedIgnorePath = path.join(modIgnorePath, 'foo.js')
-const modifiedIgnoreSpacePath = path.join(modIgnorePath, 'foo-space.js')
-const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
-const badCachePath = path.join(fixturesDir, 'badCache')
+const fixtures = {
+  good: ['files', 'good.js'],
+  bad: ['files', 'bad.js'],
+  badInline: ['files', 'badInline.js'],
+  empty: ['files', 'empty.js'],
+  fix: ['files', 'fix.js'],
+  cache: ['files', '.eslintcache'],
+  config: ['configs', '.eslintrc.yml'],
+  ignored: ['eslintignore', 'ignored.js'],
+  endRange: ['end-range', 'no-unreachable.js'],
+  badCache: ['badCache'],
+  modifiedIgnore: ['modified-ignore-rule', 'foo.js'],
+  modifiedIgnoreSpace: ['modified-ignore-rule', 'foo-space.js'],
+  importing: ['import-resolution', 'nested', 'importing.js'],
+  badImport: ['import-resolution', 'nested', 'badImport.js'],
+}
+
+const paths = Object.keys(fixtures)
+  .reduce((accumulator, fixture) => {
+    const acc = accumulator
+    acc[fixture] = path.join(fixturesDir, ...(fixtures[fixture]))
+    return acc
+  }, {})
 
 /**
  * Async helper to copy a file from one place to another on the filesystem.
@@ -112,7 +119,7 @@ describe('The eslint provider for Linter', () => {
   describe('checks bad.js and', () => {
     let editor = null
     beforeEach(async () => {
-      editor = await atom.workspace.open(badPath)
+      editor = await atom.workspace.open(paths.bad)
     })
 
     it('verifies the messages', async () => {
@@ -127,14 +134,14 @@ describe('The eslint provider for Linter', () => {
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected0)
       expect(messages[0].url).toBe(expected0Url)
-      expect(messages[0].location.file).toBe(badPath)
+      expect(messages[0].location.file).toBe(paths.bad)
       expect(messages[0].location.position).toEqual([[0, 0], [0, 3]])
       expect(messages[0].solutions).not.toBeDefined()
 
       expect(messages[1].severity).toBe('error')
       expect(messages[1].excerpt).toBe(expected1)
       expect(messages[1].url).toBe(expected1Url)
-      expect(messages[1].location.file).toBe(badPath)
+      expect(messages[1].location.file).toBe(paths.bad)
       expect(messages[1].location.position).toEqual([[0, 8], [0, 9]])
       expect(messages[1].solutions.length).toBe(1)
       expect(messages[1].solutions[0].position).toEqual([[0, 6], [0, 9]])
@@ -143,21 +150,21 @@ describe('The eslint provider for Linter', () => {
   })
 
   it('finds nothing wrong with an empty file', async () => {
-    const editor = await atom.workspace.open(emptyPath)
+    const editor = await atom.workspace.open(paths.empty)
     const messages = await lint(editor)
 
     expect(messages.length).toBe(0)
   })
 
   it('finds nothing wrong with a valid file', async () => {
-    const editor = await atom.workspace.open(goodPath)
+    const editor = await atom.workspace.open(paths.good)
     const messages = await lint(editor)
 
     expect(messages.length).toBe(0)
   })
 
   it('reports the fixes for fixable errors', async () => {
-    const editor = await atom.workspace.open(fixPath)
+    const editor = await atom.workspace.open(paths.fix)
     const messages = await lint(editor)
 
     expect(messages[0].solutions[0].position).toEqual([[0, 10], [1, 8]])
@@ -169,14 +176,14 @@ describe('The eslint provider for Linter', () => {
 
   describe('when resolving import paths using eslint-plugin-import', () => {
     it('correctly resolves imports from parent', async () => {
-      const editor = await atom.workspace.open(importingpath)
+      const editor = await atom.workspace.open(paths.importing)
       const messages = await lint(editor)
 
       expect(messages.length).toBe(0)
     })
 
     it('shows a message for an invalid import', async () => {
-      const editor = await atom.workspace.open(badImportPath)
+      const editor = await atom.workspace.open(paths.badImport)
       const messages = await lint(editor)
       const expected = "Unable to resolve path to module '../nonexistent'. (import/no-unresolved)"
       const expectedUrl = 'https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md'
@@ -185,7 +192,7 @@ describe('The eslint provider for Linter', () => {
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected)
       expect(messages[0].url).toBe(expectedUrl)
-      expect(messages[0].location.file).toBe(badImportPath)
+      expect(messages[0].location.file).toBe(paths.badImport)
       expect(messages[0].location.position).toEqual([[0, 24], [0, 40]])
       expect(messages[0].solutions).not.toBeDefined()
     })
@@ -197,14 +204,14 @@ describe('The eslint provider for Linter', () => {
     })
 
     it('will not give warnings when linting the file', async () => {
-      const editor = await atom.workspace.open(ignoredPath)
+      const editor = await atom.workspace.open(paths.ignored)
       const messages = await lint(editor)
 
       expect(messages.length).toBe(0)
     })
 
     it('will not give warnings when autofixing the file', async () => {
-      const editor = await atom.workspace.open(ignoredPath)
+      const editor = await atom.workspace.open(paths.ignored)
       atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:fix-file')
       const expectedMessage = 'Linter-ESLint: Fix complete.'
       const notification = await getNotification(expectedMessage)
@@ -219,11 +226,11 @@ describe('The eslint provider for Linter', () => {
 
     beforeEach(async () => {
       // Copy the file to a temporary folder
-      const tempFixturePath = await copyFileToTempDir(fixPath)
+      const tempFixturePath = await copyFileToTempDir(paths.fix)
       editor = await atom.workspace.open(tempFixturePath)
       tempDir = path.dirname(tempFixturePath)
       // Copy the config to the same temporary directory
-      await copyFileToDir(configPath, tempDir)
+      await copyFileToDir(paths.config, tempDir)
     })
 
     afterEach(() => {
@@ -266,11 +273,11 @@ describe('The eslint provider for Linter', () => {
 
     beforeEach(async () => {
       // Copy the file to a temporary folder
-      const tempFixturePath = await copyFileToTempDir(fixPath)
+      const tempFixturePath = await copyFileToTempDir(paths.fix)
       editor = await atom.workspace.open(tempFixturePath)
       tempDir = path.dirname(tempFixturePath)
       // Copy the config to the same temporary directory
-      await copyFileToDir(configPath, tempDir)
+      await copyFileToDir(paths.config, tempDir)
     })
 
     afterEach(() => {
@@ -279,7 +286,7 @@ describe('The eslint provider for Linter', () => {
     })
 
     it('does not delete the cache file when performing fixes', async () => {
-      const tempCacheFile = await copyFileToDir(cachePath, tempDir)
+      const tempCacheFile = await copyFileToDir(paths.cache, tempDir)
       const checkCachefileExists = () => {
         fs.statSync(tempCacheFile)
       }
@@ -295,19 +302,19 @@ describe('The eslint provider for Linter', () => {
 
     it('does nothing on saved files', async () => {
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
-      const editor = await atom.workspace.open(modifiedIgnoreSpacePath)
+      const editor = await atom.workspace.open(paths.modifiedIgnoreSpace)
       const messages = await lint(editor)
 
       expect(messages.length).toBe(1)
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected)
       expect(messages[0].url).toBe(expectedUrl)
-      expect(messages[0].location.file).toBe(modifiedIgnoreSpacePath)
+      expect(messages[0].location.file).toBe(paths.modifiedIgnoreSpace)
       expect(messages[0].location.position).toEqual([[0, 9], [0, 10]])
     })
 
     it('works when the file is modified', async () => {
-      const editor = await atom.workspace.open(modifiedIgnorePath)
+      const editor = await atom.workspace.open(paths.modifiedIgnore)
 
       // Verify no error before
       const firstMessages = await lint(editor)
@@ -322,7 +329,7 @@ describe('The eslint provider for Linter', () => {
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected)
       expect(messages[0].url).toBe(expectedUrl)
-      expect(messages[0].location.file).toBe(modifiedIgnorePath)
+      expect(messages[0].location.file).toBe(paths.modifiedIgnore)
       expect(messages[0].location.position).toEqual([[0, 9], [0, 10]])
 
       // Enable the option under test
@@ -338,7 +345,7 @@ describe('The eslint provider for Linter', () => {
     let editor
     const expectedMessage = 'linter-eslint debugging information'
     beforeEach(async () => {
-      editor = await atom.workspace.open(goodPath)
+      editor = await atom.workspace.open(paths.good)
     })
 
     it('shows an info notification', async () => {
@@ -363,7 +370,7 @@ describe('The eslint provider for Linter', () => {
   })
 
   it('handles ranges in messages', async () => {
-    const editor = await atom.workspace.open(endRangePath)
+    const editor = await atom.workspace.open(paths.endRange)
     const messages = await lint(editor)
     const expected = 'Unreachable code. (no-unreachable)'
     const expectedUrl = 'https://eslint.org/docs/rules/no-unreachable'
@@ -371,7 +378,7 @@ describe('The eslint provider for Linter', () => {
     expect(messages[0].severity).toBe('error')
     expect(messages[0].excerpt).toBe(expected)
     expect(messages[0].url).toBe(expectedUrl)
-    expect(messages[0].location.file).toBe(endRangePath)
+    expect(messages[0].location.file).toBe(paths.endRange)
     expect(messages[0].location.position).toEqual([[5, 2], [6, 15]])
   })
 
@@ -382,7 +389,7 @@ describe('The eslint provider for Linter', () => {
     beforeEach(async () => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', false)
 
-      const tempFilePath = await copyFileToTempDir(badInlinePath)
+      const tempFilePath = await copyFileToTempDir(paths.badInline)
       editor = await atom.workspace.open(tempFilePath)
       tempFixtureDir = path.dirname(tempFilePath)
     })
@@ -422,7 +429,7 @@ describe('The eslint provider for Linter', () => {
     beforeEach(async () => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', true)
 
-      const tempFilePath = await copyFileToTempDir(badInlinePath)
+      const tempFilePath = await copyFileToTempDir(paths.badInline)
       editor = await atom.workspace.open(tempFilePath)
       tempFixtureDir = path.dirname(tempFilePath)
     })
@@ -443,8 +450,8 @@ describe('The eslint provider for Linter', () => {
       // Ensure the cache is enabled, since we will be taking advantage of
       // a failing in it's operation
       atom.config.set('linter-eslint.disableFSCache', false)
-      const fooPath = path.join(badCachePath, 'temp', 'foo.js')
-      const newConfigPath = path.join(badCachePath, 'temp', '.eslintrc.js')
+      const fooPath = path.join(paths.badCache, 'temp', 'foo.js')
+      const newConfigPath = path.join(paths.badCache, 'temp', '.eslintrc.js')
       const editor = await atom.workspace.open(fooPath)
       function undefMsg(varName) {
         return `'${varName}' is not defined. (no-undef)`
@@ -530,7 +537,7 @@ describe('The eslint provider for Linter', () => {
 
     it('shows the rule ID when enabled', async () => {
       atom.config.set('linter-eslint.showRuleIdInMessage', true)
-      const editor = await atom.workspace.open(badImportPath)
+      const editor = await atom.workspace.open(paths.badImport)
       const messages = await lint(editor)
       const expected = "Unable to resolve path to module '../nonexistent'. (import/no-unresolved)"
 
@@ -538,14 +545,14 @@ describe('The eslint provider for Linter', () => {
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected)
       expect(messages[0].url).toBe(expectedUrl)
-      expect(messages[0].location.file).toBe(badImportPath)
+      expect(messages[0].location.file).toBe(paths.badImport)
       expect(messages[0].location.position).toEqual([[0, 24], [0, 40]])
       expect(messages[0].solutions).not.toBeDefined()
     })
 
     it("doesn't show the rule ID when disabled", async () => {
       atom.config.set('linter-eslint.showRuleIdInMessage', false)
-      const editor = await atom.workspace.open(badImportPath)
+      const editor = await atom.workspace.open(paths.badImport)
       const messages = await lint(editor)
       const expected = "Unable to resolve path to module '../nonexistent'."
 
@@ -553,7 +560,7 @@ describe('The eslint provider for Linter', () => {
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected)
       expect(messages[0].url).toBe(expectedUrl)
-      expect(messages[0].location.file).toBe(badImportPath)
+      expect(messages[0].location.file).toBe(paths.badImport)
       expect(messages[0].location.position).toEqual([[0, 24], [0, 40]])
       expect(messages[0].solutions).not.toBeDefined()
     })
