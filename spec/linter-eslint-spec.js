@@ -25,6 +25,8 @@ const fixtures = {
   modifiedIgnoreSpace: ['modified-ignore-rule', 'foo-space.js'],
   importing: ['import-resolution', 'nested', 'importing.js'],
   badImport: ['import-resolution', 'nested', 'badImport.js'],
+  eslintignoreDir: ['eslintignore'],
+  eslintIgnoreKeyDir: ['configs', 'eslintignorekey']
 }
 
 const paths = Object.keys(fixtures)
@@ -215,6 +217,44 @@ describe('The eslint provider for Linter', () => {
       const notification = await getNotification(expectedMessage)
 
       expect(notification.getMessage()).toBe(expectedMessage)
+    })
+  })
+
+  describe('when a file is not specified in .eslintignore file', async () => {
+    it('will give warnings when linting the file', async () => {
+      const tempPath = await copyFileToTempDir(path.join(paths.eslintignoreDir, 'ignored.js'))
+      const tempDir = path.dirname(tempPath)
+
+      const editor = await atom.workspace.open(tempPath)
+      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      await copyFileToDir(path.join(paths.eslintignoreDir, '.eslintrc.yaml'), tempDir)
+
+      const messages = await lint(editor)
+      expect(messages.length).toBe(1)
+      rimraf.sync(tempDir)
+    })
+  })
+
+  describe('when a file is specified in an eslintIgnore key in package.json', () => {
+    it('will still lint the file if an .eslintignore file is present', async () => {
+      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      const editor = await atom.workspace.open(path.join(paths.eslintIgnoreKeyDir, 'ignored.js'))
+      const messages = await lint(editor)
+
+      expect(messages.length).toBe(1)
+    })
+
+    it('will not give warnings when linting the file', async () => {
+      const tempPath = await copyFileToTempDir(path.join(paths.eslintIgnoreKeyDir, 'ignored.js'))
+      const tempDir = path.dirname(tempPath)
+
+      const editor = await atom.workspace.open(tempPath)
+      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      await copyFileToDir(path.join(paths.eslintIgnoreKeyDir, 'package.json'), tempDir)
+
+      const messages = await lint(editor)
+      expect(messages.length).toBe(0)
+      rimraf.sync(tempDir)
     })
   })
 
