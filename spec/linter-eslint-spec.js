@@ -26,6 +26,8 @@ const modifiedIgnorePath = path.join(modIgnorePath, 'foo.js')
 const modifiedIgnoreSpacePath = path.join(modIgnorePath, 'foo-space.js')
 const endRangePath = path.join(fixturesDir, 'end-range', 'no-unreachable.js')
 const badCachePath = path.join(fixturesDir, 'badCache')
+const eslintIgnoreDir = path.join(fixturesDir, 'eslintignore')
+const eslintIgnoreKeyDir = path.join(fixturesDir, 'configs', 'eslintignorekey')
 
 /**
  * Async helper to copy a file from one place to another on the filesystem.
@@ -210,6 +212,46 @@ describe('The eslint provider for Linter', () => {
       const notification = await getNotification(expectedMessage)
 
       expect(notification.getMessage()).toBe(expectedMessage)
+    })
+  })
+
+  describe('when a file is not specified in .eslintignore file', async () => {
+    it('will give warnings when linting the file', async () => {
+      const tempPath = await copyFileToTempDir(path.join(eslintIgnoreDir, 'ignored.js'))
+      const tempDir = path.dirname(tempPath)
+
+      const editor = await atom.workspace.open(tempPath)
+      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      await copyFileToDir(path.join(eslintIgnoreDir, '.eslintrc.yaml'), tempDir)
+
+      const messages = await lint(editor)
+      expect(messages.length).toBe(1)
+      expect(editor)
+      // rimraf.sync(tempDir)
+    })
+  })
+
+  describe('when a file is specified in an eslintIgnore key in package.json', () => {
+    it('will still lint the file if .eslintignore file', async () => {
+      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      const editor = await atom.workspace.open(path.join(eslintIgnoreKeyDir, 'ignored.js'))
+      const messages = await lint(editor)
+
+      expect(messages.length).toBe(1)
+    })
+
+    it('will not give warnings when linting the file', async () => {
+      const tempPath = await copyFileToTempDir(path.join(eslintIgnoreKeyDir, 'ignored.js'))
+      const tempDir = path.dirname(tempPath)
+
+      const editor = await atom.workspace.open(tempPath)
+      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      await copyFileToDir(path.join(eslintIgnoreKeyDir, 'package.json'), tempDir)
+
+      const messages = await lint(editor)
+      expect(messages.length).toBe(0)
+      expect(editor)
+      rimraf.sync(tempDir)
     })
   })
 

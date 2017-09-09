@@ -1,0 +1,16 @@
+{
+  "name": "test-fixture",
+  "version": "0.0.1",
+  "description": "",
+  "main": "foo.js",
+  "author": "",
+  "license": "",
+  "eslintConfig": {
+    "rules": {
+      "semi": ["error", "never"]
+    }
+  },
+  "eslintIgnore": [
+    "**/ignored.js"
+  ]
+}
