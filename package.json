@@ -124,6 +124,7 @@
     "crypto-random-string": "^1.0.0",
     "eslint": "^4.6.0",
     "eslint-rule-documentation": "^1.0.18",
+    "fs-plus": "^3.0.1",
     "resolve-env": "^1.0.0",
     "user-home": "^2.0.0"
   },

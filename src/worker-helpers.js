@@ -1,7 +1,7 @@
 'use babel'
 
 import Path from 'path'
-import fs from 'fs'
+import fs from 'fs-plus'
 import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
@@ -11,6 +11,12 @@ const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
   NODE_PREFIX_PATH: null,
   LAST_MODULES_PATH: null
+}
+
+const cleanPath = (path) => {
+  const unTildeify = fs.normalize(path)
+  const unEnvVarify = resolveEnv(unTildeify)
+  return unEnvVarify
 }
 
 export function getNodePrefixPath() {
@@ -45,7 +51,8 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
   let locationType = null
   if (config.useGlobalEslint) {
     locationType = 'global'
-    const prefixPath = config.globalNodePath || getNodePrefixPath()
+    const configGlobal = config.globalNodePath && cleanPath(config.globalNodePath)
+    const prefixPath = configGlobal || getNodePrefixPath()
     // NPM on Windows and Yarn on all platforms
     eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
     if (!isDirectory(eslintDir)) {
@@ -55,9 +62,9 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
   } else if (!config.advancedLocalNodeModules) {
     locationType = 'local project'
     eslintDir = Path.join(modulesDir || '', 'eslint')
-  } else if (Path.isAbsolute(config.advancedLocalNodeModules)) {
+  } else if (Path.isAbsolute(cleanPath(config.advancedLocalNodeModules))) {
     locationType = 'advanced specified'
-    eslintDir = Path.join(config.advancedLocalNodeModules || '', 'eslint')
+    eslintDir = Path.join(cleanPath(config.advancedLocalNodeModules) || '', 'eslint')
   } else {
     locationType = 'advanced specified'
     eslintDir = Path.join(projectPath || '', config.advancedLocalNodeModules, 'eslint')
@@ -161,7 +168,7 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
   }
 
   if (config.eslintRulesDir) {
-    let rulesDir = resolveEnv(config.eslintRulesDir)
+    let rulesDir = cleanPath(config.eslintRulesDir)
     if (!Path.isAbsolute(rulesDir)) {
       rulesDir = findCached(fileDir, rulesDir)
     }
@@ -172,7 +179,7 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
 
   if (givenConfigPath === null && config.eslintrcPath) {
     // If we didn't find a configuration use the fallback from the settings
-    cliEngineConfig.configFile = resolveEnv(config.eslintrcPath)
+    cliEngineConfig.configFile = cleanPath(config.eslintrcPath)
   }
 
   return cliEngineConfig
