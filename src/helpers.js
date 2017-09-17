@@ -63,22 +63,6 @@ export async function sendJob(worker, config) {
   })
 }
 
-export function showError(givenMessage, givenDetail = null) {
-  let detail
-  let message
-  if (givenMessage instanceof Error) {
-    // mdn.io/Destructuring_assignment#Assignment_without_declaration
-    ({ stack: detail, message } = givenMessage)
-  } else {
-    detail = givenDetail
-    message = givenMessage
-  }
-  atom.notifications.addError(`[Linter-ESLint] ${message}`, {
-    detail,
-    dismissable: true
-  })
-}
-
 function validatePoint(textBuffer, line, col) {
   // Clip the given point to a valid one, and check if it equals the original
   if (!textBuffer.clipPosition([line, col]).isEqual([line, col])) {
