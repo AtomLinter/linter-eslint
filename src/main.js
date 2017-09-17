@@ -188,11 +188,26 @@ module.exports = {
       scope: 'file',
       lintsOnChange: true,
       lint: async (textEditor) => {
-        const text = textEditor.getText()
-        if (text.length === 0) {
-          return []
+        if (!atom.workspace.isTextEditor(textEditor)) {
+          // If we somehow get fed an invalid TextEditor just immediately return
+          return null
         }
+
         const filePath = textEditor.getPath()
+        if (!filePath) {
+          // The editor currently has no path, we can't report messages back to
+          // Linter so just return null
+          return null
+        }
+
+        if (filePath.includes('://')) {
+          // If the path is a URL (Nuclide remote file) return a message
+          // telling the user we are unable to work on remote files.
+          const message = 'Remote file open, impossible to run ESLint.'
+          helpers.handleError(textEditor, new Error(message))
+        }
+
+        const text = textEditor.getText()
 
         if (!helpers) {
           helpers = require('./helpers')
