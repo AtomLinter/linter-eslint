@@ -15,7 +15,12 @@ let sendRules = false
 function updateFixableRules(eslint) {
   const { Linter } = eslint
   const linter = new Linter()
-  const currentRules = new Set(linter.getRules().keys())
+  const currentRules = new Set()
+  linter.getRules().forEach((props, rule) => {
+    if (Object.prototype.hasOwnProperty.call(props.meta, 'fixable')) {
+      currentRules.add(rule)
+    }
+  })
 
   sendRules = false
 
