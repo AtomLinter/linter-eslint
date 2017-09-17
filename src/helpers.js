@@ -270,12 +270,6 @@ export async function processESLintMessages(response, textEditor, showRule, work
         ret.solutions = [linterFix]
       }
     } catch (err) {
-      if (!err.message.startsWith('Line number ') &&
-        !err.message.startsWith('Column start ')
-      ) {
-        // This isn't an invalid point error from `generateRange`, re-throw it
-        throw err
-      }
       ret = await generateInvalidTrace({
         msgLine,
         msgCol,
