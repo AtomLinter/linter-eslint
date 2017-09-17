@@ -335,71 +335,94 @@ describe('The eslint provider for Linter', () => {
   })
 
   describe('Ignores specified rules when editing', () => {
-    const expected = 'Trailing spaces not allowed. (no-trailing-spaces)'
-    const expectedUrl = 'https://eslint.org/docs/rules/no-trailing-spaces'
+    let expectedPath
+
+    const checkNoConsole = (message) => {
+      const text = 'Unexpected console statement. (no-console)'
+      const url = 'https://eslint.org/docs/rules/no-console'
+      expect(message.severity).toBe('error')
+      expect(message.excerpt).toBe(text)
+      expect(message.url).toBe(url)
+      expect(message.location.file).toBe(expectedPath)
+      expect(message.location.position).toEqual([[0, 0], [0, 11]])
+    }
+
+    const checkNoTrailingSpace = (message) => {
+      const text = 'Trailing spaces not allowed. (no-trailing-spaces)'
+      const url = 'https://eslint.org/docs/rules/no-trailing-spaces'
+
+      expect(message.severity).toBe('error')
+      expect(message.excerpt).toBe(text)
+      expect(message.url).toBe(url)
+      expect(message.location.file).toBe(expectedPath)
+      expect(message.location.position).toEqual([[1, 9], [1, 10]])
+    }
+
+    const checkBefore = (messages) => {
+      expect(messages.length).toBe(1)
+      checkNoConsole(messages[0])
+    }
+
+    const checkNew = (messages) => {
+      expect(messages.length).toBe(2)
+      checkNoConsole(messages[0])
+      checkNoTrailingSpace(messages[1])
+    }
+
+    const checkAfter = (messages) => {
+      expect(messages.length).toBe(1)
+      checkNoConsole(messages[0])
+    }
 
     it('does nothing on saved files', async () => {
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
       atom.config.set('linter-eslint.ignoreFixableRulesWhileTyping', true)
-      const editor = await atom.workspace.open(paths.modifiedIgnoreSpace)
+      expectedPath = paths.modifiedIgnoreSpace
+      const editor = await atom.workspace.open(expectedPath)
       // Run once to populate the fixable rules list
       await lint(editor)
       // Run again for the testable results
       const messages = await lint(editor)
-
-      expect(messages.length).toBe(1)
-      expect(messages[0].severity).toBe('error')
-      expect(messages[0].excerpt).toBe(expected)
-      expect(messages[0].url).toBe(expectedUrl)
-      expect(messages[0].location.file).toBe(paths.modifiedIgnoreSpace)
-      expect(messages[0].location.position).toEqual([[0, 9], [0, 10]])
+      checkNew(messages)
     })
 
-    it('works when the file is modified', async () => {
-      const editor = await atom.workspace.open(paths.modifiedIgnore)
+    it('allows ignoring a specific list of rules when modified', async () => {
+      expectedPath = paths.modifiedIgnore
+      const editor = await atom.workspace.open(expectedPath)
 
-      // Verify no error before
+      // Verify expected error before
       const firstMessages = await lint(editor)
-      expect(firstMessages.length).toBe(0)
+      checkBefore(firstMessages)
 
       // Insert a space into the editor
-      editor.getBuffer().insert([0, 9], ' ')
+      editor.getBuffer().insert([1, 9], ' ')
 
       // Verify the space is showing an error
       const messages = await lint(editor)
-      expect(messages.length).toBe(1)
-      expect(messages[0].severity).toBe('error')
-      expect(messages[0].excerpt).toBe(expected)
-      expect(messages[0].url).toBe(expectedUrl)
-      expect(messages[0].location.file).toBe(paths.modifiedIgnore)
-      expect(messages[0].location.position).toEqual([[0, 9], [0, 10]])
+      checkNew(messages)
 
       // Enable the option under test
       atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
 
       // Check the lint results
       const newMessages = await lint(editor)
-      expect(newMessages.length).toBe(0)
+      checkAfter(newMessages)
     })
 
-    it('verifies the messages', async () => {
-      const editor = await atom.workspace.open(paths.modifiedIgnore)
+    it('allows ignoring all fixable rules while typing', async () => {
+      expectedPath = paths.modifiedIgnore
+      const editor = await atom.workspace.open(expectedPath)
 
       // Verify no error before
       const firstMessages = await lint(editor)
-      expect(firstMessages.length).toBe(0)
+      checkBefore(firstMessages)
 
       // Insert a space into the editor
-      editor.getBuffer().insert([0, 9], ' ')
+      editor.getBuffer().insert([1, 9], ' ')
 
       // Verify the space is showing an error
       const messages = await lint(editor)
-      expect(messages.length).toBe(1)
-      expect(messages[0].severity).toBe('error')
-      expect(messages[0].excerpt).toBe(expected)
-      expect(messages[0].url).toBe(expectedUrl)
-      expect(messages[0].location.file).toBe(paths.modifiedIgnore)
-      expect(messages[0].location.position).toEqual([[0, 9], [0, 10]])
+      checkNew(messages)
 
       // Enable the option under test
       // NOTE: Depends on no-trailing-spaces being marked as fixable by ESLint
@@ -407,7 +430,7 @@ describe('The eslint provider for Linter', () => {
 
       // Check the lint results
       const newMessages = await lint(editor)
-      expect(newMessages.length).toBe(0)
+      checkAfter(newMessages)
     })
   })
 
