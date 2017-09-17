@@ -79,10 +79,9 @@ export function showError(givenMessage, givenDetail = null) {
   })
 }
 
-function validatePoint(textEditor, line, col) {
-  const buffer = textEditor.getBuffer()
+function validatePoint(textBuffer, line, col) {
   // Clip the given point to a valid one, and check if it equals the original
-  if (!buffer.clipPosition([line, col]).isEqual([line, col])) {
+  if (!textBuffer.clipPosition([line, col]).isEqual([line, col])) {
     throw new Error(`${line}:${col} isn't a valid point!`)
   }
 }
@@ -245,8 +244,9 @@ export async function processESLintMessages(response, textEditor, showRule, work
     let range
     try {
       if (eslintFullRange) {
-        validatePoint(textEditor, msgLine, msgCol)
-        validatePoint(textEditor, msgEndLine, msgEndCol)
+        const buffer = textEditor.getBuffer()
+        validatePoint(buffer, msgLine, msgCol)
+        validatePoint(buffer, msgEndLine, msgEndCol)
         range = [[msgLine, msgCol], [msgEndLine, msgEndCol]]
       } else {
         range = generateRange(textEditor, msgLine, msgCol)
