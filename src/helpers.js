@@ -133,7 +133,7 @@ export async function generateDebugString(worker) {
   return details.join('\n')
 }
 
-export async function handleError(textEditor, error) {
+export function handleError(textEditor, error) {
   const { stack, message } = error
   // Only show the first line of the message as the excerpt
   const excerpt = `Error while running ESLint: ${message.split('\n')[0]}.`
