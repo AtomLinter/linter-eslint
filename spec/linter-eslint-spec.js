@@ -422,12 +422,13 @@ describe('The eslint provider for Linter', () => {
 
   describe('when setting `disableWhenNoEslintConfig` is false', () => {
     let editor
+    let tempFilePath
     let tempFixtureDir
 
     beforeEach(async () => {
       atom.config.set('linter-eslint.disableWhenNoEslintConfig', false)
 
-      const tempFilePath = await copyFileToTempDir(paths.badInline)
+      tempFilePath = await copyFileToTempDir(paths.badInline)
       editor = await atom.workspace.open(tempFilePath)
       tempFixtureDir = path.dirname(tempFilePath)
     })
@@ -437,26 +438,19 @@ describe('The eslint provider for Linter', () => {
     })
 
     it('errors when no config file is found', async () => {
-      let didError
-      let gotLintingErrors
-
-      try {
-        const messages = await lint(editor)
-        // Older versions of ESLint will report an error
-        // (or if current user running tests has a config in their home directory)
-        const expected = "'foo' is not defined. (no-undef)"
-        const expectedUrl = 'https://eslint.org/docs/rules/no-undef'
-        expect(messages.length).toBe(1)
-        expect(messages[0].excerpt).toBe(expected)
-        expect(messages[0].url).toBe(expectedUrl)
-        gotLintingErrors = true
-      } catch (err) {
-        // Newer versions of ESLint will throw an exception
-        expect(err.message).toBe('No ESLint configuration found.')
-        didError = true
-      }
-
-      expect(didError || gotLintingErrors).toBe(true)
+      const messages = await lint(editor)
+      const expected = 'Error while running ESLint: No ESLint configuration found..'
+      const description = `<div style="white-space: pre-wrap">No ESLint configuration found.
+<hr />Error: No ESLint configuration found.
+    at Config.getLocalConfigHierarchy`
+      // The rest of the description includes paths specific to the computer running it
+      expect(messages.length).toBe(1)
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(expected)
+      expect(messages[0].description.startsWith(description)).toBe(true)
+      expect(messages[0].url).not.toBeDefined()
+      expect(messages[0].location.file).toBe(tempFilePath)
+      expect(messages[0].location.position).toEqual([[0, 0], [0, 28]])
     })
   })
 

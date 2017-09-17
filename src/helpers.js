@@ -133,6 +133,21 @@ export async function generateDebugString(worker) {
   return details.join('\n')
 }
 
+export async function handleError(textEditor, error) {
+  const { stack, message } = error
+  // Only show the first line of the message as the excerpt
+  const excerpt = `Error while running ESLint: ${message.split('\n')[0]}.`
+  return [{
+    severity: 'error',
+    excerpt,
+    description: `<div style="white-space: pre-wrap">${message}\n<hr />${stack}</div>`,
+    location: {
+      file: textEditor.getPath(),
+      position: generateRange(textEditor),
+    },
+  }]
+}
+
 const generateInvalidTrace = async ({
   msgLine, msgCol, msgEndLine, msgEndCol,
   eslintFullRange, filePath, textEditor, ruleId, message, worker
