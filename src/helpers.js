@@ -149,10 +149,10 @@ export async function generateDebugString(worker) {
   return details.join('\n')
 }
 
-const generateInvalidTrace = async (
+const generateInvalidTrace = async ({
   msgLine, msgCol, msgEndLine, msgEndCol,
   eslintFullRange, filePath, textEditor, ruleId, message, worker
-) => {
+}) => {
   let errMsgRange = `${msgLine + 1}:${msgCol}`
   if (eslintFullRange) {
     errMsgRange += ` - ${msgEndLine + 1}:${msgEndCol + 1}`
@@ -276,10 +276,18 @@ export async function processESLintMessages(response, textEditor, showRule, work
         // This isn't an invalid point error from `generateRange`, re-throw it
         throw err
       }
-      ret = await generateInvalidTrace(
-        msgLine, msgCol, msgEndLine, msgEndCol,
-        eslintFullRange, filePath, textEditor, ruleId, message, worker
-      )
+      ret = await generateInvalidTrace({
+        msgLine,
+        msgCol,
+        msgEndLine,
+        msgEndCol,
+        eslintFullRange,
+        filePath,
+        textEditor,
+        ruleId,
+        message,
+        worker
+      })
     }
 
     return ret
