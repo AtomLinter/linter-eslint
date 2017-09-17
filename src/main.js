@@ -62,6 +62,20 @@ module.exports = {
     this.subscriptions = new CompositeDisposable()
     this.worker = null
 
+    /**
+     * FIXME: Deprecated eslintRulesDir{String} option in favor of
+     * eslintRulesDirs{Array<String>}. Remove in the next major release,
+     * in v8.5.0, or after 2018-04.
+     */
+    const oldRulesdir = atom.config.get('linter-eslint.eslintRulesDir')
+    if (oldRulesdir) {
+      const rulesDirs = atom.config.get('linter-eslint.eslintRulesDirs')
+      if (rulesDirs.length === 0) {
+        atom.config.set('linter-eslint.eslintRulesDirs', [oldRulesdir])
+      }
+      atom.config.unset('linter-eslint.eslintRulesDir')
+    }
+
     const embeddedScope = 'source.js.embedded.html'
     this.subscriptions.add(atom.config.observe(
       'linter-eslint.lintHtmlFiles',

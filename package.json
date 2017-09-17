@@ -49,11 +49,14 @@
       "type": "string",
       "default": ""
     },
-    "eslintRulesDir": {
-      "title": "ESLint Rules Dir",
-      "description": "Specify a directory for ESLint to load rules from",
-      "type": "string",
-      "default": ""
+    "eslintRulesDirs": {
+      "title": "ESLint Rules Directories",
+      "description": "Specify a comma separated list of directories for ESLint to load rules from.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "string"
+      }
     },
     "disableEslintIgnore": {
       "title": "Don't use .eslintignore files",

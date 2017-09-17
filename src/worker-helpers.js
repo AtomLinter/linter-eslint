@@ -169,15 +169,13 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
     cliEngineConfig.ignorePath = ignoreFile
   }
 
-  if (config.eslintRulesDir) {
-    let rulesDir = cleanPath(config.eslintRulesDir)
+  cliEngineConfig.rulePaths = config.eslintRulesDirs.map((path) => {
+    const rulesDir = cleanPath(path)
     if (!Path.isAbsolute(rulesDir)) {
-      rulesDir = findCached(fileDir, rulesDir)
+      return findCached(fileDir, rulesDir)
     }
-    if (rulesDir) {
-      cliEngineConfig.rulePaths = [rulesDir]
-    }
-  }
+    return rulesDir
+  }).filter(path => path)
 
   if (givenConfigPath === null && config.eslintrcPath) {
     // If we didn't find a configuration use the fallback from the settings
