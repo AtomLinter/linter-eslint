@@ -9,9 +9,39 @@ import isConfigAtHomeRoot from './is-config-at-home-root'
 
 process.title = 'linter-eslint helper'
 
+const fixableRules = new Set()
+let sendRules = false
+
+function updateFixableRules(eslint) {
+  const { Linter } = eslint
+  const linter = new Linter()
+  const currentRules = new Set(linter.getRules().keys())
+
+  sendRules = false
+
+  const newRules = new Set(currentRules)
+  fixableRules.forEach(rule => newRules.delete(rule))
+  if (newRules.size > 0) {
+    sendRules = true
+  }
+
+  const removedRules = new Set(fixableRules)
+  currentRules.forEach(rule => removedRules.delete(rule))
+  if (removedRules.size > 0) {
+    sendRules = true
+  }
+
+  if (sendRules) {
+    fixableRules.clear()
+    currentRules.forEach(rule => fixableRules.add(rule))
+  }
+}
+
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
-  return cliEngine.executeOnText(contents, filePath)
+  const report = cliEngine.executeOnText(contents, filePath)
+  updateFixableRules(eslint)
+  return report
 }
 
 function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
@@ -39,7 +69,7 @@ module.exports = async () => {
     const configPath = Helpers.getConfigPath(fileDir)
     const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
     if (noProjectConfig && config.disableWhenNoEslintConfig) {
-      emit(emitKey, [])
+      emit(emitKey, { messages: [] })
       return
     }
 
@@ -51,7 +81,12 @@ module.exports = async () => {
     let response
     if (type === 'lint') {
       const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
-      response = report.results.length ? report.results[0].messages : []
+      response = {
+        messages: report.results.length ? report.results[0].messages : []
+      }
+      if (sendRules) {
+        response.fixableRules = Array.from(fixableRules.keys())
+      }
     } else if (type === 'fix') {
       response = fixJob({ cliEngineOptions, contents, eslint, filePath })
     } else if (type === 'debug') {

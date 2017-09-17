@@ -8,6 +8,8 @@ import cryptoRandomString from 'crypto-random-string'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Range } from 'atom'
 
+const fixableRules = new Set()
+
 /**
  * Start the worker process if it hasn't already been started
  * @param  {Task} worker The worker process reference to act on
@@ -61,6 +63,10 @@ export async function sendJob(worker, config) {
       console.error(e)
     }
   })
+}
+
+export function getFixableRules() {
+  return Array.from(fixableRules.values())
 }
 
 export function showError(givenMessage, givenDetail = null) {
@@ -194,14 +200,14 @@ const generateInvalidTrace = async (
 /**
  * Given a raw response from ESLint, this processes the messages into a format
  * compatible with the Linter API.
- * @param  {Object}     response   The raw response from ESLint
+ * @param  {Object}     messages   The messages from ESLint's response
  * @param  {TextEditor} textEditor The Atom::TextEditor of the file the messages belong to
  * @param  {bool}       showRule   Whether to show the rule in the messages
  * @param  {Object}     worker     The current Worker Task to send Debug jobs to
  * @return {Promise}               The messages transformed into Linter messages
  */
-export async function processESLintMessages(response, textEditor, showRule, worker) {
-  return Promise.all(response.map(async ({
+export async function processESLintMessages(messages, textEditor, showRule, worker) {
+  return Promise.all(messages.map(async ({
     fatal, message: originalMessage, line, severity, ruleId, column, fix, endLine, endColumn
   }) => {
     const message = fatal ? originalMessage.split('\n')[0] : originalMessage
@@ -284,4 +290,20 @@ export async function processESLintMessages(response, textEditor, showRule, work
 
     return ret
   }))
+}
+
+/**
+ * Processes the response from the lint job
+ * @param  {Object}     response   The raw response from the job
+ * @param  {TextEditor} textEditor The Atom::TextEditor of the file the messages belong to
+ * @param  {bool}       showRule   Whether to show the rule in the messages
+ * @param  {Object}     worker     The current Worker Task to send Debug jobs to
+ * @return {Promise}               The messages transformed into Linter messages
+ */
+export async function processJobResponse(response, textEditor, showRule, worker) {
+  if (Object.prototype.hasOwnProperty.call(response, 'fixableRules')) {
+    fixableRules.clear()
+    response.fixableRules.forEach(rule => fixableRules.add(rule))
+  }
+  return processESLintMessages(response.messages, textEditor, showRule, worker)
 }

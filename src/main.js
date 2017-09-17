@@ -18,6 +18,7 @@ let lintHtmlFiles
 let ignoredRulesWhenModified
 let ignoredRulesWhenFixing
 let disableWhenNoEslintConfig
+let ignoreFixableRulesWhileTyping
 
 // Internal variables
 const idleCallbacks = new Set()
@@ -136,6 +137,11 @@ module.exports = {
       (ids) => { ignoredRulesWhenFixing = idsToIgnoredRules(ids) }
     ))
 
+    this.subscriptions.add(atom.config.observe(
+      'linter-eslint.ignoreFixableRulesWhileTyping',
+      (value) => { ignoreFixableRulesWhileTyping = value }
+    ))
+
     this.subscriptions.add(atom.contextMenu.add({
       'atom-text-editor:not(.mini), .overlayer': [{
         label: 'ESLint Fix',
@@ -190,13 +196,17 @@ module.exports = {
         }
         const filePath = textEditor.getPath()
 
+        if (!helpers) {
+          helpers = require('./helpers')
+        }
+
         let rules = {}
         if (textEditor.isModified() && Object.keys(ignoredRulesWhenModified).length > 0) {
           rules = ignoredRulesWhenModified
         }
-
-        if (!helpers) {
-          helpers = require('./helpers')
+        if (textEditor.isModified() && ignoreFixableRulesWhileTyping) {
+          // Note that this list will only contain rules after the first lint job
+          rules = idsToIgnoredRules(helpers.getFixableRules())
         }
 
         if (!this.worker) {
@@ -221,7 +231,7 @@ module.exports = {
            */
           return null
         }
-        return helpers.processESLintMessages(response, textEditor, showRule, this.worker)
+        return helpers.processJobResponse(response, textEditor, showRule, this.worker)
       }
     }
   },
