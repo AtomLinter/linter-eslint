@@ -69,26 +69,9 @@ export function getFixableRules() {
   return Array.from(fixableRules.values())
 }
 
-export function showError(givenMessage, givenDetail = null) {
-  let detail
-  let message
-  if (givenMessage instanceof Error) {
-    // mdn.io/Destructuring_assignment#Assignment_without_declaration
-    ({ stack: detail, message } = givenMessage)
-  } else {
-    detail = givenDetail
-    message = givenMessage
-  }
-  atom.notifications.addError(`[Linter-ESLint] ${message}`, {
-    detail,
-    dismissable: true
-  })
-}
-
-function validatePoint(textEditor, line, col) {
-  const buffer = textEditor.getBuffer()
+function validatePoint(textBuffer, line, col) {
   // Clip the given point to a valid one, and check if it equals the original
-  if (!buffer.clipPosition([line, col]).isEqual([line, col])) {
+  if (!textBuffer.clipPosition([line, col]).isEqual([line, col])) {
     throw new Error(`${line}:${col} isn't a valid point!`)
   }
 }
@@ -156,10 +139,25 @@ export async function generateDebugString(worker) {
   return details.join('\n')
 }
 
-const generateInvalidTrace = async (
+export function handleError(textEditor, error) {
+  const { stack, message } = error
+  // Only show the first line of the message as the excerpt
+  const excerpt = `Error while running ESLint: ${message.split('\n')[0]}.`
+  return [{
+    severity: 'error',
+    excerpt,
+    description: `<div style="white-space: pre-wrap">${message}\n<hr />${stack}</div>`,
+    location: {
+      file: textEditor.getPath(),
+      position: generateRange(textEditor),
+    },
+  }]
+}
+
+const generateInvalidTrace = async ({
   msgLine, msgCol, msgEndLine, msgEndCol,
   eslintFullRange, filePath, textEditor, ruleId, message, worker
-) => {
+}) => {
   let errMsgRange = `${msgLine + 1}:${msgCol}`
   if (eslintFullRange) {
     errMsgRange += ` - ${msgEndLine + 1}:${msgEndCol + 1}`
@@ -247,27 +245,28 @@ export async function processESLintMessages(messages, textEditor, showRule, work
       msgCol = typeof column !== 'undefined' ? column - 1 : column
     }
 
-    let ret
+    let ret = {
+      severity: severity === 1 ? 'warning' : 'error',
+      location: {
+        file: filePath,
+      }
+    }
+
+    if (ruleId) {
+      ret.url = ruleURI(ruleId).url
+    }
+
     let range
     try {
       if (eslintFullRange) {
-        validatePoint(textEditor, msgLine, msgCol)
-        validatePoint(textEditor, msgEndLine, msgEndCol)
+        const buffer = textEditor.getBuffer()
+        validatePoint(buffer, msgLine, msgCol)
+        validatePoint(buffer, msgEndLine, msgEndCol)
         range = [[msgLine, msgCol], [msgEndLine, msgEndCol]]
       } else {
         range = generateRange(textEditor, msgLine, msgCol)
       }
-      ret = {
-        severity: severity === 1 ? 'warning' : 'error',
-        location: {
-          file: filePath,
-          position: range
-        }
-      }
-
-      if (ruleId) {
-        ret.url = ruleURI(ruleId).url
-      }
+      ret.location.position = range
 
       const ruleAppendix = showRule ? ` (${ruleId || 'Fatal'})` : ''
       ret.excerpt = `${message}${ruleAppendix}`
@@ -276,16 +275,18 @@ export async function processESLintMessages(messages, textEditor, showRule, work
         ret.solutions = [linterFix]
       }
     } catch (err) {
-      if (!err.message.startsWith('Line number ') &&
-        !err.message.startsWith('Column start ')
-      ) {
-        // This isn't an invalid point error from `generateRange`, re-throw it
-        throw err
-      }
-      ret = await generateInvalidTrace(
-        msgLine, msgCol, msgEndLine, msgEndCol,
-        eslintFullRange, filePath, textEditor, ruleId, message, worker
-      )
+      ret = await generateInvalidTrace({
+        msgLine,
+        msgCol,
+        msgEndLine,
+        msgEndCol,
+        eslintFullRange,
+        filePath,
+        textEditor,
+        ruleId,
+        message,
+        worker
+      })
     }
 
     return ret
