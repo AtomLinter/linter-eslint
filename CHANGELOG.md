@@ -1,5 +1,13 @@
 # Changelog
 
+## v8.3.1
+
+*   Fix deprecation warning in Atom v1.21.0 ([#1019][])
+*   Don't attempt to process fixable rules on ESLint v3 ([#1024][])
+
+[#1019]: https://github.com/AtomLinter/linter-eslint/pull/1019
+[#1024]: https://github.com/AtomLinter/linter-eslint/pull/1024
+
 ## v8.3.0
 
 *   Stop breaking `BABEL_ENV` within Atom ([#961][])
