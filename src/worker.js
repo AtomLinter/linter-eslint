@@ -29,7 +29,10 @@ function updateFixableRules(linter) {
   // Build a set of fixable rules based on the rules loaded in the provided linter
   const currentRules = new Set()
   linter.getRules().forEach((props, rule) => {
-    if (Object.prototype.hasOwnProperty.call(props.meta, 'fixable')) {
+    if (
+      Object.prototype.hasOwnProperty.call(props, 'meta') &&
+      Object.prototype.hasOwnProperty.call(props.meta, 'fixable')
+    ) {
       currentRules.add(rule)
     }
   })
