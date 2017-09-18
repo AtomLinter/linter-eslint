@@ -21,6 +21,11 @@ let sendRules = false
  * @return {void}
  */
 function updateFixableRules(linter) {
+  if (linter === undefined) {
+    // ESLint < v4 doesn't support this property
+    return
+  }
+
   // Build a set of fixable rules based on the rules loaded in the provided linter
   const currentRules = new Set()
   linter.getRules().forEach((props, rule) => {
