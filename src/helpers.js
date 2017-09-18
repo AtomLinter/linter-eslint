@@ -239,7 +239,17 @@ export async function processESLintMessages(response, textEditor, showRule, work
       msgCol = typeof column !== 'undefined' ? column - 1 : column
     }
 
-    let ret
+    let ret = {
+      severity: severity === 1 ? 'warning' : 'error',
+      location: {
+        file: filePath,
+      }
+    }
+
+    if (ruleId) {
+      ret.url = ruleURI(ruleId).url
+    }
+
     let range
     try {
       if (eslintFullRange) {
@@ -250,17 +260,7 @@ export async function processESLintMessages(response, textEditor, showRule, work
       } else {
         range = generateRange(textEditor, msgLine, msgCol)
       }
-      ret = {
-        severity: severity === 1 ? 'warning' : 'error',
-        location: {
-          file: filePath,
-          position: range
-        }
-      }
-
-      if (ruleId) {
-        ret.url = ruleURI(ruleId).url
-      }
+      ret.location.position = range
 
       const ruleAppendix = showRule ? ` (${ruleId || 'Fatal'})` : ''
       ret.excerpt = `${message}${ruleAppendix}`
