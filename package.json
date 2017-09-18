@@ -106,7 +106,7 @@
     },
     "ignoreFixableRulesWhileTyping": {
       "title": "Ignore fixable rules while typing",
-      "description": "Have the linter ignore all fixable rules during linting when editing a document. The list is automatically updated on each lint job, and requires at least one run to be populated.",
+      "description": "Have the linter ignore all fixable rules during linting when editing a document. The list is automatically updated on each lint job, and requires at least one run to be populated. Only supported when using ESLint v4+.",
       "type": "boolean",
       "default": false
     }
