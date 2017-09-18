@@ -12,9 +12,7 @@ process.title = 'linter-eslint helper'
 const fixableRules = new Set()
 let sendRules = false
 
-function updateFixableRules(eslint) {
-  const { Linter } = eslint
-  const linter = new Linter()
+function updateFixableRules(linter) {
   const currentRules = new Set()
   linter.getRules().forEach((props, rule) => {
     if (Object.prototype.hasOwnProperty.call(props.meta, 'fixable')) {
@@ -45,7 +43,7 @@ function updateFixableRules(eslint) {
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
-  updateFixableRules(eslint)
+  updateFixableRules(cliEngine.linter)
   return report
 }
 

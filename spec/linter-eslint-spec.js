@@ -25,6 +25,7 @@ const fixtures = {
   modifiedIgnoreSpace: ['modified-ignore-rule', 'foo-space.js'],
   importing: ['import-resolution', 'nested', 'importing.js'],
   badImport: ['import-resolution', 'nested', 'badImport.js'],
+  fixablePlugin: ['plugin-import', 'life.js'],
   eslintignoreDir: ['eslintignore'],
   eslintIgnoreKeyDir: ['configs', 'eslintignorekey']
 }
@@ -431,6 +432,32 @@ describe('The eslint provider for Linter', () => {
       // Check the lint results
       const newMessages = await lint(editor)
       checkAfter(newMessages)
+    })
+
+    it('allows ignoring fixible rules from plugins while typing', async () => {
+      expectedPath = paths.fixablePlugin
+      const editor = await atom.workspace.open(expectedPath)
+
+      // Verify no error before the editor is modified
+      const firstMessages = await lint(editor)
+      expect(firstMessages.length).toBe(0)
+
+      // Remove the newline between the import and console log
+      editor.getBuffer().deleteRow(1)
+
+      // Verify there is an error for the fixable import/newline-after-import rule
+      const messages = await lint(editor)
+      expect(messages.length).toBe(1)
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe('Expected empty line after import statement not followed by another import. (import/newline-after-import)')
+
+      // Enable the option under test
+      // NOTE: Depends on mport/newline-after-import rule being marked as fixable
+      atom.config.set('linter-eslint.ignoreFixableRulesWhileTyping', true)
+
+      // Check the lint results
+      const newMessages = await lint(editor)
+      expect(newMessages.length).toBe(0)
     })
   })
 
