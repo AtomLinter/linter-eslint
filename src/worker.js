@@ -12,7 +12,16 @@ process.title = 'linter-eslint helper'
 const fixableRules = new Set()
 let sendRules = false
 
+/**
+ * Modifies the closed-over fixableRules variable when called _if_ there are
+ * newly-loaded fixable rules or fixable rules are removed from the set of all
+ * loaded rules, according to the eslint `linter` instance that is passed in.
+ *
+ * @param  {Object} linter eslint 'linter' instance
+ * @return {void}
+ */
 function updateFixableRules(linter) {
+  // Build a set of fixable rules based on the rules loaded in the provided linter
   const currentRules = new Set()
   linter.getRules().forEach((props, rule) => {
     if (Object.prototype.hasOwnProperty.call(props.meta, 'fixable')) {
@@ -20,14 +29,17 @@ function updateFixableRules(linter) {
     }
   })
 
+  // Unless something has changed, we won't need to send updated set of fixableRules
   sendRules = false
 
+  // Check for new fixable rules added since the last time we sent fixableRules
   const newRules = new Set(currentRules)
   fixableRules.forEach(rule => newRules.delete(rule))
   if (newRules.size > 0) {
     sendRules = true
   }
 
+  // Check for fixable rules that were removed since the last time we sent fixableRules
   const removedRules = new Set(fixableRules)
   currentRules.forEach(rule => removedRules.delete(rule))
   if (removedRules.size > 0) {
@@ -35,6 +47,7 @@ function updateFixableRules(linter) {
   }
 
   if (sendRules) {
+    // Rebuild fixableRules
     fixableRules.clear()
     currentRules.forEach(rule => fixableRules.add(rule))
   }
@@ -43,6 +56,8 @@ function updateFixableRules(linter) {
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
+  // Use the internal (undocumented) `linter` instance attached to the cliEngine
+  // to check the loaded rules (including plugin rules) and update our list of fixable rules.
   updateFixableRules(cliEngine.linter)
   return report
 }
