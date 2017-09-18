@@ -1,5 +1,26 @@
 # Changelog
 
+## v8.3.0
+
+*   Stop breaking `BABEL_ENV` within Atom ([#961][])
+*   Handle empty `projectPath` in diagnostic command ([#962][])
+*   Set `cwd` to project directory if no `.eslintignore` is found ([#965][])
+*   Update to ESLint v4.6.0 internally ([#938][], [#997][])
+*   Add a right click command to trigger a fix job ([#963][])
+*   Ignore invalid `TextEditor`s for fix jobs ([#978][])
+*   Handle ESLint errors as a lint message ([#1015][])
+*   Add option to silence fixable rules while typing ([#1018][])
+
+[#938]: https://github.com/AtomLinter/linter-eslint/pull/938
+[#961]: https://github.com/AtomLinter/linter-eslint/pull/961
+[#962]: https://github.com/AtomLinter/linter-eslint/pull/962
+[#963]: https://github.com/AtomLinter/linter-eslint/pull/963
+[#965]: https://github.com/AtomLinter/linter-eslint/pull/965
+[#978]: https://github.com/AtomLinter/linter-eslint/pull/978
+[#997]: https://github.com/AtomLinter/linter-eslint/pull/997
+[#1015]: https://github.com/AtomLinter/linter-eslint/pull/1015
+[#1018]: https://github.com/AtomLinter/linter-eslint/pull/1018
+
 ## v8.2.1
 
 *   Prevent users `.babelrc` from breaking building the package ([#922](https://github.com/AtomLinter/linter-eslint/pull/922))
