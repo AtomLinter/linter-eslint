@@ -203,25 +203,29 @@ module.exports = {
           await waitOnIdle()
         }
 
-        const response = await helpers.sendJob(this.worker, {
-          type: 'lint',
-          contents: text,
-          config: atom.config.get('linter-eslint'),
-          rules,
-          filePath,
-          projectPath: atom.project.relativizePath(filePath)[0] || ''
-        })
-
-        if (textEditor.getText() !== text) {
-          /*
-             The editor text has been modified since the lint was triggered,
-             as we can't be sure that the results will map properly back to
-             the new contents, simply return `null` to tell the
-             `provideLinter` consumer not to update the saved results.
-           */
-          return null
+        let response
+        try {
+          response = await helpers.sendJob(this.worker, {
+            type: 'lint',
+            contents: text,
+            config: atom.config.get('linter-eslint'),
+            rules,
+            filePath,
+            projectPath: atom.project.relativizePath(filePath)[0] || ''
+          })
+          if (textEditor.getText() !== text) {
+            /*
+            The editor text has been modified since the lint was triggered,
+            as we can't be sure that the results will map properly back to
+            the new contents, simply return `null` to tell the
+            `provideLinter` consumer not to update the saved results.
+            */
+            return null
+          }
+          return helpers.processESLintMessages(response, textEditor, showRule, this.worker)
+        } catch (error) {
+          return helpers.handleError(textEditor, error)
         }
-        return helpers.processESLintMessages(response, textEditor, showRule, this.worker)
       }
     }
   },
