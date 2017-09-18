@@ -155,11 +155,9 @@ module.exports = {
           // Compares the private component property of the active TextEditor
           //   against the components of the elements
           const evtIsActiveEditor = evt.path.some(elem =>
-            // Atom v1.19.0
+            // Atom v1.19.0+
             (elem.component && activeEditor.component &&
-              elem.component === activeEditor.component) ||
-            // Atom v1.18.0
-            (activeEditor.editorElement === elem))
+              elem.component === activeEditor.component))
           // Only show if it was the active editor and it is a valid scope
           return evtIsActiveEditor && validScope(activeEditor)
         }
