@@ -1,5 +1,11 @@
 # Changelog
 
+## v8.3.2
+
+*   Verify that a rule has a meta property before accessing ([#1026][])
+
+[#1026]: https://github.com/AtomLinter/linter-eslint/pull/1026
+
 ## v8.3.1
 
 *   Fix deprecation warning in Atom v1.21.0 ([#1019][])
