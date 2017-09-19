@@ -13,11 +13,13 @@ const Cache = {
   LAST_MODULES_PATH: null
 }
 
-const cleanPath = (path) => {
-  const unTildeify = fs.normalize(path)
-  const unEnvVarify = resolveEnv(unTildeify)
-  return unEnvVarify
-}
+/**
+ * Takes a path and translates `~` to the user's home directory, and replaces
+ * all environment variables with their value.
+ * @param  {string} path The path to remove "strangeness" from
+ * @return {string}      The cleaned path
+ */
+const cleanPath = path => (path ? resolveEnv(fs.normalize(path)) : '')
 
 export function getNodePrefixPath() {
   if (Cache.NODE_PREFIX_PATH === null) {
@@ -51,7 +53,7 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
   let locationType = null
   if (config.useGlobalEslint) {
     locationType = 'global'
-    const configGlobal = config.globalNodePath && cleanPath(config.globalNodePath)
+    const configGlobal = cleanPath(config.globalNodePath)
     const prefixPath = configGlobal || getNodePrefixPath()
     // NPM on Windows and Yarn on all platforms
     eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
@@ -64,7 +66,7 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
     eslintDir = Path.join(modulesDir || '', 'eslint')
   } else if (Path.isAbsolute(cleanPath(config.advancedLocalNodeModules))) {
     locationType = 'advanced specified'
-    eslintDir = Path.join(cleanPath(config.advancedLocalNodeModules) || '', 'eslint')
+    eslintDir = Path.join(cleanPath(config.advancedLocalNodeModules), 'eslint')
   } else {
     locationType = 'advanced specified'
     eslintDir = Path.join(projectPath || '', config.advancedLocalNodeModules, 'eslint')
