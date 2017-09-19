@@ -203,8 +203,10 @@ module.exports = {
         if (filePath.includes('://')) {
           // If the path is a URL (Nuclide remote file) return a message
           // telling the user we are unable to work on remote files.
-          const message = 'Remote file open, impossible to run ESLint.'
-          helpers.handleError(textEditor, new Error(message))
+          return helpers.generateUserMessage(textEditor, {
+            severity: 'warning',
+            excerpt: 'Remote file open, linter-eslint is disabled for this file.',
+          })
         }
 
         const text = textEditor.getText()
