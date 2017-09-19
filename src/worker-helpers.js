@@ -69,7 +69,7 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
     eslintDir = Path.join(cleanPath(config.advancedLocalNodeModules), 'eslint')
   } else {
     locationType = 'advanced specified'
-    eslintDir = Path.join(projectPath || '', config.advancedLocalNodeModules, 'eslint')
+    eslintDir = Path.join(projectPath || '', cleanPath(config.advancedLocalNodeModules), 'eslint')
   }
   if (isDirectory(eslintDir)) {
     return {
