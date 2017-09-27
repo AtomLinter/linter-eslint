@@ -139,19 +139,45 @@ export async function generateDebugString(worker) {
   return details.join('\n')
 }
 
-export function handleError(textEditor, error) {
-  const { stack, message } = error
-  // Only show the first line of the message as the excerpt
-  const excerpt = `Error while running ESLint: ${message.split('\n')[0]}.`
+/**
+ * Turn the given options into a Linter message array
+ * @param  {TextEditor} textEditor The TextEditor to use to build the message
+ * @param  {Object} options    The parameters used to fill in the message
+ * @param  {string} [options.severity='error'] Can be one of: 'error', 'warning', 'info'
+ * @param  {string} [options.excerpt=''] Short text to use in the message
+ * @param  {string|Function} [options.description] Used to provide additional information
+ * @return {Array}            Message to user generated from the parameters
+ */
+export function generateUserMessage(textEditor, options) {
+  const {
+    severity = 'error',
+    excerpt = '',
+    description,
+  } = options
   return [{
-    severity: 'error',
+    severity,
     excerpt,
-    description: `<div style="white-space: pre-wrap">${message}\n<hr />${stack}</div>`,
+    description,
     location: {
       file: textEditor.getPath(),
       position: generateRange(textEditor),
     },
   }]
+}
+
+/**
+ * Generates a message to the user in order to nicely display the Error being
+ * thrown instead of depending on generic error handling.
+ * @param  {TextEditor} textEditor The TextEditor to use to build the message
+ * @param  {Error} error      Error to generate a message for
+ * @return {Array}            Message to user generated from the Error
+ */
+export function handleError(textEditor, error) {
+  const { stack, message } = error
+  // Only show the first line of the message as the excerpt
+  const excerpt = `Error while running ESLint: ${message.split('\n')[0]}.`
+  const description = `<div style="white-space: pre-wrap">${message}\n<hr />${stack}</div>`
+  return generateUserMessage(textEditor, { severity: 'error', excerpt, description })
 }
 
 const generateInvalidTrace = async ({
