@@ -1,5 +1,15 @@
 # Changelog
 
+## v8.4.0
+
+*   Normalize all config paths ([#1014][])
+*   Check for remote files ([#1017][])
+*   Allow multiple rule directories ([#1016][])
+
+[#1014]: https://github.com/AtomLinter/linter-eslint/pull/1014
+[#1016]: https://github.com/AtomLinter/linter-eslint/pull/1016
+[#1017]: https://github.com/AtomLinter/linter-eslint/pull/1017
+
 ## v8.3.2
 
 *   Verify that a rule has a meta property before accessing ([#1026][])
