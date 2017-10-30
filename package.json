@@ -45,12 +45,6 @@
       "default": "",
       "order": 4
     },
-    "disableWhenNoEslintConfig": {
-      "title": "Disable when no ESLint config is found (in package.json or .eslintrc)",
-      "type": "boolean",
-      "default": true,
-      "order": 5
-    },
     "eslintrcPath": {
       "title": ".eslintrc Path",
       "description": "It will only be used when there's no config file in project",
@@ -94,32 +88,43 @@
       "default": false,
       "order": 11
     },
-    "rulesToDisableWhileFixing": {
-      "title": "Disable specific rules from fixes",
-      "description": "Prevent rules from being auto-fixed by ESLint. Applies to fixes made during saves as well as when running the `Linter Eslint: Fix File` command.",
-      "type": "array",
-      "default": [],
-      "items": {
-        "type": "string"
-      },
-      "order": 12
-    },
-    "ignoreFixableRulesWhileTyping": {
-      "title": "Ignore fixable rules while typing",
-      "description": "Have the linter ignore all fixable rules during linting when editing a document. The list is automatically updated on each lint job, and requires at least one run to be populated. Only supported when using ESLint v4+.",
-      "type": "boolean",
-      "default": false,
-      "order": 13
-    },
-    "rulesToSilenceWhileTyping": {
-      "title": "Silence specific rules while typing",
-      "description": "Useful when Atom fixes errors on save like `no-trailing-spaces` or `eol-last`.",
-      "type": "array",
-      "default": [],
-      "items": {
-        "type": "string"
-      },
-      "order": 14
+    "disabling": {
+      "type": "object",
+      "properties": {
+        "disableWhenNoEslintConfig": {
+          "title": "Disable when no ESLint config is found (in package.json or .eslintrc)",
+          "type": "boolean",
+          "default": true,
+          "order": 1
+        },
+        "ignoreFixableRulesWhileTyping": {
+          "title": "Ignore fixable rules while typing",
+          "description": "Have the linter ignore all fixable rules during linting when editing a document. The list is automatically updated on each lint job, and requires at least one run to be populated. Only supported when using ESLint v4+.",
+          "type": "boolean",
+          "default": false,
+          "order": 2
+        },
+        "rulesToDisableWhileFixing": {
+          "title": "Disable specific rules from fixes",
+          "description": "Prevent rules from being auto-fixed by ESLint. Applies to fixes made during saves as well as when running the `Linter Eslint: Fix File` command.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "order": 3
+        },
+        "rulesToSilenceWhileTyping": {
+          "title": "Silence specific rules while typing",
+          "description": "Useful when Atom fixes errors on save like `no-trailing-spaces` or `eol-last`.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "order": 4
+        }
+      }
     },
     "advancedLocalNodeModules": {
       "title": "Path to the local node_modules folder",

@@ -298,7 +298,7 @@ describe('The eslint provider for Linter', () => {
     })
 
     it('should not fix linting errors for rules that are disabled with rulesToDisableWhileFixing', async () => {
-      atom.config.set('linter-eslint.rulesToDisableWhileFixing', ['semi'])
+      atom.config.set('linter-eslint.disabling.rulesToDisableWhileFixing', ['semi'])
 
       await firstLint(editor)
       await makeFixes(editor)
@@ -382,8 +382,8 @@ describe('The eslint provider for Linter', () => {
     }
 
     it('does nothing on saved files', async () => {
-      atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
-      atom.config.set('linter-eslint.ignoreFixableRulesWhileTyping', true)
+      atom.config.set('linter-eslint.disabling.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
+      atom.config.set('linter-eslint.disabling.ignoreFixableRulesWhileTyping', true)
       expectedPath = paths.modifiedIgnoreSpace
       const editor = await atom.workspace.open(expectedPath)
       // Run once to populate the fixable rules list
@@ -409,7 +409,7 @@ describe('The eslint provider for Linter', () => {
       checkNew(messages)
 
       // Enable the option under test
-      atom.config.set('linter-eslint.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
+      atom.config.set('linter-eslint.disabling.rulesToSilenceWhileTyping', ['no-trailing-spaces'])
 
       // Check the lint results
       const newMessages = await lint(editor)
@@ -433,7 +433,7 @@ describe('The eslint provider for Linter', () => {
 
       // Enable the option under test
       // NOTE: Depends on no-trailing-spaces being marked as fixable by ESLint
-      atom.config.set('linter-eslint.ignoreFixableRulesWhileTyping', true)
+      atom.config.set('linter-eslint.disabling.ignoreFixableRulesWhileTyping', true)
 
       // Check the lint results
       const newMessages = await lint(editor)
@@ -459,7 +459,7 @@ describe('The eslint provider for Linter', () => {
 
       // Enable the option under test
       // NOTE: Depends on mport/newline-after-import rule being marked as fixable
-      atom.config.set('linter-eslint.ignoreFixableRulesWhileTyping', true)
+      atom.config.set('linter-eslint.disabling.ignoreFixableRulesWhileTyping', true)
 
       // Check the lint results
       const newMessages = await lint(editor)
@@ -516,7 +516,7 @@ describe('The eslint provider for Linter', () => {
     let tempFixtureDir
 
     beforeEach(async () => {
-      atom.config.set('linter-eslint.disableWhenNoEslintConfig', false)
+      atom.config.set('linter-eslint.disabling.disableWhenNoEslintConfig', false)
 
       tempFilePath = await copyFileToTempDir(paths.badInline)
       editor = await atom.workspace.open(tempFilePath)
@@ -549,7 +549,7 @@ describe('The eslint provider for Linter', () => {
     let tempFixtureDir
 
     beforeEach(async () => {
-      atom.config.set('linter-eslint.disableWhenNoEslintConfig', true)
+      atom.config.set('linter-eslint.disabling.disableWhenNoEslintConfig', true)
 
       const tempFilePath = await copyFileToTempDir(paths.badInline)
       editor = await atom.workspace.open(tempFilePath)

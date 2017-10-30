@@ -52,7 +52,7 @@ module.exports = async () => {
       const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
       const configPath = Helpers.getConfigPath(fileDir)
       const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
-      if (noProjectConfig && config.disableWhenNoEslintConfig) {
+      if (noProjectConfig && config.disabling.disableWhenNoEslintConfig) {
         emit(emitKey, { messages: [] })
         return
       }
