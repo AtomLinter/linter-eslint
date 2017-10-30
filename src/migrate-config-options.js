@@ -21,7 +21,32 @@ const directMoveMigrations = [
     /* Added November, 2017 */
     old: 'linter-eslint.rulesToSilenceWhileTyping',
     new: 'linter-eslint.disabling.rulesToSilenceWhileTyping'
-  }
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.disableEslintIgnore',
+    new: 'linter-eslint.advanced.disableEslintIgnore'
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.disableFSCache',
+    new: 'linter-eslint.advanced.disableFSCache'
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.showRuleIdInMessage',
+    new: 'linter-eslint.advanced.showRuleIdInMessage'
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.eslintrcPath',
+    new: 'linter-eslint.advanced.eslintrcPath'
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.advancedLocalNodeModules',
+    new: 'linter-eslint.advanced.advancedLocalNodeModules'
+  },
 ]
 
 function migrateConfigOptions() {

@@ -12,11 +12,19 @@ const globalNodePath = process.platform === 'win32' ?
   Path.join(getFixturesPath('global-eslint'), 'lib') :
   getFixturesPath('global-eslint')
 
+function createConfig(overrides = {}) {
+  return {
+    ...overrides,
+    disabling: { ...overrides.disabling },
+    advanced: { ...overrides.advanced },
+  }
+}
+
 describe('Worker Helpers', () => {
   describe('findESLintDirectory', () => {
     it('returns an object with path and type keys', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const foundEslint = Helpers.findESLintDirectory(modulesDir, {})
+      const foundEslint = Helpers.findESLintDirectory(modulesDir, createConfig())
       expect(typeof foundEslint === 'object').toBe(true)
       expect(foundEslint.path).toBeDefined()
       expect(foundEslint.type).toBeDefined()
@@ -24,7 +32,8 @@ describe('Worker Helpers', () => {
 
     it('finds a local eslint when useGlobalEslint is false', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const foundEslint = Helpers.findESLintDirectory(modulesDir, { useGlobalEslint: false })
+      const config = createConfig({ useGlobalEslint: false })
+      const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedEslintPath = Path.join(getFixturesPath('local-eslint'), 'node_modules', 'eslint')
       expect(foundEslint.path).toEqual(expectedEslintPath)
       expect(foundEslint.type).toEqual('local project')
@@ -32,7 +41,7 @@ describe('Worker Helpers', () => {
 
     it('does not find a local eslint when useGlobalEslint is true', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const config = { useGlobalEslint: true, globalNodePath }
+      const config = createConfig({ useGlobalEslint: true, globalNodePath })
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedEslintPath = Path.join(getFixturesPath('local-eslint'), 'node_modules', 'eslint')
       expect(foundEslint.path).not.toEqual(expectedEslintPath)
@@ -41,7 +50,7 @@ describe('Worker Helpers', () => {
 
     it('finds a global eslint when useGlobalEslint is true and a valid globalNodePath is provided', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const config = { useGlobalEslint: true, globalNodePath }
+      const config = createConfig({ useGlobalEslint: true, globalNodePath })
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedEslintPath = process.platform === 'win32'
         ? Path.join(globalNodePath, 'node_modules', 'eslint')
@@ -52,7 +61,7 @@ describe('Worker Helpers', () => {
 
     it('falls back to the packaged eslint when no local eslint is found', () => {
       const modulesDir = 'not/a/real/path'
-      const config = { useGlobalEslint: false }
+      const config = createConfig({ useGlobalEslint: false })
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedBundledPath = Path.join(__dirname, '..', 'node_modules', 'eslint')
       expect(foundEslint.path).toEqual(expectedBundledPath)
@@ -65,56 +74,62 @@ describe('Worker Helpers', () => {
 
     it('tries to find an indirect local eslint using an absolute path', () => {
       const path = Path.join(getFixturesPath('indirect-local-eslint'), pathPart)
-      const eslint = Helpers.getESLintInstance('', {
+      const config = createConfig({
         useGlobalEslint: false,
-        advancedLocalNodeModules: path
+        advanced: { advancedLocalNodeModules: path }
       })
+      const eslint = Helpers.getESLintInstance('', config)
       expect(eslint).toBe('located')
     })
 
     it('tries to find an indirect local eslint using a relative path', () => {
       const path = Path.join(getFixturesPath('indirect-local-eslint'), pathPart)
       const [projectPath, relativePath] = atom.project.relativizePath(path)
-
-      const eslint = Helpers.getESLintInstance('', {
+      const config = createConfig({
         useGlobalEslint: false,
-        advancedLocalNodeModules: relativePath
-      }, projectPath)
+        advanced: { advancedLocalNodeModules: relativePath }
+      })
+      const eslint = Helpers.getESLintInstance('', config, projectPath)
 
       expect(eslint).toBe('located')
     })
 
     it('tries to find a local eslint', () => {
-      const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), {})
+      const config = createConfig()
+      const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
       expect(eslint).toBe('located')
     })
 
     it('cries if local eslint is not found', () => {
       expect(() => {
-        Helpers.getESLintInstance(getFixturesPath('files', {}))
+        const config = createConfig()
+        Helpers.getESLintInstance(getFixturesPath('files', config))
       }).toThrow()
     })
 
     it('tries to find a global eslint if config is specified', () => {
-      const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), {
+      const config = createConfig({
         useGlobalEslint: true,
         globalNodePath
       })
+      const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
       expect(eslint).toBe('located')
     })
 
     it('cries if global eslint is not found', () => {
       expect(() => {
-        Helpers.getESLintInstance(getFixturesPath('local-eslint'), {
+        const config = createConfig({
           useGlobalEslint: true,
           globalNodePath: getFixturesPath('files')
         })
+        Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
       }).toThrow()
     })
 
     it('tries to find a local eslint with nested node_modules', () => {
       const fileDir = Path.join(getFixturesPath('local-eslint'), 'lib', 'foo.js')
-      const eslint = Helpers.getESLintInstance(fileDir, {})
+      const config = createConfig()
+      const eslint = Helpers.getESLintInstance(fileDir, config)
       expect(eslint).toBe('located')
     })
   })
@@ -167,7 +182,8 @@ describe('Worker Helpers', () => {
     it('return path relative of ignore file if found', () => {
       const fixtureDir = getFixturesPath('eslintignore')
       const fixtureFile = Path.join(fixtureDir, 'ignored.js')
-      const relativePath = Helpers.getRelativePath(fixtureDir, fixtureFile, {})
+      const config = createConfig()
+      const relativePath = Helpers.getRelativePath(fixtureDir, fixtureFile, config)
       const expectedPath = Path.relative(Path.join(__dirname, '..'), fixtureFile)
       expect(relativePath).toBe(expectedPath)
     })
@@ -175,8 +191,11 @@ describe('Worker Helpers', () => {
     it('does not return path relative to ignore file if config overrides it', () => {
       const fixtureDir = getFixturesPath('eslintignore')
       const fixtureFile = Path.join(fixtureDir, 'ignored.js')
+      const config = createConfig({
+        advanced: { disableEslintIgnore: true }
+      })
       const relativePath =
-        Helpers.getRelativePath(fixtureDir, fixtureFile, { disableEslintIgnore: true })
+        Helpers.getRelativePath(fixtureDir, fixtureFile, config)
       expect(relativePath).toBe('ignored.js')
     })
 
@@ -187,8 +206,9 @@ describe('Worker Helpers', () => {
       const tempDir = Path.dirname(tempFixturePath)
       const filepath = Path.join(tempDir, 'good.js')
       const tempDirParent = Path.dirname(tempDir)
+      const config = createConfig()
 
-      const relativePath = Helpers.getRelativePath(tempDir, filepath, {}, tempDirParent)
+      const relativePath = Helpers.getRelativePath(tempDir, filepath, config, tempDirParent)
       // Since the project is the parent of the temp dir, the relative path should be
       // the dir containing the file, plus the file. (e.g. asgln3/good.js)
       const expectedPath = Path.join(Path.basename(tempDir), 'good.js')
@@ -203,8 +223,9 @@ describe('Worker Helpers', () => {
       const tempFixturePath = await copyFileToTempDir(fixtureFile)
       const tempDir = Path.dirname(tempFixturePath)
       const filepath = Path.join(tempDir, 'good.js')
+      const config = createConfig()
 
-      const relativePath = Helpers.getRelativePath(tempDir, filepath, {}, null)
+      const relativePath = Helpers.getRelativePath(tempDir, filepath, config, null)
       expect(relativePath).toBe('good.js')
 
       // Remove the temporary directory

@@ -113,8 +113,8 @@ describe('The eslint provider for Linter', () => {
   const { lint } = linterProvider
 
   beforeEach(async () => {
-    atom.config.set('linter-eslint.disableFSCache', false)
-    atom.config.set('linter-eslint.disableEslintIgnore', true)
+    atom.config.set('linter-eslint.advanced.disableFSCache', false)
+    atom.config.set('linter-eslint.advanced.disableEslintIgnore', true)
 
     // Activate the JavaScript language so Atom knows what the files are
     await atom.packages.activatePackage('language-javascript')
@@ -206,7 +206,7 @@ describe('The eslint provider for Linter', () => {
 
   describe('when a file is specified in an .eslintignore file', () => {
     beforeEach(() => {
-      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      atom.config.set('linter-eslint.advanced.disableEslintIgnore', false)
     })
 
     it('will not give warnings when linting the file', async () => {
@@ -233,7 +233,7 @@ describe('The eslint provider for Linter', () => {
       const tempDir = path.dirname(tempPath)
 
       const editor = await atom.workspace.open(tempPath)
-      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      atom.config.set('linter-eslint.advanced.disableEslintIgnore', false)
       await copyFileToDir(path.join(paths.eslintignoreDir, '.eslintrc.yaml'), tempDir)
 
       const messages = await lint(editor)
@@ -244,7 +244,7 @@ describe('The eslint provider for Linter', () => {
 
   describe('when a file is specified in an eslintIgnore key in package.json', () => {
     it('will still lint the file if an .eslintignore file is present', async () => {
-      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      atom.config.set('linter-eslint.advanced.disableEslintIgnore', false)
       const editor = await atom.workspace.open(path.join(paths.eslintIgnoreKeyDir, 'ignored.js'))
       const messages = await lint(editor)
 
@@ -256,7 +256,7 @@ describe('The eslint provider for Linter', () => {
       const tempDir = path.dirname(tempPath)
 
       const editor = await atom.workspace.open(tempPath)
-      atom.config.set('linter-eslint.disableEslintIgnore', false)
+      atom.config.set('linter-eslint.advanced.disableEslintIgnore', false)
       await copyFileToDir(path.join(paths.eslintIgnoreKeyDir, 'package.json'), tempDir)
 
       const messages = await lint(editor)
@@ -571,7 +571,7 @@ describe('The eslint provider for Linter', () => {
     it('works when the cache fails', async () => {
       // Ensure the cache is enabled, since we will be taking advantage of
       // a failing in it's operation
-      atom.config.set('linter-eslint.disableFSCache', false)
+      atom.config.set('linter-eslint.advanced.disableFSCache', false)
       const fooPath = path.join(paths.badCache, 'temp', 'foo.js')
       const newConfigPath = path.join(paths.badCache, 'temp', '.eslintrc.js')
       const editor = await atom.workspace.open(fooPath)
@@ -658,7 +658,7 @@ describe('The eslint provider for Linter', () => {
     const expectedUrl = 'https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md'
 
     it('shows the rule ID when enabled', async () => {
-      atom.config.set('linter-eslint.showRuleIdInMessage', true)
+      atom.config.set('linter-eslint.advanced.showRuleIdInMessage', true)
       const editor = await atom.workspace.open(paths.badImport)
       const messages = await lint(editor)
       const expected = "Unable to resolve path to module '../nonexistent'. (import/no-unresolved)"
@@ -673,7 +673,7 @@ describe('The eslint provider for Linter', () => {
     })
 
     it("doesn't show the rule ID when disabled", async () => {
-      atom.config.set('linter-eslint.showRuleIdInMessage', false)
+      atom.config.set('linter-eslint.advanced.showRuleIdInMessage', false)
       const editor = await atom.workspace.open(paths.badImport)
       const messages = await lint(editor)
       const expected = "Unable to resolve path to module '../nonexistent'."

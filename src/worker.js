@@ -44,7 +44,7 @@ module.exports = async () => {
       contents, type, config, filePath, projectPath, rules, emitKey
     } = jobConfig
     try {
-      if (config.disableFSCache) {
+      if (config.advanced.disableFSCache) {
         FindCache.clear()
       }
 

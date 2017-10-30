@@ -61,15 +61,15 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
       // NPM on platforms other than Windows
       eslintDir = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
-  } else if (!config.advancedLocalNodeModules) {
+  } else if (!config.advanced.advancedLocalNodeModules) {
     locationType = 'local project'
     eslintDir = Path.join(modulesDir || '', 'eslint')
-  } else if (Path.isAbsolute(cleanPath(config.advancedLocalNodeModules))) {
+  } else if (Path.isAbsolute(cleanPath(config.advanced.advancedLocalNodeModules))) {
     locationType = 'advanced specified'
-    eslintDir = Path.join(cleanPath(config.advancedLocalNodeModules), 'eslint')
+    eslintDir = Path.join(cleanPath(config.advanced.advancedLocalNodeModules), 'eslint')
   } else {
     locationType = 'advanced specified'
-    eslintDir = Path.join(projectPath || '', cleanPath(config.advancedLocalNodeModules), 'eslint')
+    eslintDir = Path.join(projectPath || '', cleanPath(config.advanced.advancedLocalNodeModules), 'eslint')
   }
   if (isDirectory(eslintDir)) {
     return {
@@ -137,7 +137,7 @@ export function getConfigPath(fileDir) {
 }
 
 export function getRelativePath(fileDir, filePath, config, projectPath) {
-  const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
+  const ignoreFile = config.advanced.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
 
   // If we can find an .eslintignore file, we can set cwd there
   // (because they are expected to be at the project root)
@@ -159,11 +159,11 @@ export function getRelativePath(fileDir, filePath, config, projectPath) {
 export function getCLIEngineOptions(type, config, rules, filePath, fileDir, givenConfigPath) {
   const cliEngineConfig = {
     rules,
-    ignore: !config.disableEslintIgnore,
+    ignore: !config.advanced.disableEslintIgnore,
     fix: type === 'fix'
   }
 
-  const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
+  const ignoreFile = config.advanced.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
   if (ignoreFile) {
     cliEngineConfig.ignorePath = ignoreFile
   }
@@ -176,9 +176,9 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
     return rulesDir
   }).filter(path => path)
 
-  if (givenConfigPath === null && config.eslintrcPath) {
+  if (givenConfigPath === null && config.advanced.eslintrcPath) {
     // If we didn't find a configuration use the fallback from the settings
-    cliEngineConfig.configFile = cleanPath(config.eslintrcPath)
+    cliEngineConfig.configFile = cleanPath(config.advanced.eslintrcPath)
   }
 
   return cliEngineConfig

@@ -144,7 +144,7 @@ module.exports = {
     }))
 
     this.subscriptions.add(atom.config.observe(
-      'linter-eslint.showRuleIdInMessage',
+      'linter-eslint.advanced.showRuleIdInMessage',
       (value) => { showRule = value }
     ))
 

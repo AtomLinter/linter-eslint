@@ -45,13 +45,6 @@
       "default": "",
       "order": 4
     },
-    "eslintrcPath": {
-      "title": ".eslintrc Path",
-      "description": "It will only be used when there's no config file in project",
-      "type": "string",
-      "default": "",
-      "order": 6
-    },
     "eslintRulesDirs": {
       "title": "ESLint Rules Directories",
       "description": "Specify a comma separated list of directories for ESLint to load rules from.",
@@ -62,25 +55,6 @@
       },
       "order": 7
     },
-    "disableEslintIgnore": {
-      "title": "Don't use .eslintignore files",
-      "type": "boolean",
-      "default": false,
-      "order": 8
-    },
-    "disableFSCache": {
-      "title": "Disable FileSystem Cache",
-      "description": "Paths of node_modules, .eslintignore and others are cached",
-      "type": "boolean",
-      "default": false,
-      "order": 9
-    },
-    "showRuleIdInMessage": {
-      "title": "Show Rule ID in Messages",
-      "type": "boolean",
-      "default": true,
-      "order": 10
-    },
     "fixOnSave": {
       "title": "Fix errors on save",
       "description": "Have eslint attempt to fix some errors automatically when saving the file.",
@@ -90,6 +64,7 @@
     },
     "disabling": {
       "type": "object",
+      "order": 4,
       "properties": {
         "disableWhenNoEslintConfig": {
           "title": "Disable when no ESLint config is found (in package.json or .eslintrc)",
@@ -126,12 +101,44 @@
         }
       }
     },
-    "advancedLocalNodeModules": {
-      "title": "Path to the local node_modules folder",
-      "description": "Optionally specify the path to the local node_modules folder",
-      "type": "string",
-      "default": "",
-      "order": 15
+    "advanced": {
+      "type": "object",
+      "order": 5,
+      "properties": {
+        "disableEslintIgnore": {
+          "title": "Don't use .eslintignore files",
+          "type": "boolean",
+          "default": false,
+          "order": 1
+        },
+        "disableFSCache": {
+          "title": "Disable FileSystem Cache",
+          "description": "Paths of node_modules, .eslintignore and others are cached",
+          "type": "boolean",
+          "default": false,
+          "order": 2
+        },
+        "showRuleIdInMessage": {
+          "title": "Show Rule ID in Messages",
+          "type": "boolean",
+          "default": true,
+          "order": 3
+        },
+        "eslintrcPath": {
+          "title": ".eslintrc Path",
+          "description": "It will only be used when there's no config file in project",
+          "type": "string",
+          "default": "",
+          "order": 4
+        },
+        "advancedLocalNodeModules": {
+          "title": "Path to the local node_modules folder",
+          "description": "Optionally specify the path to the local node_modules folder",
+          "type": "string",
+          "default": "",
+          "order": 5
+        }
+      }
     }
   },
   "scripts": {
