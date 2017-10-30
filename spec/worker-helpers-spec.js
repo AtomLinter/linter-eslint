@@ -15,6 +15,7 @@ const globalNodePath = process.platform === 'win32' ?
 function createConfig(overrides = {}) {
   return {
     ...overrides,
+    global: { ...overrides.global },
     disabling: { ...overrides.disabling },
     advanced: { ...overrides.advanced },
   }
@@ -32,7 +33,7 @@ describe('Worker Helpers', () => {
 
     it('finds a local eslint when useGlobalEslint is false', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const config = createConfig({ useGlobalEslint: false })
+      const config = createConfig({ global: { useGlobalEslint: false } })
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedEslintPath = Path.join(getFixturesPath('local-eslint'), 'node_modules', 'eslint')
       expect(foundEslint.path).toEqual(expectedEslintPath)
@@ -41,7 +42,7 @@ describe('Worker Helpers', () => {
 
     it('does not find a local eslint when useGlobalEslint is true', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const config = createConfig({ useGlobalEslint: true, globalNodePath })
+      const config = createConfig({ global: { useGlobalEslint: true, globalNodePath } })
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedEslintPath = Path.join(getFixturesPath('local-eslint'), 'node_modules', 'eslint')
       expect(foundEslint.path).not.toEqual(expectedEslintPath)
@@ -50,7 +51,7 @@ describe('Worker Helpers', () => {
 
     it('finds a global eslint when useGlobalEslint is true and a valid globalNodePath is provided', () => {
       const modulesDir = Path.join(getFixturesPath('local-eslint'), 'node_modules')
-      const config = createConfig({ useGlobalEslint: true, globalNodePath })
+      const config = createConfig({ global: { useGlobalEslint: true, globalNodePath } })
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedEslintPath = process.platform === 'win32'
         ? Path.join(globalNodePath, 'node_modules', 'eslint')
@@ -61,7 +62,7 @@ describe('Worker Helpers', () => {
 
     it('falls back to the packaged eslint when no local eslint is found', () => {
       const modulesDir = 'not/a/real/path'
-      const config = createConfig({ useGlobalEslint: false })
+      const config = createConfig({ global: { useGlobalEslint: false } })
       const foundEslint = Helpers.findESLintDirectory(modulesDir, config)
       const expectedBundledPath = Path.join(__dirname, '..', 'node_modules', 'eslint')
       expect(foundEslint.path).toEqual(expectedBundledPath)
@@ -75,7 +76,7 @@ describe('Worker Helpers', () => {
     it('tries to find an indirect local eslint using an absolute path', () => {
       const path = Path.join(getFixturesPath('indirect-local-eslint'), pathPart)
       const config = createConfig({
-        useGlobalEslint: false,
+        global: { useGlobalEslint: false },
         advanced: { advancedLocalNodeModules: path }
       })
       const eslint = Helpers.getESLintInstance('', config)
@@ -86,7 +87,7 @@ describe('Worker Helpers', () => {
       const path = Path.join(getFixturesPath('indirect-local-eslint'), pathPart)
       const [projectPath, relativePath] = atom.project.relativizePath(path)
       const config = createConfig({
-        useGlobalEslint: false,
+        global: { useGlobalEslint: false },
         advanced: { advancedLocalNodeModules: relativePath }
       })
       const eslint = Helpers.getESLintInstance('', config, projectPath)
@@ -109,9 +110,9 @@ describe('Worker Helpers', () => {
 
     it('tries to find a global eslint if config is specified', () => {
       const config = createConfig({
-        useGlobalEslint: true,
-        globalNodePath
+        global: { useGlobalEslint: true, globalNodePath }
       })
+      console.log({ config })
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
       expect(eslint).toBe('located')
     })
@@ -119,8 +120,7 @@ describe('Worker Helpers', () => {
     it('cries if global eslint is not found', () => {
       expect(() => {
         const config = createConfig({
-          useGlobalEslint: true,
-          globalNodePath: getFixturesPath('files')
+          global: { useGlobalEslint: true, globalNodePath: getFixturesPath('files') }
         })
         Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
       }).toThrow()

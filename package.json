@@ -31,20 +31,6 @@
       "default": false,
       "order": 2
     },
-    "useGlobalEslint": {
-      "title": "Use global ESLint installation",
-      "description": "Make sure you have it in your $PATH",
-      "type": "boolean",
-      "default": false,
-      "order": 3
-    },
-    "globalNodePath": {
-      "title": "Global Node Installation Path",
-      "description": "Write the value of `npm get prefix` here",
-      "type": "string",
-      "default": "",
-      "order": 4
-    },
     "eslintRulesDirs": {
       "title": "ESLint Rules Directories",
       "description": "Specify a comma separated list of directories for ESLint to load rules from.",
@@ -61,6 +47,27 @@
       "type": "boolean",
       "default": false,
       "order": 11
+    },
+    "global": {
+      "type": "object",
+      "order": 3,
+      "title": "Global ESLint",
+      "properties": {
+        "useGlobalEslint": {
+          "title": "Use global ESLint installation",
+          "description": "Make sure you have it in your $PATH",
+          "type": "boolean",
+          "default": false,
+          "order": 1
+        },
+        "globalNodePath": {
+          "title": "Global Node Installation Path",
+          "description": "Write the value of `npm get prefix` here",
+          "type": "string",
+          "default": "",
+          "order": 2
+        }
+      }
     },
     "disabling": {
       "type": "object",

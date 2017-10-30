@@ -51,9 +51,9 @@ function isDirectory(dirPath) {
 export function findESLintDirectory(modulesDir, config, projectPath) {
   let eslintDir = null
   let locationType = null
-  if (config.useGlobalEslint) {
+  if (config.global.useGlobalEslint) {
     locationType = 'global'
-    const configGlobal = cleanPath(config.globalNodePath)
+    const configGlobal = cleanPath(config.global.globalNodePath)
     const prefixPath = configGlobal || getNodePrefixPath()
     // NPM on Windows and Yarn on all platforms
     eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
@@ -76,7 +76,7 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
       path: eslintDir,
       type: locationType,
     }
-  } else if (config.useGlobalEslint) {
+  } else if (config.global.useGlobalEslint) {
     throw new Error('ESLint not found, please ensure the global Node path is set correctly.')
   }
   return {
@@ -91,7 +91,7 @@ export function getESLintFromDirectory(modulesDir, config, projectPath) {
     // eslint-disable-next-line import/no-dynamic-require
     return require(ESLintDirectory)
   } catch (e) {
-    if (config.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
+    if (config.global.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
       throw new Error('ESLint not found, try restarting Atom to clear caches.')
     }
     // eslint-disable-next-line import/no-dynamic-require

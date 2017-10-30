@@ -47,6 +47,16 @@ const directMoveMigrations = [
     old: 'linter-eslint.advancedLocalNodeModules',
     new: 'linter-eslint.advanced.advancedLocalNodeModules'
   },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.useGlobalEslint',
+    new: 'linter-eslint.global.useGlobalEslint'
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.globalNodePath',
+    new: 'linter-eslint.global.globalNodePath'
+  },
 ]
 
 function migrateConfigOptions() {
