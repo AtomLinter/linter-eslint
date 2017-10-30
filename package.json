@@ -9,6 +9,20 @@
     "atom": ">=1.13.0 <2.0.0"
   },
   "configSchema": {
+    "fixOnSave": {
+      "title": "Fix errors on save",
+      "description": "Have eslint attempt to fix some errors automatically when saving the file.",
+      "type": "boolean",
+      "default": false,
+      "order": 1
+    },
+    "lintHtmlFiles": {
+      "title": "Lint HTML Files",
+      "description": "You should also add `eslint-plugin-html` to your .eslintrc plugins",
+      "type": "boolean",
+      "default": false,
+      "order": 2
+    },
     "scopes": {
       "title": "List of scopes to run ESLint on, run `Editor: Log Cursor Scope` to determine the scopes for a file.",
       "type": "array",
@@ -22,14 +36,7 @@
       "items": {
         "type": "string"
       },
-      "order": 1
-    },
-    "lintHtmlFiles": {
-      "title": "Lint HTML Files",
-      "description": "You should also add `eslint-plugin-html` to your .eslintrc plugins",
-      "type": "boolean",
-      "default": false,
-      "order": 2
+      "order": 3
     },
     "eslintRulesDirs": {
       "title": "ESLint Rules Directories",
@@ -39,18 +46,11 @@
       "items": {
         "type": "string"
       },
-      "order": 7
-    },
-    "fixOnSave": {
-      "title": "Fix errors on save",
-      "description": "Have eslint attempt to fix some errors automatically when saving the file.",
-      "type": "boolean",
-      "default": false,
-      "order": 11
+      "order": 4
     },
     "global": {
       "type": "object",
-      "order": 3,
+      "order": 5,
       "title": "Global ESLint",
       "properties": {
         "useGlobalEslint": {
@@ -71,7 +71,7 @@
     },
     "disabling": {
       "type": "object",
-      "order": 4,
+      "order": 6,
       "properties": {
         "disableWhenNoEslintConfig": {
           "title": "Disable when no ESLint config is found (in package.json or .eslintrc)",
@@ -110,7 +110,7 @@
     },
     "advanced": {
       "type": "object",
-      "order": 5,
+      "order": 7,
       "properties": {
         "disableEslintIgnore": {
           "title": "Don't use .eslintignore files",
