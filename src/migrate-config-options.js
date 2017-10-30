@@ -1,5 +1,29 @@
 'use babel'
 
+// These are cases where the old setting should be directly moved to the new setting.
+const directMoveMigrations = [
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.disableWhenNoEslintConfig',
+    new: 'linter-eslint.disabling.disableWhenNoEslintConfig',
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.ignoreFixableRulesWhileTyping',
+    new: 'linter-eslint.disabling.ignoreFixableRulesWhileTyping'
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.rulesToDisableWhileFixing',
+    new: 'linter-eslint.disabling.rulesToDisableWhileFixing'
+  },
+  {
+    /* Added November, 2017 */
+    old: 'linter-eslint.rulesToSilenceWhileTyping',
+    new: 'linter-eslint.disabling.rulesToSilenceWhileTyping'
+  }
+]
+
 function migrateConfigOptions() {
   /**
    * FIXME: Deprecated eslintRulesDir{String} option in favor of
@@ -15,51 +39,14 @@ function migrateConfigOptions() {
     atom.config.unset('linter-eslint.eslintRulesDir')
   }
 
-  /**
-   * Move disableWhenNoEslintConfig into `disabling` section.
-   * Added November, 2017
-   */
-  const oldDisableWhenNoEslintConfig = atom.config.get('linter-eslint.disableWhenNoEslintConfig')
-  if (oldDisableWhenNoEslintConfig !== undefined) {
-    atom.config.set('linter-eslint.disabling.disableWhenNoEslintConfig', oldDisableWhenNoEslintConfig)
-    atom.config.unset('linter-eslint.disableWhenNoEslintConfig')
-  }
-
-  /**
-   * Move ignoreFixableRulesWhileTyping into `disabling` section.
-   * Added November, 2017
-   */
-  const oldIgnoreFixableRulesWhileTyping = atom.config.get('linter-eslint.ignoreFixableRulesWhileTyping')
-  if (oldIgnoreFixableRulesWhileTyping !== undefined) {
-    atom.config.set('linter-eslint.disabling.ignoreFixableRulesWhileTyping', oldIgnoreFixableRulesWhileTyping)
-    atom.config.unset('linter-eslint.ignoreFixableRulesWhileTyping')
-  }
-
-  /**
-   * Move rulesToDisableWhileFixing into `disabling` section.
-   * Added November, 2017
-   */
-  const oldRulesToDisableWhileFixing = atom.config.get('linter-eslint.rulesToDisableWhileFixing')
-  if (oldRulesToDisableWhileFixing !== undefined) {
-    const newRulesToDisableWhileFixing = atom.config.get('linter-eslint.disabling.rulesToDisableWhileFixing')
-    if (newRulesToDisableWhileFixing.length === 0) {
-      atom.config.set('linter-eslint.disabling.rulesToDisableWhileFixing', oldRulesToDisableWhileFixing)
+  // Copy old settings over to the new ones, then unset the old setting keys
+  directMoveMigrations.forEach((migration) => {
+    const oldSetting = atom.config.get(migration.old)
+    if (oldSetting !== undefined) {
+      atom.config.set(migration.new, oldSetting)
+      atom.config.unset(migration.old)
     }
-    atom.config.unset('linter-eslint.rulesToDisableWhileFixing')
-  }
-
-  /**
-   * Move rulesToSilenceWhileTyping into `disabling` section.
-   * Added November, 2017
-   */
-  const oldRulesToSilenceWhileTyping = atom.config.get('linter-eslint.rulesToSilenceWhileTyping')
-  if (oldRulesToSilenceWhileTyping !== undefined) {
-    const newRulesToSilenceWhileTyping = atom.config.get('linter-eslint.disabling.rulesToSilenceWhileTyping')
-    if (newRulesToSilenceWhileTyping.length === 0) {
-      atom.config.set('linter-eslint.disabling.rulesToSilenceWhileTyping', oldRulesToSilenceWhileTyping)
-    }
-    atom.config.unset('linter-eslint.rulesToSilenceWhileTyping')
-  }
+  })
 }
 
 module.exports = migrateConfigOptions
