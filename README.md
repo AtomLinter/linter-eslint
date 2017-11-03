@@ -67,6 +67,14 @@ The path to the local node_modules folder can be a path relative to the project 
 
 If there is no local installation Atom will use the built-in ESLint in the linter-eslint package itself.
 
+## Common Problems
+
+#### JSX not loading when you open a .jsx file?
+
+If you can't load .jsx files, it's likely the atom editor is not recognizing the .jsx scope, which then won't select to use 
+the linter-eslint package. To find out, try running `Editor: Log Cursor Scopes` in your command pallate. If you see something
+along the lines of `text-plain.null-grammar`, your editor is not applying the correct scope, so you'll need to install [language-javascript-jsx](https://atom.io/packages/language-javascript-jsx). 
+
 ## Contributing
 
 See the [contributing guidelines](./CONTRIBUTING.md) to get started
