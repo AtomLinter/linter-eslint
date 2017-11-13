@@ -69,11 +69,15 @@ If there is no local installation Atom will use the built-in ESLint in the linte
 
 ## Common Problems
 
-#### JSX not loading when you open a .jsx file?
+#### Linter not starting when you open a file?
 
-If you can't load .jsx files, it's likely the atom editor is not recognizing the .jsx scope, which then won't select to use 
+If the linter is not starting when opening a file, it's likely the atom editor is not recognizing the filetype scope, which then won't select to use
 the linter-eslint package. To find out, try running `Editor: Log Cursor Scopes` in your command pallate. If you see something
-along the lines of `text-plain.null-grammar`, your editor is not applying the correct scope, so you'll need to install [language-javascript-jsx](https://atom.io/packages/language-javascript-jsx). 
+along the lines of `text-plain.null-grammar`, your editor is not recognizing filetype extension or language and applying the 
+correct scope, so you'll need to install the correct language. A common example is for JSX, where you will need
+[language-javascript-jsx](https://atom.io/packages/language-javascript-jsx) to allow Atom to recognize the JSX language, and 
+run the linter on those files. In short, check your cursor scopes if the linter isn't working.
+It's likely you have a language issue.
 
 ## Contributing
 
