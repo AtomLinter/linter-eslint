@@ -74,7 +74,7 @@ async function getNotification(expectedMessage) {
         // is expected simply return and keep waiting for the next message.
         return
       }
-      // Dispose of the notificaiton subscription
+      // Dispose of the notification subscription
       notificationSub.dispose()
       resolve(notification)
     }
