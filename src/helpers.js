@@ -8,6 +8,7 @@ import cryptoRandomString from 'crypto-random-string'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Range } from 'atom'
 
+const lintRules = new Map()
 const fixableRules = new Set()
 
 /**
@@ -327,6 +328,39 @@ export async function processESLintMessages(messages, textEditor, showRule, work
 }
 
 /**
+ * Update the list of fixable rules
+ */
+function updateFixableRules() {
+  fixableRules.clear()
+  lintRules.forEach((props, rule) => {
+    if (
+      Object.prototype.hasOwnProperty.call(props, 'meta') &&
+      Object.prototype.hasOwnProperty.call(props.meta, 'fixable')
+    ) {
+      fixableRules.add(rule)
+    }
+  })
+}
+
+/**
+ * Process the updated rules into the local Map and call further update functions
+ * @param  {Array} updatedRules Array of Arrays of the rule and properties
+ */
+export function updateRules(updatedRules) {
+  lintRules.clear()
+  updatedRules.forEach(([rule, props]) => lintRules.set(rule, props))
+  updateFixableRules()
+}
+
+/**
+ * Return the known list of rules.
+ * @return {Map} The currently known rules
+ */
+export function getRules() {
+  return lintRules
+}
+
+/**
  * Processes the response from the lint job
  * @param  {Object}     response   The raw response from the job
  * @param  {TextEditor} textEditor The Atom::TextEditor of the file the messages belong to
@@ -335,9 +369,8 @@ export async function processESLintMessages(messages, textEditor, showRule, work
  * @return {Promise}               The messages transformed into Linter messages
  */
 export async function processJobResponse(response, textEditor, showRule, worker) {
-  if (Object.prototype.hasOwnProperty.call(response, 'fixableRules')) {
-    fixableRules.clear()
-    response.fixableRules.forEach(rule => fixableRules.add(rule))
+  if (Object.prototype.hasOwnProperty.call(response, 'updatedRules')) {
+    updateRules(response.updatedRules)
   }
   return processESLintMessages(response.messages, textEditor, showRule, worker)
 }

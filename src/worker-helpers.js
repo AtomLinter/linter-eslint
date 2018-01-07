@@ -183,3 +183,50 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
 
   return cliEngineConfig
 }
+
+/**
+ * Gets the list of rules used for a lint job
+ * @param  {Object} cliEngine The CLIEngine instance used for the lint job
+ * @return {Map}              A Map of the rules used, rule names as keys, rule
+ *                            properties as the contents.
+ */
+export function getRules(cliEngine) {
+  // Attempt to use the internal (undocumented) `linter` instance attached to
+  // the CLIEngine to get the loaded rules (including plugin rules).
+  // Added in ESLint v4
+  if (Object.prototype.hasOwnProperty.call(cliEngine, 'linter')) {
+    return cliEngine.linter.getRules()
+  }
+
+  // Older versions of ESLint don't (easily) support getting a list of rules
+  return new Map()
+}
+
+/**
+ * Given an exiting rule list and a new rule list, determines whether there
+ * have been changes.
+ * @param  {[type]} newRules     A map of the new rules
+ * @param  {[type]} currentRules A Map of the current rules
+ * @return {boolean}             Whether or not there were changes
+ */
+export function didRulesChange(currentRules, newRules) {
+  let rulesChanged = false
+  const currentRuleIds = new Set(currentRules.keys())
+  const newRuleIds = new Set(newRules.keys())
+
+  // Check for new rules added since the last time we sent currentRules
+  const newRulesIds = new Set(newRules.keys())
+  currentRuleIds.forEach(rule => newRulesIds.delete(rule))
+  if (newRulesIds.size > 0) {
+    rulesChanged = true
+  }
+
+  // Check for rules that were removed since the last time we sent currentRules
+  const removedRuleIds = new Set(currentRuleIds)
+  newRuleIds.forEach(rule => removedRuleIds.delete(rule))
+  if (removedRuleIds.size > 0) {
+    rulesChanged = true
+  }
+
+  return rulesChanged
+}
