@@ -2,11 +2,12 @@
 
 import * as Path from 'path'
 import rimraf from 'rimraf'
+// eslint-disable-next-line no-unused-vars
+import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix'
 import * as Helpers from '../src/worker-helpers'
 import { copyFileToTempDir } from './linter-eslint-spec'
 
 const getFixturesPath = path => Path.join(__dirname, 'fixtures', path)
-
 
 const globalNodePath = process.platform === 'win32' ?
   Path.join(getFixturesPath('global-eslint'), 'lib') :
@@ -136,47 +137,27 @@ describe('Worker Helpers', () => {
     })
   })
 
-  describe('getConfigPath', () => {
-    it('finds .eslintrc', () => {
-      const fileDir = getFixturesPath(Path.join('configs', 'no-ext'))
-      const expectedPath = Path.join(fileDir, '.eslintrc')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+  describe('getConfigForFile', () => {
+    // Use the bundled ESLint for the tests
+    const eslint = require('eslint')
+    const fixtureFile = getFixturesPath(Path.join('configs', 'js', 'foo.js'))
+
+    it('uses ESLint to determine the configuration', () => {
+      const filePath = fixtureFile
+      const foundConfig = Helpers.getConfigForFile(eslint, filePath)
+      expect(foundConfig.rules.semi).toEqual([2, 'never'])
     })
 
-    it('finds .eslintrc.yaml', () => {
-      const fileDir = getFixturesPath(Path.join('configs', 'yaml'))
-      const expectedPath = Path.join(fileDir, '.eslintrc.yaml')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
-    })
+    it('returns null when the file has no configuration', async () => {
+      // Copy the file to a temporary folder
+      const filePath = await copyFileToTempDir(fixtureFile)
+      const tempDir = Path.dirname(filePath)
 
-    it('finds .eslintrc.yml', () => {
-      const fileDir = getFixturesPath(Path.join('configs', 'yml'))
-      const expectedPath = Path.join(fileDir, '.eslintrc.yml')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
-    })
+      const foundConfig = Helpers.getConfigForFile(eslint, filePath)
+      expect(foundConfig).toBeNull()
 
-    it('finds .eslintrc.js', () => {
-      const fileDir = getFixturesPath(Path.join('configs', 'js'))
-      const expectedPath = Path.join(fileDir, '.eslintrc.js')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
-    })
-
-    it('finds .eslintrc.json', () => {
-      const fileDir = getFixturesPath(Path.join('configs', 'json'))
-      const expectedPath = Path.join(fileDir, '.eslintrc.json')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
-    })
-
-    it('finds package.json with an eslintConfig property', () => {
-      const fileDir = getFixturesPath(Path.join('configs', 'package-json'))
-      const expectedPath = Path.join(fileDir, 'package.json')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
-    })
-
-    it('ignores package.json with no eslintConfig property', () => {
-      const fileDir = getFixturesPath(Path.join('configs', 'package-json', 'nested'))
-      const expectedPath = getFixturesPath(Path.join('configs', 'package-json', 'package.json'))
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+      // Remove the temporary directory
+      rimraf.sync(tempDir)
     })
   })
 
@@ -204,13 +185,12 @@ describe('Worker Helpers', () => {
     it('returns the path relative to the project dir if provided when no ignore file is found', async () => {
       const fixtureFile = getFixturesPath(Path.join('files', 'good.js'))
       // Copy the file to a temporary folder
-      const tempFixturePath = await copyFileToTempDir(fixtureFile)
-      const tempDir = Path.dirname(tempFixturePath)
-      const filepath = Path.join(tempDir, 'good.js')
+      const filePath = await copyFileToTempDir(fixtureFile)
+      const tempDir = Path.dirname(filePath)
       const tempDirParent = Path.dirname(tempDir)
       const config = createConfig()
 
-      const relativePath = Helpers.getRelativePath(tempDir, filepath, config, tempDirParent)
+      const relativePath = Helpers.getRelativePath(tempDir, filePath, config, tempDirParent)
       // Since the project is the parent of the temp dir, the relative path should be
       // the dir containing the file, plus the file. (e.g. asgln3/good.js)
       const expectedPath = Path.join(Path.basename(tempDir), 'good.js')
@@ -222,12 +202,11 @@ describe('Worker Helpers', () => {
     it('returns just the file being linted if no ignore file is found and no project dir is provided', async () => {
       const fixtureFile = getFixturesPath(Path.join('files', 'good.js'))
       // Copy the file to a temporary folder
-      const tempFixturePath = await copyFileToTempDir(fixtureFile)
-      const tempDir = Path.dirname(tempFixturePath)
-      const filepath = Path.join(tempDir, 'good.js')
+      const filePath = await copyFileToTempDir(fixtureFile)
+      const tempDir = Path.dirname(filePath)
       const config = createConfig()
 
-      const relativePath = Helpers.getRelativePath(tempDir, filepath, config, null)
+      const relativePath = Helpers.getRelativePath(tempDir, filePath, config, null)
       expect(relativePath).toBe('good.js')
 
       // Remove the temporary directory

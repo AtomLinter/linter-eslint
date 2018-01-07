@@ -172,8 +172,7 @@
     "eslint": "^4.9.0",
     "eslint-rule-documentation": "^1.0.18",
     "fs-plus": "^3.0.1",
-    "resolve-env": "^1.0.0",
-    "user-home": "^2.0.0"
+    "resolve-env": "^1.0.0"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^12.1.0",
