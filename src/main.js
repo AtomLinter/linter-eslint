@@ -195,6 +195,21 @@ module.exports = {
     this.subscriptions.dispose()
   },
 
+  async restartESLintWorker() {
+    return new Promise((resolve) => {
+      if (this.worker !== null) {
+        this.worker.terminate()
+        this.worker = null
+      }
+      const initializeESLintWorker = () => {
+        this.worker = new Task(require.resolve('./worker.js'))
+        resolve()
+      }
+      // Initialize the worker during an idle time
+      window.requestIdleCallback(initializeESLintWorker)
+    })
+  },
+
   provideLinter() {
     return {
       name: 'ESLint',
@@ -242,9 +257,15 @@ module.exports = {
           await waitOnIdle()
         }
 
-        let response
+        // Sometimes the worker dies and becomes disconnected
+        // When that happens, it seems that there is no way to recover other
+        // than to kill the worker and create a new one.
+        if (this.worker && !this.worker.childProcess.connected) {
+          await this.restartESLintWorker()
+        }
+
         try {
-          response = await helpers.sendJob(this.worker, {
+          const response = await helpers.sendJob(this.worker, {
             type: 'lint',
             contents: text,
             config: atom.config.get('linter-eslint'),
@@ -321,6 +342,13 @@ module.exports = {
     }
     if (!this.worker) {
       await waitOnIdle()
+    }
+
+    // Sometimes the worker dies and becomes disconnected
+    // When that happens, it seems that there is no way to recover other
+    // than to kill the worker and create a new one.
+    if (this.worker && !this.worker.childProcess.connected) {
+      await this.restartESLintWorker()
     }
 
     try {
