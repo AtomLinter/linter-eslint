@@ -49,6 +49,9 @@ export async function sendJob(worker, config) {
       const error = new Error(msg)
       // Set the stack to the one given to us by the worker
       error.stack = stack
+      errSub.dispose()
+      // eslint-disable-next-line no-use-before-define
+      responseSub.dispose()
       reject(error)
     })
     const responseSub = worker.on(config.emitKey, (data) => {
@@ -60,6 +63,8 @@ export async function sendJob(worker, config) {
     try {
       worker.send(config)
     } catch (e) {
+      errSub.dispose()
+      responseSub.dispose()
       console.error(e)
     }
   })
