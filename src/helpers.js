@@ -43,8 +43,10 @@ export async function sendJob(worker, config) {
   config.emitKey = cryptoRandomString(10)
 
   return new Promise((resolve, reject) => {
-    const errSub = worker.on('task:error', (...err) => {
-      const [msg, stack] = err
+    // All worker errors are caught and re-emitted along with their associated
+    // emitKey, so that we do not create multiple listeners for the same
+    // 'task:error' event
+    const errSub = worker.on(`workerError:${config.emitKey}`, ({ msg, stack }) => {
       // Re-throw errors from the task
       const error = new Error(msg)
       // Set the stack to the one given to us by the worker

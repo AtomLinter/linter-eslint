@@ -83,42 +83,48 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
 
 module.exports = async () => {
   process.on('message', (jobConfig) => {
-    const {
-      contents, type, config, filePath, projectPath, rules, emitKey
-    } = jobConfig
-    if (config.disableFSCache) {
-      FindCache.clear()
-    }
-
-    const fileDir = Path.dirname(filePath)
-    const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
-    const configPath = Helpers.getConfigPath(fileDir)
-    const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
-    if (noProjectConfig && config.disableWhenNoEslintConfig) {
-      emit(emitKey, { messages: [] })
-      return
-    }
-
-    const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config, projectPath)
-
-    const cliEngineOptions = Helpers
-      .getCLIEngineOptions(type, config, rules, relativeFilePath, fileDir, configPath)
-
-    let response
-    if (type === 'lint') {
-      const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
-      response = {
-        messages: report.results.length ? report.results[0].messages : []
+    // We catch all worker errors so that we can create a separate error emitter
+    // for each emitKey, rather than adding multiple listeners for `task:error`
+    try {
+      const {
+        contents, type, config, filePath, projectPath, rules, emitKey
+      } = jobConfig
+      if (config.disableFSCache) {
+        FindCache.clear()
       }
-      if (sendRules) {
-        response.fixableRules = Array.from(fixableRules.keys())
+
+      const fileDir = Path.dirname(filePath)
+      const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
+      const configPath = Helpers.getConfigPath(fileDir)
+      const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
+      if (noProjectConfig && config.disableWhenNoEslintConfig) {
+        emit(emitKey, { messages: [] })
+        return
       }
-    } else if (type === 'fix') {
-      response = fixJob({ cliEngineOptions, contents, eslint, filePath })
-    } else if (type === 'debug') {
-      const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
-      response = Helpers.findESLintDirectory(modulesDir, config, projectPath)
+
+      const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config, projectPath)
+
+      const cliEngineOptions = Helpers
+        .getCLIEngineOptions(type, config, rules, relativeFilePath, fileDir, configPath)
+
+      let response
+      if (type === 'lint') {
+        const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
+        response = {
+          messages: report.results.length ? report.results[0].messages : []
+        }
+        if (sendRules) {
+          response.fixableRules = Array.from(fixableRules.keys())
+        }
+      } else if (type === 'fix') {
+        response = fixJob({ cliEngineOptions, contents, eslint, filePath })
+      } else if (type === 'debug') {
+        const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
+        response = Helpers.findESLintDirectory(modulesDir, config, projectPath)
+      }
+      emit(emitKey, response)
+    } catch (workerErr) {
+      emit(`workerError:${jobConfig.emitKey}`, { msg: workerErr.message, stack: workerErr.stack })
     }
-    emit(emitKey, response)
   })
 }
