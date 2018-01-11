@@ -7,9 +7,9 @@
 
 
 ## Bug Checklist
-- Restart Atom
-- Verify the `eslint` CLI gives the proper result, while `linter-eslint` does not
-- Paste the output of the `Linter Eslint: Debug` command from the Command Palette below
+- [ ] Restart Atom
+- [ ] Verify the `eslint` CLI gives the proper result, while `linter-eslint` does not
+- [ ] Paste the output of the `Linter Eslint: Debug` command from the Command Palette below
 
 ```
 Linter Eslint: Debug output here
