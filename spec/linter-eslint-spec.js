@@ -84,23 +84,28 @@ async function getNotification(expectedMessage) {
 }
 
 async function makeFixes(textEditor) {
-  const editorReloaded = new Promise((resolve) => {
-    // Subscribe to the file reload event
-    const reloadSubscription = textEditor.getBuffer().onDidReload(() => {
-      reloadSubscription.dispose()
+  const editorReloadPromise = new Promise((resolve) => {
+    // Subscribe to file reload events
+    const editorReloadSubscription = textEditor.getBuffer().onDidReload(() => {
+      editorReloadSubscription.dispose()
       resolve()
     })
   })
 
-  // Now that subscription is active, send off a fix request
-  atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
   const expectedMessage = 'Linter-ESLint: Fix complete.'
-  const notification = await getNotification(expectedMessage)
+  // Subscribe to notification events
+  const notificationPromise = getNotification(expectedMessage)
 
+  // Subscriptions now active for Editor Reload and Message Notification
+  // Send off a fix request.
+  atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
+
+  const notification = await notificationPromise
   expect(notification.getMessage()).toBe(expectedMessage)
   expect(notification.getType()).toBe('success')
 
-  return editorReloaded
+  // After editor reloads, it should be safe for consuming test to resume.
+  return editorReloadPromise
 }
 
 describe('The eslint provider for Linter', () => {
