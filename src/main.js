@@ -6,10 +6,23 @@ import { CompositeDisposable, Task } from 'atom'
 // Dependencies
 // NOTE: We are not directly requiring these in order to reduce the time it
 // takes to require this file as that causes delays in Atom loading this package
-let path
-let helpers
-let workerHelpers
-let isConfigAtHomeRoot
+//
+// The functions first assigned to the dependency variables will self-assign
+// their underlying modules once called in an animation frame.
+
+/* eslint-disable no-return-assign */
+let path = () => path = require('path')
+let helpers = () => helpers = require('./helpers')
+let workerHelpers = () => workerHelpers = require('./worker-helpers')
+let isConfigAtHomeRoot = () =>
+  isConfigAtHomeRoot = require('./is-config-at-home-root')
+/* eslint-enable */
+
+// Load the dependencies when Atom next has free time.
+//
+requestAnimationFrame(() => {
+  path(); helpers(); workerHelpers(); isConfigAtHomeRoot()
+})
 
 // Configuration
 const scopes = []
@@ -113,9 +126,6 @@ module.exports = {
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
-        if (!helpers) {
-          helpers = require('./helpers')
-        }
         if (!this.worker) {
           await waitOnIdle()
         }
@@ -225,10 +235,6 @@ module.exports = {
 
         const text = textEditor.getText()
 
-        if (!helpers) {
-          helpers = require('./helpers')
-        }
-
         let rules = {}
         if (textEditor.isModified() && Object.keys(ignoredRulesWhenModified).length > 0) {
           rules = ignoredRulesWhenModified
@@ -283,16 +289,6 @@ module.exports = {
       atom.notifications.addError(message)
     }
 
-    if (!path) {
-      path = require('path')
-    }
-    if (!isConfigAtHomeRoot) {
-      isConfigAtHomeRoot = require('./is-config-at-home-root')
-    }
-    if (!workerHelpers) {
-      workerHelpers = require('./worker-helpers')
-    }
-
     const filePath = textEditor.getPath()
     const fileDir = path.dirname(filePath)
     const projectPath = atom.project.relativizePath(filePath)[0]
@@ -316,9 +312,6 @@ module.exports = {
       rules = ignoredRulesWhenFixing
     }
 
-    if (!helpers) {
-      helpers = require('./helpers')
-    }
     if (!this.worker) {
       await waitOnIdle()
     }
