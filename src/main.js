@@ -4,12 +4,8 @@
 import { CompositeDisposable, Task } from 'atom'
 
 // Dependencies
-// NOTE: We are not directly requiring these in order to reduce the time it
-// takes to require this file as that causes delays in Atom loading this package
-let path
-let helpers
-let workerHelpers
-let isConfigAtHomeRoot
+// NOTE: Some dependencies are not listed here because they are not required
+// until expected first use to reduce initial loading time of this package.
 
 // Configuration
 const scopes = []
@@ -113,9 +109,7 @@ module.exports = {
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
-        if (!helpers) {
-          helpers = require('./helpers')
-        }
+        const helpers = require('./helpers')
         if (!this.worker) {
           await waitOnIdle()
         }
@@ -202,6 +196,8 @@ module.exports = {
       scope: 'file',
       lintsOnChange: true,
       lint: async (textEditor) => {
+        const helpers = require('./helpers')
+
         if (!atom.workspace.isTextEditor(textEditor)) {
           // If we somehow get fed an invalid TextEditor just immediately return
           return null
@@ -225,9 +221,6 @@ module.exports = {
 
         const text = textEditor.getText()
 
-        if (!helpers) {
-          helpers = require('./helpers')
-        }
 
         let rules = {}
         if (textEditor.isModified() && Object.keys(ignoredRulesWhenModified).length > 0) {
@@ -270,6 +263,10 @@ module.exports = {
   },
 
   async fixJob(isSave = false) {
+    const path = require('path')
+    const isConfigAtHomeRoot = require('./is-config-at-home-root')
+    const workerHelpers = require('./worker-helpers')
+
     const textEditor = atom.workspace.getActiveTextEditor()
 
     if (!textEditor || !atom.workspace.isTextEditor(textEditor)) {
@@ -281,16 +278,6 @@ module.exports = {
       // Abort for invalid or unsaved text editors
       const message = 'Linter-ESLint: Please save before fixing'
       atom.notifications.addError(message)
-    }
-
-    if (!path) {
-      path = require('path')
-    }
-    if (!isConfigAtHomeRoot) {
-      isConfigAtHomeRoot = require('./is-config-at-home-root')
-    }
-    if (!workerHelpers) {
-      workerHelpers = require('./worker-helpers')
     }
 
     const filePath = textEditor.getPath()
@@ -316,9 +303,7 @@ module.exports = {
       rules = ignoredRulesWhenFixing
     }
 
-    if (!helpers) {
-      helpers = require('./helpers')
-    }
+    const helpers = require('./helpers')
     if (!this.worker) {
       await waitOnIdle()
     }
