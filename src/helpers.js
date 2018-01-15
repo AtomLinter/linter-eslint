@@ -230,6 +230,25 @@ const generateInvalidTrace = async ({
 }
 
 /**
+ * Get the URL of the documentation for a rule, either from the rule's own
+ * metadata, from eslint-rule-documentation's known rules, or the fallback URL
+ * on how to add it to eslint-rule-documentation.
+ * @param  {String} ruleId The rule ID to get the documentation URL for
+ * @return {String}        URL of the rule documentation
+ */
+export function getRuleUrl(ruleId) {
+  const props = lintRules.get(ruleId)
+  if (props && props.meta && props.meta.docs && props.meta.docs.url) {
+    // The rule has a documentation URL specified in its metadata
+    return props.meta.docs.url
+  }
+
+  // The rule didn't specify a URL in its metadata, or was not currently known
+  // somehow. Attempt to determine a URL using eslint-rule-documentation.
+  return ruleURI(ruleId).url
+}
+
+/**
  * Given a raw response from ESLint, this processes the messages into a format
  * compatible with the Linter API.
  * @param  {Object}     messages   The messages from ESLint's response
@@ -287,7 +306,7 @@ export async function processESLintMessages(messages, textEditor, showRule, work
     }
 
     if (ruleId) {
-      ret.url = ruleURI(ruleId).url
+      ret.url = getRuleUrl(ruleId)
     }
 
     let range
