@@ -213,6 +213,13 @@ describe('Worker Helpers', () => {
   })
 
   describe('getRules', () => {
+    it('works with the getRules function introduced in ESLint v4.15.0', () => {
+      const cliEngine = {
+        getRules: () => 'foo'
+      }
+      expect(Helpers.getRules(cliEngine)).toBe('foo')
+    })
+
     it('works with the hidden linter in ESLint v4 before v4.15.0', () => {
       const cliEngine = {
         linter: {
