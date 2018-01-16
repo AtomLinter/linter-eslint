@@ -211,28 +211,13 @@ export function getRules(cliEngine) {
 /**
  * Given an exiting rule list and a new rule list, determines whether there
  * have been changes.
- * @param  {[type]} newRules     A map of the new rules
- * @param  {[type]} currentRules A Map of the current rules
+ * NOTE: This only accounts for presence of the rules, changes to their metadata
+ * are not taken into account.
+ * @param  {Map} newRules     A Map of the new rules
+ * @param  {Map} currentRules A Map of the current rules
  * @return {boolean}             Whether or not there were changes
  */
 export function didRulesChange(currentRules, newRules) {
-  let rulesChanged = false
-  const currentRuleIds = new Set(currentRules.keys())
-  const newRuleIds = new Set(newRules.keys())
-
-  // Check for new rules added since the last time we sent currentRules
-  const newRulesIds = new Set(newRules.keys())
-  currentRuleIds.forEach(rule => newRulesIds.delete(rule))
-  if (newRulesIds.size > 0) {
-    rulesChanged = true
-  }
-
-  // Check for rules that were removed since the last time we sent currentRules
-  const removedRuleIds = new Set(currentRuleIds)
-  newRuleIds.forEach(rule => removedRuleIds.delete(rule))
-  if (removedRuleIds.size > 0) {
-    rulesChanged = true
-  }
-
-  return rulesChanged
+  return !(currentRules.size === newRules.size &&
+    Array.from(currentRules.keys()).every(ruleId => newRules.has(ruleId)))
 }
