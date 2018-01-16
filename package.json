@@ -122,7 +122,7 @@
     "atom-babel6-transpiler": "^1.1.3",
     "atom-linter": "^10.0.0",
     "atom-package-deps": "^4.6.0",
-    "babel-preset-node5": "^12.0.0",
+    "babel-preset-env": "^1.6.1",
     "consistent-path": "^2.0.1",
     "crypto-random-string": "^1.0.0",
     "eslint": "^4.9.0",
@@ -197,7 +197,14 @@
         "setBabelEnv": false,
         "babel": {
           "presets": [
-            "node5"
+            [
+              "env",
+              {
+                "targets": {
+                  "node": "current"
+                }
+              }
+            ]
           ],
           "sourceMaps": "inline",
           "babelrc": false
