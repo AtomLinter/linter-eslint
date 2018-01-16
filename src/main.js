@@ -274,7 +274,7 @@ module.exports = {
         }
         if (textEditor.isModified() && ignoreFixableRulesWhileTyping) {
           // Note that this list will only contain rules after the first lint job
-          rules = idsToIgnoredRules(helpers.getFixableRules())
+          rules = idsToIgnoredRules(helpers.rules.getFixableRules())
         }
 
         if (!this.worker) {
