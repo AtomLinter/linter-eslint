@@ -70,9 +70,7 @@ module.exports = async () => {
         }
         if (shouldSendRules) {
           // You can't emit Maps, convert to Array of Arrays to send back.
-          response.updatedRules = []
-          rulesMetadata.forEach((props, rule) =>
-            response.updatedRules.push([rule, props]))
+          response.updatedRules = Array.from(rulesMetadata)
         }
       } else if (type === 'fix') {
         response = fixJob({ cliEngineOptions, contents, eslint, filePath })
