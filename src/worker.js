@@ -10,14 +10,14 @@ import isConfigAtHomeRoot from './is-config-at-home-root'
 process.title = 'linter-eslint helper'
 
 const rulesMetadata = new Map()
-let sendRules = false
+let shouldSendRules = false
 
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
   const rules = Helpers.getRules(cliEngine)
-  sendRules = Helpers.didRulesChange(rulesMetadata, rules)
-  if (sendRules) {
+  shouldSendRules = Helpers.didRulesChange(rulesMetadata, rules)
+  if (shouldSendRules) {
     // Rebuild rulesMetadata
     rulesMetadata.clear()
     rules.forEach((properties, rule) => rulesMetadata.set(rule, properties))
@@ -68,7 +68,7 @@ module.exports = async () => {
         response = {
           messages: report.results.length ? report.results[0].messages : []
         }
-        if (sendRules) {
+        if (shouldSendRules) {
           // You can't emit Maps, convert to Array of Arrays to send back.
           response.updatedRules = []
           rulesMetadata.forEach((props, rule) =>
