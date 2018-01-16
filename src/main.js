@@ -177,12 +177,26 @@ module.exports = {
         }
       }]
     }))
+    this.initializeWorker()
+  },
 
-    const initializeESLintWorker = () => {
-      this.worker = new Task(require.resolve('./worker.js'))
-    }
-    // Initialize the worker during an idle time
-    window.requestIdleCallback(initializeESLintWorker)
+  async initializeWorker() {
+    return new Promise((resolve) => {
+      let callbackId
+      if (this.worker !== null) {
+        this.worker.terminate()
+        this.worker = null
+      }
+
+      const initializeESLintWorker = () => {
+        this.worker = new Task(require.resolve('./worker.js'))
+        idleCallbacks.delete(callbackId)
+        resolve()
+      }
+      // Initialize the worker during an idle time
+      callbackId = window.requestIdleCallback(initializeESLintWorker)
+      idleCallbacks.add(callbackId)
+    })
   },
 
   deactivate() {
@@ -193,21 +207,6 @@ module.exports = {
     idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
     idleCallbacks.clear()
     this.subscriptions.dispose()
-  },
-
-  async restartESLintWorker() {
-    return new Promise((resolve) => {
-      if (this.worker !== null) {
-        this.worker.terminate()
-        this.worker = null
-      }
-      const initializeESLintWorker = () => {
-        this.worker = new Task(require.resolve('./worker.js'))
-        resolve()
-      }
-      // Initialize the worker during an idle time
-      window.requestIdleCallback(initializeESLintWorker)
-    })
   },
 
   provideLinter() {
@@ -261,7 +260,7 @@ module.exports = {
         // When that happens, it seems that there is no way to recover other
         // than to kill the worker and create a new one.
         if (this.worker && !this.worker.childProcess.connected) {
-          await this.restartESLintWorker()
+          await this.initializeWorker()
         }
 
         try {
@@ -348,7 +347,7 @@ module.exports = {
     // When that happens, it seems that there is no way to recover other
     // than to kill the worker and create a new one.
     if (this.worker && !this.worker.childProcess.connected) {
-      await this.restartESLintWorker()
+      await this.initializeWorker()
     }
 
     try {
