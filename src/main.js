@@ -1,7 +1,7 @@
 'use babel'
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { CompositeDisposable, Task } from 'atom'
+import { CompositeDisposable } from 'atom'
 
 // Internal variables
 const idleCallbacks = new Set()
@@ -44,10 +44,15 @@ const scheduleIdleTasks = () => {
     require('atom-package-deps').install('linter-eslint')
   }
   const linterEslintLoadDependencies = loadDeps
+  const linterEslintStartWorker = () => {
+    loadDeps()
+    helpers.startWorker()
+  }
 
   if (!atom.inSpecMode()) {
     makeIdleCallback(linterEslintInstallPeerPackages)
     makeIdleCallback(linterEslintLoadDependencies)
+    makeIdleCallback(linterEslintStartWorker)
   }
 }
 
@@ -74,18 +79,6 @@ const idsToIgnoredRules = ruleIds =>
     , {}
   )
 
-// Worker still hasn't initialized, since the queued idle callbacks are
-// done in order, waiting on a newly queued idle callback will ensure that
-// the worker has been initialized
-const waitOnIdle = async () =>
-  new Promise((resolve) => {
-    const callbackID = window.requestIdleCallback(() => {
-      idleCallbacks.delete(callbackID)
-      resolve()
-    })
-    idleCallbacks.add(callbackID)
-  })
-
 const validScope = editor => editor.getCursors().some(cursor =>
   cursor.getScopeDescriptor().getScopesArray().some(scope =>
     scopes.includes(scope)))
@@ -93,7 +86,6 @@ const validScope = editor => editor.getCursors().some(cursor =>
 module.exports = {
   activate() {
     this.subscriptions = new CompositeDisposable()
-    this.worker = null
 
     /**
      * FIXME: Deprecated eslintRulesDir{String} option in favor of
@@ -147,10 +139,7 @@ module.exports = {
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
         loadDeps()
-        if (!this.worker) {
-          await waitOnIdle()
-        }
-        const debugString = await helpers.generateDebugString(this.worker)
+        const debugString = await helpers.generateDebugString()
         const notificationOptions = { detail: debugString, dismissable: true }
         atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
       }
@@ -209,36 +198,17 @@ module.exports = {
       }]
     }))
 
-    this.initializeWorker()
     scheduleIdleTasks()
   },
 
-  async initializeWorker() {
-    return new Promise((resolve) => {
-      let callbackId
-      if (this.worker !== null) {
-        this.worker.terminate()
-        this.worker = null
-      }
-
-      const initializeESLintWorker = () => {
-        this.worker = new Task(require.resolve('./worker.js'))
-        idleCallbacks.delete(callbackId)
-        resolve()
-      }
-      // Initialize the worker during an idle time
-      callbackId = window.requestIdleCallback(initializeESLintWorker)
-      idleCallbacks.add(callbackId)
-    })
-  },
-
   deactivate() {
-    if (this.worker !== null) {
-      this.worker.terminate()
-      this.worker = null
-    }
     idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
     idleCallbacks.clear()
+    if (helpers) {
+      // If the helpers module hasn't been loaded then there was no chance a
+      // worker was started anyway.
+      helpers.killWorker()
+    }
     this.subscriptions.dispose()
   },
 
@@ -286,19 +256,8 @@ module.exports = {
           }
         }
 
-        if (!this.worker) {
-          await waitOnIdle()
-        }
-
-        // Sometimes the worker dies and becomes disconnected
-        // When that happens, it seems that there is no way to recover other
-        // than to kill the worker and create a new one.
-        if (this.worker && !this.worker.childProcess.connected) {
-          await this.initializeWorker()
-        }
-
         try {
-          const response = await helpers.sendJob(this.worker, {
+          const response = await helpers.sendJob({
             type: 'lint',
             contents: text,
             config: atom.config.get('linter-eslint'),
@@ -315,7 +274,7 @@ module.exports = {
             */
             return null
           }
-          return helpers.processJobResponse(response, textEditor, showRule, this.worker)
+          return helpers.processJobResponse(response, textEditor, showRule)
         } catch (error) {
           return helpers.handleError(textEditor, error)
         }
@@ -362,19 +321,8 @@ module.exports = {
       rules = ignoredRulesWhenFixing
     }
 
-    if (!this.worker) {
-      await waitOnIdle()
-    }
-
-    // Sometimes the worker dies and becomes disconnected
-    // When that happens, it seems that there is no way to recover other
-    // than to kill the worker and create a new one.
-    if (this.worker && !this.worker.childProcess.connected) {
-      await this.initializeWorker()
-    }
-
     try {
-      const response = await helpers.sendJob(this.worker, {
+      const response = await helpers.sendJob({
         type: 'fix',
         config: atom.config.get('linter-eslint'),
         contents: text,
