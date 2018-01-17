@@ -3,6 +3,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable, Task } from 'atom'
 
+// Internal variables
+const idleCallbacks = new Set()
+
 // Dependencies
 // NOTE: We are not directly requiring these in order to reduce the time it
 // takes to require this file as that causes delays in Atom loading this package
@@ -26,6 +29,19 @@ const loadDeps = () => {
   }
 }
 
+const installPackage = () => {
+  let callbackID
+  const installLinterEslintDeps = () => {
+    idleCallbacks.delete(callbackID)
+    if (!atom.inSpecMode()) {
+      require('atom-package-deps').install('linter-eslint')
+      loadDeps()
+    }
+  }
+  callbackID = window.requestIdleCallback(installLinterEslintDeps)
+  idleCallbacks.add(callbackID)
+}
+
 // Configuration
 const scopes = []
 let showRule
@@ -34,9 +50,6 @@ let ignoredRulesWhenModified
 let ignoredRulesWhenFixing
 let disableWhenNoEslintConfig
 let ignoreFixableRulesWhileTyping
-
-// Internal variables
-const idleCallbacks = new Set()
 
 // Internal functions
 const idsToIgnoredRules = ruleIds =>
@@ -64,16 +77,7 @@ const validScope = editor => editor.getCursors().some(cursor =>
 
 module.exports = {
   activate() {
-    let callbackID
-    const installLinterEslintDeps = () => {
-      idleCallbacks.delete(callbackID)
-      if (!atom.inSpecMode()) {
-        require('atom-package-deps').install('linter-eslint')
-        loadDeps()
-      }
-    }
-    callbackID = window.requestIdleCallback(installLinterEslintDeps)
-    idleCallbacks.add(callbackID)
+    installPackage()
 
     this.subscriptions = new CompositeDisposable()
     this.worker = null
