@@ -214,6 +214,7 @@ module.exports = {
       name: 'ESLint',
       grammarScopes: scopes,
       scope: 'file',
+      lintsProject: true,
       lintsOnChange: true,
       lint: async (textEditor) => {
         if (!atom.workspace.isTextEditor(textEditor)) {
