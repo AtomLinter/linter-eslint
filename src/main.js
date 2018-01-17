@@ -6,23 +6,25 @@ import { CompositeDisposable, Task } from 'atom'
 // Dependencies
 // NOTE: We are not directly requiring these in order to reduce the time it
 // takes to require this file as that causes delays in Atom loading this package
-//
-// The functions first assigned to the dependency variables will self-assign
-// their underlying modules once called in an animation frame.
+let path
+let helpers
+let workerHelpers
+let isConfigAtHomeRoot
 
-/* eslint-disable no-return-assign */
-let path = () => path = require('path')
-let helpers = () => helpers = require('./helpers')
-let workerHelpers = () => workerHelpers = require('./worker-helpers')
-let isConfigAtHomeRoot = () =>
-  isConfigAtHomeRoot = require('./is-config-at-home-root')
-/* eslint-enable */
-
-// Load the dependencies when Atom next has free time.
-//
-requestAnimationFrame(() => {
-  path(); helpers(); workerHelpers(); isConfigAtHomeRoot()
-})
+const loadDeps = () => {
+  if (!path) {
+    path = require('path')
+  }
+  if (!helpers) {
+    helpers = require('./helpers')
+  }
+  if (!workerHelpers) {
+    workerHelpers = require('./worker-helpers')
+  }
+  if (!isConfigAtHomeRoot) {
+    isConfigAtHomeRoot = require('./is-config-at-home-root')
+  }
+}
 
 // Configuration
 const scopes = []
@@ -67,6 +69,7 @@ module.exports = {
       idleCallbacks.delete(callbackID)
       if (!atom.inSpecMode()) {
         require('atom-package-deps').install('linter-eslint')
+        loadDeps()
       }
     }
     callbackID = window.requestIdleCallback(installLinterEslintDeps)
@@ -126,6 +129,7 @@ module.exports = {
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
+        loadDeps()
         if (!this.worker) {
           await waitOnIdle()
         }
@@ -238,6 +242,8 @@ module.exports = {
           return null
         }
 
+        loadDeps()
+
         if (filePath.includes('://')) {
           // If the path is a URL (Nuclide remote file) return a message
           // telling the user we are unable to work on remote files.
@@ -302,6 +308,8 @@ module.exports = {
       // Silently return if the TextEditor is invalid
       return
     }
+
+    loadDeps()
 
     if (textEditor.isModified()) {
       // Abort for invalid or unsaved text editors
