@@ -177,12 +177,26 @@ module.exports = {
         }
       }]
     }))
+    this.initializeWorker()
+  },
 
-    const initializeESLintWorker = () => {
-      this.worker = new Task(require.resolve('./worker.js'))
-    }
-    // Initialize the worker during an idle time
-    window.requestIdleCallback(initializeESLintWorker)
+  async initializeWorker() {
+    return new Promise((resolve) => {
+      let callbackId
+      if (this.worker !== null) {
+        this.worker.terminate()
+        this.worker = null
+      }
+
+      const initializeESLintWorker = () => {
+        this.worker = new Task(require.resolve('./worker.js'))
+        idleCallbacks.delete(callbackId)
+        resolve()
+      }
+      // Initialize the worker during an idle time
+      callbackId = window.requestIdleCallback(initializeESLintWorker)
+      idleCallbacks.add(callbackId)
+    })
   },
 
   deactivate() {
@@ -242,9 +256,15 @@ module.exports = {
           await waitOnIdle()
         }
 
-        let response
+        // Sometimes the worker dies and becomes disconnected
+        // When that happens, it seems that there is no way to recover other
+        // than to kill the worker and create a new one.
+        if (this.worker && !this.worker.childProcess.connected) {
+          await this.initializeWorker()
+        }
+
         try {
-          response = await helpers.sendJob(this.worker, {
+          const response = await helpers.sendJob(this.worker, {
             type: 'lint',
             contents: text,
             config: atom.config.get('linter-eslint'),
@@ -321,6 +341,13 @@ module.exports = {
     }
     if (!this.worker) {
       await waitOnIdle()
+    }
+
+    // Sometimes the worker dies and becomes disconnected
+    // When that happens, it seems that there is no way to recover other
+    // than to kill the worker and create a new one.
+    if (this.worker && !this.worker.childProcess.connected) {
+      await this.initializeWorker()
     }
 
     try {
