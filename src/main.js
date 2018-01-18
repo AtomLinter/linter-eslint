@@ -43,9 +43,8 @@ const scheduleIdleTasks = () => {
   const linterEslintInstallPeerPackages = () => {
     require('atom-package-deps').install('linter-eslint')
   }
-  const linterEslintLoadDependencies = () => {
-    loadDeps()
-  }
+  const linterEslintLoadDependencies = loadDeps
+
   if (!atom.inSpecMode()) {
     makeIdleCallback(linterEslintInstallPeerPackages)
     makeIdleCallback(linterEslintLoadDependencies)
