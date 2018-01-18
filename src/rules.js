@@ -1,5 +1,10 @@
 import ruleURI from 'eslint-rule-documentation'
 
+// Private properties
+const rules = Symbol('rules')
+const validRulesArray = Symbol('validRulesArray')
+const validateRulesArray = Symbol('validateRulesArray')
+
 /**
  * Stores a list of rules from ESLint
  */
@@ -9,19 +14,20 @@ export default class Rules {
    * @param {Array} newRules Array of Arrays of the rule and properties
    */
   constructor(newRules) {
-    this.rules = new Map()
-    if (newRules) {
-      this.updateRules(newRules)
+    if (Rules[validRulesArray](newRules)) {
+      this[rules] = new Map(newRules)
+    } else {
+      this[rules] = new Map()
     }
   }
 
   /**
    * Process the updated rules into the local Map and call further update functions
-   * @param  {Array} updatedRules Array of Arrays of the rule and properties
+   * @param  {Array} newRules Array of Arrays of the rule and properties
    */
-  updateRules(updatedRules) {
-    this.rules.clear()
-    updatedRules.forEach(([rule, props]) => this.rules.set(rule, props))
+  replaceRules(newRules) {
+    Rules[validateRulesArray](newRules)
+    this[rules] = new Map(newRules)
   }
 
   /**
@@ -29,7 +35,7 @@ export default class Rules {
    * @return {Array} The ruleIds of the currently known fixable rules
    */
   getFixableRules() {
-    return Array.from(this.rules).reduce((fixable, [rule, props]) => {
+    return Array.from(this[rules]).reduce((fixable, [rule, props]) => {
       if (props.meta && props.meta.fixable) {
         return [...fixable, rule]
       }
@@ -45,7 +51,7 @@ export default class Rules {
    * @return {String}        URL of the rule documentation
    */
   getRuleUrl(ruleId) {
-    const props = this.rules.get(ruleId)
+    const props = this[rules].get(ruleId)
     if (props && props.meta && props.meta.docs && props.meta.docs.url) {
       // The rule has a documentation URL specified in its metadata
       return props.meta.docs.url
@@ -61,6 +67,22 @@ export default class Rules {
    * @return {Map} The currently known rules
    */
   getRules() {
-    return new Map(this.rules)
+    return new Map(this[rules])
+  }
+
+  static [validRulesArray](rulesArray) {
+    if (!Array.isArray(rulesArray)) {
+      return false
+    }
+    return rulesArray.every(elem =>
+      Array.isArray(elem) && elem.length === 2 &&
+      typeof elem[0] === 'string' && typeof elem[1] === 'object' &&
+      elem[1] !== null && !Array.isArray(elem[1]))
+  }
+
+  static [validateRulesArray](rulesArray) {
+    if (!Rules[validRulesArray](rulesArray)) {
+      throw new Error('Given rules are not valid!')
+    }
   }
 }

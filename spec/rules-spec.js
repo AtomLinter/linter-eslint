@@ -3,7 +3,7 @@
 import Rules from '../src/rules'
 
 describe('The Rules class', () => {
-  describe('updateRules', () => {
+  describe('replaceRules', () => {
     const ruleArray = [
       ['foo', { meta: { fixable: true } }],
       ['bar', { meta: {} }]
@@ -12,30 +12,59 @@ describe('The Rules class', () => {
     it('adds new rules', () => {
       const rules = new Rules()
       expect(rules.getRules()).toEqual(new Map())
-      rules.updateRules(ruleArray)
+      rules.replaceRules(ruleArray)
       expect(rules.getRules()).toEqual(new Map(ruleArray))
     })
 
     it('removes old rules', () => {
       const rules = new Rules()
-      rules.updateRules(ruleArray)
+      rules.replaceRules(ruleArray)
       expect(rules.getRules()).toEqual(new Map(ruleArray))
-      rules.updateRules([])
+      rules.replaceRules([])
       expect(rules.getRules()).toEqual(new Map())
     })
 
     it('updates the fixableRules list', () => {
       const rules = new Rules()
       expect(rules.getFixableRules()).toEqual([])
-      rules.updateRules(ruleArray)
+      rules.replaceRules(ruleArray)
       expect(rules.getFixableRules()).toEqual(['foo'])
+    })
+
+    it('validates new rules', () => {
+      const rules = new Rules()
+      const testRuleReplace = (value, throws = true) => {
+        const test = () => {
+          rules.replaceRules(value)
+        }
+        if (throws) {
+          expect(test).toThrow()
+        } else {
+          expect(test).not.toThrow()
+        }
+      }
+
+      // Invalid
+      testRuleReplace('foobar')
+      testRuleReplace({})
+      testRuleReplace(null)
+      testRuleReplace(undefined)
+      testRuleReplace([[]])
+      testRuleReplace([['foo']])
+      testRuleReplace([['foo', 'bar']])
+      testRuleReplace([['foo', []]])
+      testRuleReplace([['foo', null]])
+      testRuleReplace([['foo', undefined]])
+      // Valid
+      testRuleReplace([], false)
+      testRuleReplace([['foo', {}]], false)
     })
   })
 
   describe('getRuleUrl', () => {
     it('works with rules that define their own URL', () => {
       const rules = new Rules()
-      rules.updateRules([['foo', { meta: { docs: { url: 'bar' } } }]])
+      rules.replaceRules([['foo', { meta: { docs: { url: 'bar' } } }]])
       expect(rules.getRuleUrl('foo')).toBe('bar')
     })
 

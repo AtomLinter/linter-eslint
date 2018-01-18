@@ -331,7 +331,7 @@ export async function processESLintMessages(messages, textEditor, showRule, work
  */
 export async function processJobResponse(response, textEditor, showRule, worker) {
   if (Object.prototype.hasOwnProperty.call(response, 'updatedRules')) {
-    rules.updateRules(response.updatedRules)
+    rules.replaceRules(response.updatedRules)
   }
   return processESLintMessages(response.messages, textEditor, showRule, worker)
 }
