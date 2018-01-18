@@ -3,6 +3,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable, Task } from 'atom'
 
+// Internal variables
+const idleCallbacks = new Set()
+
 // Dependencies
 // NOTE: We are not directly requiring these in order to reduce the time it
 // takes to require this file as that causes delays in Atom loading this package
@@ -10,6 +13,43 @@ let path
 let helpers
 let workerHelpers
 let isConfigAtHomeRoot
+
+const loadDeps = () => {
+  if (!path) {
+    path = require('path')
+  }
+  if (!helpers) {
+    helpers = require('./helpers')
+  }
+  if (!workerHelpers) {
+    workerHelpers = require('./worker-helpers')
+  }
+  if (!isConfigAtHomeRoot) {
+    isConfigAtHomeRoot = require('./is-config-at-home-root')
+  }
+}
+
+const makeIdleCallback = (work) => {
+  let callbackId
+  const callBack = () => {
+    idleCallbacks.delete(callbackId)
+    work()
+  }
+  callbackId = window.requestIdleCallback(callBack)
+  idleCallbacks.add(callbackId)
+}
+
+const scheduleIdleTasks = () => {
+  const linterEslintInstallPeerPackages = () => {
+    require('atom-package-deps').install('linter-eslint')
+  }
+  const linterEslintLoadDependencies = loadDeps
+
+  if (!atom.inSpecMode()) {
+    makeIdleCallback(linterEslintInstallPeerPackages)
+    makeIdleCallback(linterEslintLoadDependencies)
+  }
+}
 
 // Configuration
 const scopes = []
@@ -19,9 +59,6 @@ let ignoredRulesWhenModified
 let ignoredRulesWhenFixing
 let disableWhenNoEslintConfig
 let ignoreFixableRulesWhileTyping
-
-// Internal variables
-const idleCallbacks = new Set()
 
 // Internal functions
 const idsToIgnoredRules = ruleIds =>
@@ -49,16 +86,6 @@ const validScope = editor => editor.getCursors().some(cursor =>
 
 module.exports = {
   activate() {
-    let callbackID
-    const installLinterEslintDeps = () => {
-      idleCallbacks.delete(callbackID)
-      if (!atom.inSpecMode()) {
-        require('atom-package-deps').install('linter-eslint')
-      }
-    }
-    callbackID = window.requestIdleCallback(installLinterEslintDeps)
-    idleCallbacks.add(callbackID)
-
     this.subscriptions = new CompositeDisposable()
     this.worker = null
 
@@ -113,9 +140,7 @@ module.exports = {
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
-        if (!helpers) {
-          helpers = require('./helpers')
-        }
+        loadDeps()
         if (!this.worker) {
           await waitOnIdle()
         }
@@ -177,7 +202,9 @@ module.exports = {
         }
       }]
     }))
+
     this.initializeWorker()
+    scheduleIdleTasks()
   },
 
   async initializeWorker() {
@@ -228,6 +255,8 @@ module.exports = {
           return null
         }
 
+        loadDeps()
+
         if (filePath.includes('://')) {
           // If the path is a URL (Nuclide remote file) return a message
           // telling the user we are unable to work on remote files.
@@ -238,10 +267,6 @@ module.exports = {
         }
 
         const text = textEditor.getText()
-
-        if (!helpers) {
-          helpers = require('./helpers')
-        }
 
         let rules = {}
         if (textEditor.isModified() && Object.keys(ignoredRulesWhenModified).length > 0) {
@@ -297,20 +322,12 @@ module.exports = {
       return
     }
 
+    loadDeps()
+
     if (textEditor.isModified()) {
       // Abort for invalid or unsaved text editors
       const message = 'Linter-ESLint: Please save before fixing'
       atom.notifications.addError(message)
-    }
-
-    if (!path) {
-      path = require('path')
-    }
-    if (!isConfigAtHomeRoot) {
-      isConfigAtHomeRoot = require('./is-config-at-home-root')
-    }
-    if (!workerHelpers) {
-      workerHelpers = require('./worker-helpers')
     }
 
     const filePath = textEditor.getPath()
@@ -336,9 +353,6 @@ module.exports = {
       rules = ignoredRulesWhenFixing
     }
 
-    if (!helpers) {
-      helpers = require('./helpers')
-    }
     if (!this.worker) {
       await waitOnIdle()
     }
