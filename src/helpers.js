@@ -1,14 +1,13 @@
 'use babel'
 
 import { join } from 'path'
-import ruleURI from 'eslint-rule-documentation'
 import { generateRange } from 'atom-linter'
 import cryptoRandomString from 'crypto-random-string'
-
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Range } from 'atom'
+import Rules from './rules'
 
-const fixableRules = new Set()
+export const rules = new Rules()
 
 /**
  * Start the worker process if it hasn't already been started
@@ -70,10 +69,6 @@ export async function sendJob(worker, config) {
       console.error(e)
     }
   })
-}
-
-export function getFixableRules() {
-  return Array.from(fixableRules.values())
 }
 
 function validatePoint(textBuffer, line, col) {
@@ -286,7 +281,7 @@ export async function processESLintMessages(messages, textEditor, showRule, work
     }
 
     if (ruleId) {
-      ret.url = ruleURI(ruleId).url
+      ret.url = rules.getRuleUrl(ruleId)
     }
 
     let range
@@ -335,9 +330,8 @@ export async function processESLintMessages(messages, textEditor, showRule, work
  * @return {Promise}               The messages transformed into Linter messages
  */
 export async function processJobResponse(response, textEditor, showRule, worker) {
-  if (Object.prototype.hasOwnProperty.call(response, 'fixableRules')) {
-    fixableRules.clear()
-    response.fixableRules.forEach(rule => fixableRules.add(rule))
+  if (Object.prototype.hasOwnProperty.call(response, 'updatedRules')) {
+    rules.replaceRules(response.updatedRules)
   }
   return processESLintMessages(response.messages, textEditor, showRule, worker)
 }
