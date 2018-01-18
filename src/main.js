@@ -29,17 +29,27 @@ const loadDeps = () => {
   }
 }
 
-const installPackage = () => {
-  let callbackID
-  const installLinterEslintDeps = () => {
-    idleCallbacks.delete(callbackID)
-    if (!atom.inSpecMode()) {
-      require('atom-package-deps').install('linter-eslint')
-      loadDeps()
-    }
+const makeIdleCallback = (work) => {
+  let callbackId
+  const callBack = () => {
+    idleCallbacks.delete(callbackId)
+    work()
   }
-  callbackID = window.requestIdleCallback(installLinterEslintDeps)
-  idleCallbacks.add(callbackID)
+  callbackId = window.requestIdleCallback(callBack)
+  idleCallbacks.add(callbackId)
+}
+
+const scheduleIdleTasks = () => {
+  const linterEslintInstallPeerPackages = () => {
+    require('atom-package-deps').install('linter-eslint')
+  }
+  const linterEslintLoadDependencies = () => {
+    loadDeps()
+  }
+  if (!atom.inSpecMode()) {
+    makeIdleCallback(linterEslintInstallPeerPackages)
+    makeIdleCallback(linterEslintLoadDependencies)
+  }
 }
 
 // Configuration
@@ -77,8 +87,6 @@ const validScope = editor => editor.getCursors().some(cursor =>
 
 module.exports = {
   activate() {
-    installPackage()
-
     this.subscriptions = new CompositeDisposable()
     this.worker = null
 
@@ -195,7 +203,9 @@ module.exports = {
         }
       }]
     }))
+
     this.initializeWorker()
+    scheduleIdleTasks()
   },
 
   async initializeWorker() {
