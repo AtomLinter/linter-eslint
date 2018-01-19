@@ -61,12 +61,18 @@ let disableWhenNoEslintConfig
 let ignoreFixableRulesWhileTyping
 
 // Internal functions
+/**
+ * Given an Array or iterable containing a list of Rule IDs, return an Object
+ * to be sent to ESLint's configuration that disables those rules.
+ * @param  {[iterable]} ruleIds Iterable containing ruleIds to ignore
+ * @return {Object}             Object containing properties for each rule to ignore
+ */
 const idsToIgnoredRules = ruleIds =>
-  ruleIds.reduce((ids, id) => {
-    // eslint-disable-next-line no-param-reassign
-    ids[id] = 0 // 0 is the severity to turn off a rule
-    return ids
-  }, {})
+  Array.from(ruleIds).reduce(
+    // 0 is the severity to turn off a rule
+    (ids, id) => Object.assign(ids, { [id]: 0 })
+    , {}
+  )
 
 // Worker still hasn't initialized, since the queued idle callbacks are
 // done in order, waiting on a newly queued idle callback will ensure that
@@ -168,7 +174,7 @@ module.exports = {
 
     this.subscriptions.add(atom.config.observe(
       'linter-eslint.rulesToSilenceWhileTyping',
-      (ids) => { ignoredRulesWhenModified = idsToIgnoredRules(ids) }
+      (ids) => { ignoredRulesWhenModified = ids }
     ))
 
     this.subscriptions.add(atom.config.observe(
@@ -269,12 +275,15 @@ module.exports = {
         const text = textEditor.getText()
 
         let rules = {}
-        if (textEditor.isModified() && Object.keys(ignoredRulesWhenModified).length > 0) {
-          rules = ignoredRulesWhenModified
-        }
-        if (textEditor.isModified() && ignoreFixableRulesWhileTyping) {
-          // Note that this list will only contain rules after the first lint job
-          rules = idsToIgnoredRules(helpers.rules.getFixableRules())
+        if (textEditor.isModified()) {
+          if (ignoreFixableRulesWhileTyping) {
+            // Note that the fixable rules will only have values after the first lint job
+            const ignoredRules = new Set(helpers.rules.getFixableRules())
+            ignoredRulesWhenModified.forEach(ruleId => ignoredRules.add(ruleId))
+            rules = idsToIgnoredRules(ignoredRules)
+          } else {
+            rules = idsToIgnoredRules(ignoredRulesWhenModified)
+          }
         }
 
         if (!this.worker) {
