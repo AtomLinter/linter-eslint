@@ -2,8 +2,6 @@ import ruleURI from 'eslint-rule-documentation'
 
 // Private properties
 const rules = Symbol('rules')
-const validRulesArray = Symbol('validRulesArray')
-const validateRulesArray = Symbol('validateRulesArray')
 
 /**
  * Stores a list of rules from ESLint
@@ -14,11 +12,7 @@ export default class Rules {
    * @param {Array} newRules Array of Arrays of the rule and properties
    */
   constructor(newRules) {
-    if (Rules[validRulesArray](newRules)) {
-      this[rules] = new Map(newRules)
-    } else {
-      this[rules] = new Map()
-    }
+    this.replaceRules(newRules)
   }
 
   /**
@@ -26,7 +20,6 @@ export default class Rules {
    * @param  {Array} newRules Array of Arrays of the rule and properties
    */
   replaceRules(newRules) {
-    Rules[validateRulesArray](newRules)
     this[rules] = new Map(newRules)
   }
 
@@ -68,21 +61,5 @@ export default class Rules {
    */
   getRules() {
     return new Map(this[rules])
-  }
-
-  static [validRulesArray](rulesArray) {
-    if (!Array.isArray(rulesArray)) {
-      return false
-    }
-    return rulesArray.every(elem =>
-      Array.isArray(elem) && elem.length === 2 &&
-      typeof elem[0] === 'string' && typeof elem[1] === 'object' &&
-      elem[1] !== null && !Array.isArray(elem[1]))
-  }
-
-  static [validateRulesArray](rulesArray) {
-    if (!Rules[validRulesArray](rulesArray)) {
-      throw new Error('Given rules are not valid!')
-    }
   }
 }
