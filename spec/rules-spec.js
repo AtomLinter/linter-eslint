@@ -30,35 +30,6 @@ describe('The Rules class', () => {
       rules.replaceRules(ruleArray)
       expect(rules.getFixableRules()).toEqual(['foo'])
     })
-
-    it('validates new rules', () => {
-      const rules = new Rules()
-      const testRuleReplace = (value, throws = true) => {
-        const test = () => {
-          rules.replaceRules(value)
-        }
-        if (throws) {
-          expect(test).toThrow()
-        } else {
-          expect(test).not.toThrow()
-        }
-      }
-
-      // Invalid
-      testRuleReplace('foobar')
-      testRuleReplace({})
-      testRuleReplace(null)
-      testRuleReplace(undefined)
-      testRuleReplace([[]])
-      testRuleReplace([['foo']])
-      testRuleReplace([['foo', 'bar']])
-      testRuleReplace([['foo', []]])
-      testRuleReplace([['foo', null]])
-      testRuleReplace([['foo', undefined]])
-      // Valid
-      testRuleReplace([], false)
-      testRuleReplace([['foo', {}]], false)
-    })
   })
 
   describe('getRuleUrl', () => {
