@@ -29,7 +29,7 @@ export default class Rules {
    */
   getFixableRules() {
     return Array.from(this[rules]).reduce((fixable, [rule, props]) => {
-      if (props.meta && props.meta.fixable) {
+      if (props && props.meta && props.meta.fixable) {
         return [...fixable, rule]
       }
       return fixable
