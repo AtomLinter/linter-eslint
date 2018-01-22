@@ -234,35 +234,4 @@ describe('Worker Helpers', () => {
       expect(Helpers.getRules(cliEngine)).toEqual(new Map())
     })
   })
-
-  describe('didRulesChange', () => {
-    const emptyRules = new Map()
-    const rules1 = new Map([['rule1', {}]])
-    const rules2 = new Map([['rule1', {}], ['rule2', {}]])
-
-    it('returns false for empty Maps', () => {
-      const newRules = new Map()
-      expect(Helpers.didRulesChange(emptyRules, newRules)).toBe(false)
-    })
-
-    it('returns false when they are the same', () => {
-      expect(Helpers.didRulesChange(rules1, rules1)).toBe(false)
-    })
-
-    it('returns true when a new rule is added to an empty list', () => {
-      expect(Helpers.didRulesChange(emptyRules, rules1)).toBe(true)
-    })
-
-    it('returns true when the last rule is removed', () => {
-      expect(Helpers.didRulesChange(rules1, emptyRules)).toBe(true)
-    })
-
-    it('returns true when a new rule is added to an existing list', () => {
-      expect(Helpers.didRulesChange(rules1, rules2)).toBe(true)
-    })
-
-    it('returns true when a rule is removed from an existing list', () => {
-      expect(Helpers.didRulesChange(rules2, rules1)).toBe(true)
-    })
-  })
 })

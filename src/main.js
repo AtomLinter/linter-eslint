@@ -2,6 +2,10 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable } from 'atom'
+import store from './store/main'
+import { getFixableAsIgnored } from './store/selectors'
+// eslint-disable-next-line import/prefer-default-export
+export { store }
 
 // Internal variables
 const idleCallbacks = new Set()
@@ -248,9 +252,10 @@ module.exports = {
         if (textEditor.isModified()) {
           if (ignoreFixableRulesWhileTyping) {
             // Note that the fixable rules will only have values after the first lint job
-            const ignoredRules = new Set(helpers.rules.getFixableRules())
-            ignoredRulesWhenModified.forEach(ruleId => ignoredRules.add(ruleId))
-            rules = idsToIgnoredRules(ignoredRules)
+            rules = {
+              ...getFixableAsIgnored(store.getState()),
+              ...idsToIgnoredRules(ignoredRulesWhenModified)
+            }
           } else {
             rules = idsToIgnoredRules(ignoredRulesWhenModified)
           }
