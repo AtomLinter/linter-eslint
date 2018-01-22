@@ -7,27 +7,20 @@ import { FindCache, findCached } from 'atom-linter'
 import * as Helpers from './worker-helpers'
 import isConfigAtHomeRoot from './is-config-at-home-root'
 
-process.title = 'linter-eslint helper'
+import store from './store/worker'
+import { diffRules } from './store/actions/rules'
 
-const rulesMetadata = new Map()
-let shouldSendRules = false
+process.title = 'linter-eslint helper'
 
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
   const rules = Helpers.getRules(cliEngine)
-  shouldSendRules = Helpers.didRulesChange(rulesMetadata, rules)
-  if (shouldSendRules) {
-    // Rebuild rulesMetadata
-    rulesMetadata.clear()
-    rules.forEach((properties, rule) => rulesMetadata.set(rule, properties))
-  }
-  return report
+  return { report, rules }
 }
 
 function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
-  const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
-
+  const { report } = lintJob({ cliEngineOptions, contents, eslint, filePath })
   eslint.CLIEngine.outputFixes(report)
 
   if (!report.results.length || !report.results[0].messages.length) {
@@ -37,12 +30,12 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
 }
 
 module.exports = async () => {
-  process.on('message', (jobConfig) => {
+  process.on('message', ({
+    contents, type, config, filePath, projectPath, rules, emitKey
+  }) => {
     // We catch all worker errors so that we can create a separate error emitter
     // for each emitKey, rather than adding multiple listeners for `task:error`
-    const {
-      contents, type, config, filePath, projectPath, rules, emitKey
-    } = jobConfig
+
     try {
       if (config.disableFSCache) {
         FindCache.clear()
@@ -63,17 +56,16 @@ module.exports = async () => {
         .getCLIEngineOptions(type, config, rules, relativeFilePath, fileDir, configPath)
 
       let response
+      const jobConfig = { cliEngineOptions, contents, eslint, filePath }
       if (type === 'lint') {
-        const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
+        const { report, rules: newRules } =
+          lintJob(jobConfig)
         response = {
-          messages: report.results.length ? report.results[0].messages : []
-        }
-        if (shouldSendRules) {
-          // You can't emit Maps, convert to Array of Arrays to send back.
-          response.updatedRules = Array.from(rulesMetadata)
+          messages: report.results.length ? report.results[0].messages : [],
+          rulesDiff: store.dispatch(diffRules(newRules))
         }
       } else if (type === 'fix') {
-        response = fixJob({ cliEngineOptions, contents, eslint, filePath })
+        response = fixJob(jobConfig)
       } else if (type === 'debug') {
         const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
         response = Helpers.findESLintDirectory(modulesDir, config, projectPath)

@@ -6,6 +6,7 @@ import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
 import getPath from 'consistent-path'
+import { getRulesDiff } from './store/selectors'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
@@ -218,6 +219,7 @@ export function getRules(cliEngine) {
  * @return {boolean}             Whether or not there were changes
  */
 export function didRulesChange(currentRules, newRules) {
-  return !(currentRules.size === newRules.size &&
-    Array.from(currentRules.keys()).every(ruleId => newRules.has(ruleId)))
+  return !!getRulesDiff({ rules: currentRules }, { rules: newRules })
+  // return !(currentRules.size === newRules.size &&
+  //   Array.from(currentRules.keys()).every(ruleId => newRules.has(ruleId)))
 }

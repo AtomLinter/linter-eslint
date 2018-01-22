@@ -5,9 +5,10 @@ import { generateRange } from 'atom-linter'
 import cryptoRandomString from 'crypto-random-string'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Range, Task } from 'atom'
-import Rules from './rules'
+import store from './store/main'
+import { getRuleUrl } from './store/selectors'
+import { updateRules } from './store/actions/rules'
 
-export const rules = new Rules()
 let worker = null
 
 /**
@@ -300,7 +301,7 @@ export async function processESLintMessages(messages, textEditor, showRule) {
     }
 
     if (ruleId) {
-      ret.url = rules.getRuleUrl(ruleId)
+      ret.url = getRuleUrl(store.getState(), ruleId)
     }
 
     let range
@@ -347,8 +348,7 @@ export async function processESLintMessages(messages, textEditor, showRule) {
  * @return {Promise}               The messages transformed into Linter messages
  */
 export async function processJobResponse(response, textEditor, showRule) {
-  if (Object.prototype.hasOwnProperty.call(response, 'updatedRules')) {
-    rules.replaceRules(response.updatedRules)
-  }
+  const { rulesDiff } = response
+  store.dispatch(updateRules(rulesDiff))
   return processESLintMessages(response.messages, textEditor, showRule)
 }
