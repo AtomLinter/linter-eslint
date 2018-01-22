@@ -6,6 +6,7 @@ import cryptoRandomString from 'crypto-random-string'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Range, Task } from 'atom'
 import Rules from './rules'
+import { throwIfInvalidPoint } from './validate/editor'
 
 export const rules = new Rules()
 let worker = null
@@ -89,13 +90,6 @@ export async function sendJob(config) {
       console.error(e)
     }
   })
-}
-
-function validatePoint(textBuffer, line, col) {
-  // Clip the given point to a valid one, and check if it equals the original
-  if (!textBuffer.clipPosition([line, col]).isEqual([line, col])) {
-    throw new Error(`${line}:${col} isn't a valid point!`)
-  }
 }
 
 export async function getDebugInfo() {
@@ -307,8 +301,8 @@ export async function processESLintMessages(messages, textEditor, showRule) {
     try {
       if (eslintFullRange) {
         const buffer = textEditor.getBuffer()
-        validatePoint(buffer, msgLine, msgCol)
-        validatePoint(buffer, msgEndLine, msgEndCol)
+        throwIfInvalidPoint(buffer, msgLine, msgCol)
+        throwIfInvalidPoint(buffer, msgEndLine, msgEndCol)
         range = [[msgLine, msgCol], [msgEndLine, msgEndCol]]
       } else {
         range = generateRange(textEditor, msgLine, msgCol)
