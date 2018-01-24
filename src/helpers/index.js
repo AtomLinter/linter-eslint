@@ -4,41 +4,15 @@ import { join } from 'path'
 import { generateRange } from 'atom-linter'
 import cryptoRandomString from 'crypto-random-string'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { Range, Task } from 'atom'
+import { Range } from 'atom'
 import Rules from '../rules'
 import { throwIfInvalidPoint } from '../validate/editor'
+import createWorkerTask from './worker-task'
+
+const workerTask = createWorkerTask()
+export { workerTask }
 
 export const rules = new Rules()
-let worker = null
-
-/**
- * Start the worker process if it hasn't already been started
- */
-export function startWorker() {
-  if (worker === null) {
-    worker = new Task(require.resolve('../worker.js'))
-  }
-
-  if (worker.started) {
-    // Worker start request has already been sent
-    return
-  }
-  // Send empty arguments as we don't use them in the worker
-  worker.start([])
-
-  // NOTE: Modifies the Task of the worker, but it's the only clean way to track this
-  worker.started = true
-}
-
-/**
- * Forces the worker Task to kill itself
- */
-export function killWorker() {
-  if (worker !== null) {
-    worker.terminate()
-    worker = null
-  }
-}
 
 /**
  * Send a job to the worker and return the results
@@ -46,15 +20,15 @@ export function killWorker() {
  * @return {Object|String|Error}        The data returned from the worker
  */
 export async function sendJob(config) {
-  if (worker && !worker.childProcess.connected) {
+  if (workerTask.connected() === false) {
     // Sometimes the worker dies and becomes disconnected
     // When that happens, it seems that there is no way to recover other
     // than to kill the worker and create a new one.
-    killWorker()
+    workerTask.kill()
   }
 
   // Ensure the worker is started
-  startWorker()
+  workerTask.start()
 
   // Expand the config with a unique ID to emit on
   // NOTE: Jobs _must_ have a unique ID as they are completely async and results
@@ -66,7 +40,7 @@ export async function sendJob(config) {
     // All worker errors are caught and re-emitted along with their associated
     // emitKey, so that we do not create multiple listeners for the same
     // 'task:error' event
-    const errSub = worker.on(`workerError:${config.emitKey}`, ({ msg, stack }) => {
+    const errSub = workerTask.on(`workerError:${config.emitKey}`, ({ msg, stack }) => {
       // Re-throw errors from the task
       const error = new Error(msg)
       // Set the stack to the one given to us by the worker
@@ -76,14 +50,14 @@ export async function sendJob(config) {
       responseSub.dispose()
       reject(error)
     })
-    const responseSub = worker.on(config.emitKey, (data) => {
+    const responseSub = workerTask.on(config.emitKey, (data) => {
       errSub.dispose()
       responseSub.dispose()
       resolve(data)
     })
     // Send the job on to the worker
     try {
-      worker.send(config)
+      workerTask.send(config)
     } catch (e) {
       errSub.dispose()
       responseSub.dispose()

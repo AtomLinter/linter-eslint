@@ -47,7 +47,7 @@ const scheduleIdleTasks = () => {
   const linterEslintLoadDependencies = loadDeps
   const linterEslintStartWorker = () => {
     loadDeps()
-    helpers.startWorker()
+    helpers.workerTask.start()
   }
 
   if (!atom.inSpecMode()) {
@@ -207,7 +207,7 @@ module.exports = {
     if (helpers) {
       // If the helpers module hasn't been loaded then there was no chance a
       // worker was started anyway.
-      helpers.killWorker()
+      helpers.workerTask.kill()
     }
     this.subscriptions.dispose()
   },
