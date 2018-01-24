@@ -7,7 +7,7 @@ import cryptoRandomString from 'crypto-random-string'
 import { Range } from 'atom'
 import Rules from '../rules'
 import { throwIfInvalidPoint } from '../validate/editor'
-import createWorkerTask from './worker-task'
+import createWorkerTask from '../worker/task'
 
 const workerTask = createWorkerTask()
 export { workerTask }

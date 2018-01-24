@@ -8,7 +8,7 @@ import { findCached } from 'atom-linter'
 import getPath from 'consistent-path'
 
 const Cache = {
-  ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
+  ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', '..', 'node_modules', 'eslint')),
   NODE_PREFIX_PATH: null,
   LAST_MODULES_PATH: null
 }

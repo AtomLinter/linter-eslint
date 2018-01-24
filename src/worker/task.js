@@ -19,7 +19,7 @@ const createWorkerTask = () => {
       if (isConnected === false) {
         task.kill()
       }
-      task = new Task(require.resolve('../worker.js'))
+      task = new Task(require.resolve('./job.js'))
     }
     // Return if a start request already sent
     if (started) return false

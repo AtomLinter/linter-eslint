@@ -2,7 +2,7 @@
 
 import * as Path from 'path'
 import rimraf from 'rimraf'
-import * as Helpers from '../src/worker-helpers'
+import * as Helpers from '../src/worker/helpers'
 import { copyFileToTempDir } from './linter-eslint-spec'
 
 const getFixturesPath = path => Path.join(__dirname, 'fixtures', path)

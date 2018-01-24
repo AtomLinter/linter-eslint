@@ -23,7 +23,7 @@ const loadDeps = () => {
     helpers = require('./helpers')
   }
   if (!workerHelpers) {
-    workerHelpers = require('./worker-helpers')
+    workerHelpers = require('./worker/helpers')
   }
   if (!isConfigAtHomeRoot) {
     isConfigAtHomeRoot = require('./is-config-at-home-root')
