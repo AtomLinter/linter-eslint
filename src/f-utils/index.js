@@ -2,8 +2,6 @@
 
 import r from '../f-utils/mini-ramda'
 
-// random comment to test out `hub` behavior
-
 /** *************
  * Typecasting *
  ************** */
