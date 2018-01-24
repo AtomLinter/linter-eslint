@@ -37,12 +37,11 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
 }
 
 module.exports = async () => {
-  process.on('message', (jobConfig) => {
+  process.on('message', ({
+    contents, type, config, filePath, projectPath, rules, emitKey
+  }) => {
     // We catch all worker errors so that we can create a separate error emitter
     // for each emitKey, rather than adding multiple listeners for `task:error`
-    const {
-      contents, type, config, filePath, projectPath, rules, emitKey
-    } = jobConfig
     try {
       if (config.disableFSCache) {
         FindCache.clear()
