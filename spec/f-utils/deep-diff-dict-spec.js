@@ -1,7 +1,6 @@
 'use babel'
 
 // eslint-disable-next-line no-unused-vars
-import 'jasmine-fix'
 import diff from '../../src/f-utils/deep-diff-dict'
 
 
