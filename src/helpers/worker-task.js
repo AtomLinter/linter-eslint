@@ -5,32 +5,38 @@ import { Task } from 'atom'
 
 const createWorkerTask = () => {
   let task = null
+  let started = false
+  const isConnected = () => !!(task && task.childProcess.connected)
+
   /**
    * Start the worker process if it hasn't already been started
    */
   const start = () => {
     if (task === null) {
+      // Sometimes the worker dies and becomes disconnected
+      // When that happens, it seems that there is no way to recover other
+      // than to kill the worker and create a new one.
+      if (isConnected === false) {
+        task.kill()
+      }
       task = new Task(require.resolve('../worker.js'))
     }
+    // Return if a start request already sent
+    if (started) return false
 
-    if (task.started) {
-      // Worker start request has already been sent
-      return
-    }
     // Send empty arguments as we don't use them in the worker
     task.start([])
-
-    // NOTE: Modifies the Task of the worker, but it's the only clean way to track this
-    task.started = true
+    started = true
+    return true
   }
 
   /**
-   * Forces the worker Task to kill itself
+   * Force the worker Task to kill itself
    */
-
   const kill = () => {
     if (task !== null) {
       task.terminate()
+      started = false
       task = null
     }
   }
@@ -38,14 +44,11 @@ const createWorkerTask = () => {
   const on = (...args) => task.on(...args)
   const send = (...args) => task.send(...args)
 
-  const connected = () => task && task.childProcess.connected
-
   return {
     start,
     kill,
     on,
-    send,
-    connected
+    send
   }
 }
 

@@ -20,13 +20,6 @@ export const rules = new Rules()
  * @return {Object|String|Error}        The data returned from the worker
  */
 export async function sendJob(config) {
-  if (workerTask.connected() === false) {
-    // Sometimes the worker dies and becomes disconnected
-    // When that happens, it seems that there is no way to recover other
-    // than to kill the worker and create a new one.
-    workerTask.kill()
-  }
-
   // Ensure the worker is started
   workerTask.start()
 
