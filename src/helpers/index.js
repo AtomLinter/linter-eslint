@@ -5,8 +5,8 @@ import { generateRange } from 'atom-linter'
 import cryptoRandomString from 'crypto-random-string'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Range, Task } from 'atom'
-import Rules from './rules'
-import { throwIfInvalidPoint } from './validate/editor'
+import Rules from '../rules'
+import { throwIfInvalidPoint } from '../validate/editor'
 
 export const rules = new Rules()
 let worker = null
@@ -16,7 +16,7 @@ let worker = null
  */
 export function startWorker() {
   if (worker === null) {
-    worker = new Task(require.resolve('./worker.js'))
+    worker = new Task(require.resolve('../worker.js'))
   }
 
   if (worker.started) {
