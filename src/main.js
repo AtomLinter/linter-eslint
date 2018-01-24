@@ -2,6 +2,7 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable } from 'atom'
+import { hasValidScope } from './validate/editor'
 
 // Internal variables
 const idleCallbacks = new Set()
@@ -79,9 +80,6 @@ const idsToIgnoredRules = ruleIds =>
     , {}
   )
 
-const validScope = editor => editor.getCursors().some(cursor =>
-  cursor.getScopeDescriptor().getScopesArray().some(scope =>
-    scopes.includes(scope)))
 
 module.exports = {
   activate() {
@@ -130,7 +128,9 @@ module.exports = {
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(async () => {
-        if (validScope(editor) && atom.config.get('linter-eslint.fixOnSave')) {
+        if (hasValidScope(editor, scopes)
+          && atom.config.get('linter-eslint.fixOnSave')
+        ) {
           await this.fixJob(true)
         }
       })
@@ -193,7 +193,7 @@ module.exports = {
             (elem.component && activeEditor.component &&
               elem.component === activeEditor.component))
           // Only show if it was the active editor and it is a valid scope
-          return evtIsActiveEditor && validScope(activeEditor)
+          return evtIsActiveEditor && hasValidScope(activeEditor, scopes)
         }
       }]
     }))
