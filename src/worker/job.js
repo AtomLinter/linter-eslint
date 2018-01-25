@@ -5,7 +5,7 @@
 import Path from 'path'
 import { FindCache, findCached } from 'atom-linter'
 import * as Helpers from './helpers'
-import { isLintDisabled } from '../config-inspector'
+import { isLintDisabled } from '../eslint-config-inspector'
 import { getConfigPath } from '../file-system'
 
 process.title = 'linter-eslint helper'

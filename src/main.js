@@ -26,7 +26,7 @@ const loadDeps = () => {
     workerHelpers = require('./worker/helpers')
   }
   if (!configInspector) {
-    configInspector = require('./config-inspector')
+    configInspector = require('./eslint-config-inspector')
     console.log('inspector', configInspector)
   }
 }
