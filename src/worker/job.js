@@ -4,8 +4,9 @@
 
 import Path from 'path'
 import { FindCache, findCached } from 'atom-linter'
-import * as Helpers from './worker-helpers'
-import isConfigAtHomeRoot from './is-config-at-home-root'
+import * as Helpers from './helpers'
+import { isLintDisabled } from '../config-inspector'
+import { getConfigPath } from '../file-system'
 
 process.title = 'linter-eslint helper'
 
@@ -37,12 +38,11 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
 }
 
 module.exports = async () => {
-  process.on('message', (jobConfig) => {
+  process.on('message', ({
+    contents, type, config, filePath, projectPath, rules, emitKey
+  }) => {
     // We catch all worker errors so that we can create a separate error emitter
     // for each emitKey, rather than adding multiple listeners for `task:error`
-    const {
-      contents, type, config, filePath, projectPath, rules, emitKey
-    } = jobConfig
     try {
       if (config.disableFSCache) {
         FindCache.clear()
@@ -50,12 +50,14 @@ module.exports = async () => {
 
       const fileDir = Path.dirname(filePath)
       const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
-      const configPath = Helpers.getConfigPath(fileDir)
-      const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
-      if (noProjectConfig && config.disableWhenNoEslintConfig) {
+
+      const { disableWhenNoEslintConfig } = config
+      if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
         emit(emitKey, { messages: [] })
         return
       }
+
+      const configPath = getConfigPath(fileDir)
 
       const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config, projectPath)
 

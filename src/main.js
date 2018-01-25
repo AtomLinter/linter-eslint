@@ -13,7 +13,7 @@ const idleCallbacks = new Set()
 let path
 let helpers
 let workerHelpers
-let isConfigAtHomeRoot
+let configInspector
 
 const loadDeps = () => {
   if (!path) {
@@ -23,10 +23,11 @@ const loadDeps = () => {
     helpers = require('./helpers')
   }
   if (!workerHelpers) {
-    workerHelpers = require('./worker-helpers')
+    workerHelpers = require('./worker/helpers')
   }
-  if (!isConfigAtHomeRoot) {
-    isConfigAtHomeRoot = require('./is-config-at-home-root')
+  if (!configInspector) {
+    configInspector = require('./config-inspector')
+    console.log('inspector', configInspector)
   }
 }
 
@@ -47,7 +48,7 @@ const scheduleIdleTasks = () => {
   const linterEslintLoadDependencies = loadDeps
   const linterEslintStartWorker = () => {
     loadDeps()
-    helpers.startWorker()
+    helpers.workerTask.start()
   }
 
   if (!atom.inSpecMode()) {
@@ -207,7 +208,7 @@ module.exports = {
     if (helpers) {
       // If the helpers module hasn't been loaded then there was no chance a
       // worker was started anyway.
-      helpers.killWorker()
+      helpers.workerTask.kill()
     }
     this.subscriptions.dispose()
   },
@@ -310,9 +311,7 @@ module.exports = {
     }
 
     // Do not try to fix if linting should be disabled
-    const configPath = workerHelpers.getConfigPath(fileDir)
-    const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
-    if (noProjectConfig && disableWhenNoEslintConfig) {
+    if (configInspector.isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
       return
     }
 

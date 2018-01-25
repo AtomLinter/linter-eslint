@@ -8,7 +8,7 @@ import { findCached } from 'atom-linter'
 import getPath from 'consistent-path'
 
 const Cache = {
-  ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
+  ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', '..', 'node_modules', 'eslint')),
   NODE_PREFIX_PATH: null,
   LAST_MODULES_PATH: null
 }
@@ -112,28 +112,6 @@ export function getESLintInstance(fileDir, config, projectPath) {
   const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
   refreshModulesPath(modulesDir)
   return getESLintFromDirectory(modulesDir, config, projectPath)
-}
-
-export function getConfigPath(fileDir) {
-  const configFile =
-    findCached(fileDir, [
-      '.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc', 'package.json'
-    ])
-  if (configFile) {
-    if (Path.basename(configFile) === 'package.json') {
-      // eslint-disable-next-line import/no-dynamic-require
-      if (require(configFile).eslintConfig) {
-        return configFile
-      }
-      // If we are here, we found a package.json without an eslint config
-      // in a dir without any other eslint config files
-      // (because 'package.json' is last in the call to findCached)
-      // So, keep looking from the parent directory
-      return getConfigPath(Path.resolve(Path.dirname(configFile), '..'))
-    }
-    return configFile
-  }
-  return null
 }
 
 export function getRelativePath(fileDir, filePath, config, projectPath) {
