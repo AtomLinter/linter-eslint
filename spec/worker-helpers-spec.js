@@ -3,6 +3,7 @@
 import * as Path from 'path'
 import rimraf from 'rimraf'
 import * as Helpers from '../src/worker/helpers'
+import getConfigPath from '../src/file-system/get-config-path'
 import { copyFileToTempDir } from './linter-eslint-spec'
 
 const getFixturesPath = path => Path.join(__dirname, 'fixtures', path)
@@ -123,43 +124,43 @@ describe('Worker Helpers', () => {
     it('finds .eslintrc', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'no-ext'))
       const expectedPath = Path.join(fileDir, '.eslintrc')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+      expect(getConfigPath(fileDir)).toBe(expectedPath)
     })
 
     it('finds .eslintrc.yaml', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'yaml'))
       const expectedPath = Path.join(fileDir, '.eslintrc.yaml')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+      expect(getConfigPath(fileDir)).toBe(expectedPath)
     })
 
     it('finds .eslintrc.yml', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'yml'))
       const expectedPath = Path.join(fileDir, '.eslintrc.yml')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+      expect(getConfigPath(fileDir)).toBe(expectedPath)
     })
 
     it('finds .eslintrc.js', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'js'))
       const expectedPath = Path.join(fileDir, '.eslintrc.js')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+      expect(getConfigPath(fileDir)).toBe(expectedPath)
     })
 
     it('finds .eslintrc.json', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'json'))
       const expectedPath = Path.join(fileDir, '.eslintrc.json')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+      expect(getConfigPath(fileDir)).toBe(expectedPath)
     })
 
     it('finds package.json with an eslintConfig property', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'package-json'))
       const expectedPath = Path.join(fileDir, 'package.json')
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+      expect(getConfigPath(fileDir)).toBe(expectedPath)
     })
 
     it('ignores package.json with no eslintConfig property', () => {
       const fileDir = getFixturesPath(Path.join('configs', 'package-json', 'nested'))
       const expectedPath = getFixturesPath(Path.join('configs', 'package-json', 'package.json'))
-      expect(Helpers.getConfigPath(fileDir)).toBe(expectedPath)
+      expect(getConfigPath(fileDir)).toBe(expectedPath)
     })
   })
 

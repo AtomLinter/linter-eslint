@@ -13,7 +13,7 @@ const idleCallbacks = new Set()
 let path
 let helpers
 let workerHelpers
-let isConfigAtHomeRoot
+let configInspector
 
 const loadDeps = () => {
   if (!path) {
@@ -25,8 +25,9 @@ const loadDeps = () => {
   if (!workerHelpers) {
     workerHelpers = require('./worker/helpers')
   }
-  if (!isConfigAtHomeRoot) {
-    isConfigAtHomeRoot = require('./is-config-at-home-root')
+  if (!configInspector) {
+    configInspector = require('./config-inspector')
+    console.log('inspector', configInspector)
   }
 }
 
@@ -310,9 +311,7 @@ module.exports = {
     }
 
     // Do not try to fix if linting should be disabled
-    const configPath = workerHelpers.getConfigPath(fileDir)
-    const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
-    if (noProjectConfig && disableWhenNoEslintConfig) {
+    if (configInspector.isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
       return
     }
 
