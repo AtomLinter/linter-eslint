@@ -11,22 +11,30 @@ const idleCallbacks = new Set()
 // NOTE: We are not directly requiring these in order to reduce the time it
 // takes to require this file as that causes delays in Atom loading this package
 let path
-let helpers
+let worker
 let workerHelpers
-let isConfigAtHomeRoot
+let configInspector
+let debug
+let report
 
 const loadDeps = () => {
   if (!path) {
     path = require('path')
   }
-  if (!helpers) {
-    helpers = require('./helpers')
+  if (!worker) {
+    worker = require('./worker')
   }
   if (!workerHelpers) {
-    workerHelpers = require('./worker-helpers')
+    workerHelpers = require('./worker/helpers')
   }
-  if (!isConfigAtHomeRoot) {
-    isConfigAtHomeRoot = require('./is-config-at-home-root')
+  if (!configInspector) {
+    configInspector = require('./eslint-config-inspector')
+  }
+  if (!debug) {
+    debug = require('./debug')
+  }
+  if (!report) {
+    report = require('./linter-report')
   }
 }
 
@@ -47,7 +55,7 @@ const scheduleIdleTasks = () => {
   const linterEslintLoadDependencies = loadDeps
   const linterEslintStartWorker = () => {
     loadDeps()
-    helpers.startWorker()
+    worker.task.start()
   }
 
   if (!atom.inSpecMode()) {
@@ -139,7 +147,7 @@ module.exports = {
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
         loadDeps()
-        const debugString = await helpers.generateDebugString()
+        const debugString = await debug.construct()
         const notificationOptions = { detail: debugString, dismissable: true }
         atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
       }
@@ -204,10 +212,10 @@ module.exports = {
   deactivate() {
     idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
     idleCallbacks.clear()
-    if (helpers) {
+    if (worker) {
       // If the helpers module hasn't been loaded then there was no chance a
       // worker was started anyway.
-      helpers.killWorker()
+      worker.task.kill()
     }
     this.subscriptions.dispose()
   },
@@ -236,7 +244,7 @@ module.exports = {
         if (filePath.includes('://')) {
           // If the path is a URL (Nuclide remote file) return a message
           // telling the user we are unable to work on remote files.
-          return helpers.generateUserMessage(textEditor, {
+          return report.simple(textEditor, {
             severity: 'warning',
             excerpt: 'Remote file open, linter-eslint is disabled for this file.',
           })
@@ -248,7 +256,7 @@ module.exports = {
         if (textEditor.isModified()) {
           if (ignoreFixableRulesWhileTyping) {
             // Note that the fixable rules will only have values after the first lint job
-            const ignoredRules = new Set(helpers.rules.getFixableRules())
+            const ignoredRules = new Set(worker.rules.getFixableRules())
             ignoredRulesWhenModified.forEach(ruleId => ignoredRules.add(ruleId))
             rules = idsToIgnoredRules(ignoredRules)
           } else {
@@ -257,7 +265,7 @@ module.exports = {
         }
 
         try {
-          const response = await helpers.sendJob({
+          const response = await worker.sendJob({
             type: 'lint',
             contents: text,
             config: atom.config.get('linter-eslint'),
@@ -274,9 +282,9 @@ module.exports = {
             */
             return null
           }
-          return helpers.processJobResponse(response, textEditor, showRule)
+          return worker.processJobResponse(response, textEditor, showRule)
         } catch (error) {
-          return helpers.handleError(textEditor, error)
+          return report.fromException(textEditor, error)
         }
       }
     }
@@ -310,9 +318,7 @@ module.exports = {
     }
 
     // Do not try to fix if linting should be disabled
-    const configPath = workerHelpers.getConfigPath(fileDir)
-    const noProjectConfig = (configPath === null || isConfigAtHomeRoot(configPath))
-    if (noProjectConfig && disableWhenNoEslintConfig) {
+    if (configInspector.isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
       return
     }
 
@@ -322,7 +328,7 @@ module.exports = {
     }
 
     try {
-      const response = await helpers.sendJob({
+      const response = await worker.sendJob({
         type: 'fix',
         config: atom.config.get('linter-eslint'),
         contents: text,
