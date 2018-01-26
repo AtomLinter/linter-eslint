@@ -1,5 +1,17 @@
 # Changelog
 
+## v8.4.1
+
+*   Support [`CLIEngine#getRules`][] and [`rule.meta.docs.url`][] ([#1067][])
+*   Automatically restart the worker process if it dies ([#1073][])
+*   Merge all rules to ignore while typing ([#1084][])
+
+[`rule.meta.docs.url`]: https://github.com/eslint/eslint/pull/9788
+[`CLIEngine#getRules`]: https://github.com/eslint/eslint/pull/9782
+[#1067]: https://github.com/AtomLinter/linter-eslint/pull/1067
+[#1073]: https://github.com/AtomLinter/linter-eslint/pull/1073
+[#1084]: https://github.com/AtomLinter/linter-eslint/pull/1084
+
 ## v8.4.0
 
 *   Normalize all config paths ([#1014][])
