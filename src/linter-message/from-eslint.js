@@ -15,7 +15,7 @@ import invalidTrace from './invalid-trace'
  * @param  {Rules}      rules      List of known rules with helper methods
  * @return {Promise}               The messages transformed into Linter messages
  */
-const fromEslintToReport = async (messages, textEditor, showRule, rules) =>
+const fromEslintToLinterMessage = async (messages, textEditor, showRule, rules) =>
   Promise.all(messages.map(async ({
     fatal, message: originalMessage, line, severity, ruleId, column, fix, endLine, endColumn
   }) => {
@@ -102,4 +102,4 @@ const fromEslintToReport = async (messages, textEditor, showRule, rules) =>
     return ret
   }))
 
-export default fromEslintToReport
+export default fromEslintToLinterMessage

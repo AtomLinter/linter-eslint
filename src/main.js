@@ -15,7 +15,7 @@ let worker
 let workerHelpers
 let configInspector
 let debug
-let report
+let linterMessage
 
 const loadDeps = () => {
   if (!path) {
@@ -33,8 +33,8 @@ const loadDeps = () => {
   if (!debug) {
     debug = require('./debug')
   }
-  if (!report) {
-    report = require('./linter-report')
+  if (!linterMessage) {
+    linterMessage = require('./linter-message')
   }
 }
 
@@ -147,7 +147,7 @@ module.exports = {
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
         loadDeps()
-        const debugString = await debug.construct()
+        const debugString = await debug.report()
         const notificationOptions = { detail: debugString, dismissable: true }
         atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
       }
@@ -244,7 +244,7 @@ module.exports = {
         if (filePath.includes('://')) {
           // If the path is a URL (Nuclide remote file) return a message
           // telling the user we are unable to work on remote files.
-          return report.simple(textEditor, {
+          return linterMessage.simple(textEditor, {
             severity: 'warning',
             excerpt: 'Remote file open, linter-eslint is disabled for this file.',
           })
@@ -284,7 +284,7 @@ module.exports = {
           }
           return worker.processJobResponse(response, textEditor, showRule)
         } catch (error) {
-          return report.fromException(textEditor, error)
+          return linterMessage.fromException(textEditor, error)
         }
       }
     }

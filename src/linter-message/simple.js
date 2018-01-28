@@ -11,7 +11,7 @@ import { generateRange } from 'atom-linter'
  * @param  {string|Function} [options.description] Used to provide additional information
  * @return {Array}            Message to user generated from the parameters
  */
-const simpleReport = (textEditor, {
+const simpleLinterMessage = (textEditor, {
   severity = 'error',
   excerpt = '',
   description,
@@ -25,4 +25,4 @@ const simpleReport = (textEditor, {
   },
 }]
 
-export default simpleReport
+export default simpleLinterMessage

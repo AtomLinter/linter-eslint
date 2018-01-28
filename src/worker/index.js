@@ -3,7 +3,7 @@
 import Rules from '../rules'
 import createWorkerTask from '../worker/task'
 import makeSendJob from './send-job'
-import { fromEslint as eslintToReport } from '../linter-report'
+import { fromEslint as eslintToLinter } from '../linter-message'
 
 // TODO: This is the wrong place for the Rules instances.
 // It has nothing to do with managing the worker.
@@ -25,5 +25,5 @@ export const processJobResponse = (response, textEditor, showRule) => {
   if (response.updatedRules) {
     rules.replaceRules(response.updatedRules)
   }
-  return eslintToReport(response.messages, textEditor, showRule, rules)
+  return eslintToLinter(response.messages, textEditor, showRule, rules)
 }

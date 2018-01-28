@@ -9,7 +9,7 @@ import simpleReport from './simple'
  * @param  {Error} error      Error to generate a message for
  * @return {Array}            Message to user generated from the Error
  */
-const fromExceptionToReport = (textEditor, error) => {
+const fromExceptionToLinterMessage = (textEditor, error) => {
   const { stack, message } = error
   // Only show the first line of the message as the excerpt
   const excerpt = `Error while running ESLint: ${message.split('\n')[0]}.`
@@ -17,4 +17,4 @@ const fromExceptionToReport = (textEditor, error) => {
   return simpleReport(textEditor, { severity: 'error', excerpt, description })
 }
 
-export default fromExceptionToReport
+export default fromExceptionToLinterMessage

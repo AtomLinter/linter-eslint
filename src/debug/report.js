@@ -2,7 +2,7 @@
 
 import debugInfo from './info'
 
-const constructDebug = async () => {
+const debugReport = async () => {
   const debug = await debugInfo()
   const details = [
     `Atom version: ${debug.atomVersion}`,
@@ -17,4 +17,4 @@ const constructDebug = async () => {
   return details.join('\n')
 }
 
-export default constructDebug
+export default debugReport
