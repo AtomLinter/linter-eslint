@@ -2,83 +2,61 @@
 
 // These are cases where the old setting should be directly moved to the new setting.
 const directMoveMigrations = [
+  /* Added January, 2018 */
   {
-    /* Added November, 2017 */
-    old: 'linter-eslint.disableWhenNoEslintConfig',
-    new: 'linter-eslint.disabling.disableWhenNoEslintConfig',
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.fixOnSave',
-    new: 'linter-eslint.autofix.fixOnSave'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.ignoreFixableRulesWhileTyping',
-    new: 'linter-eslint.autofix.ignoreFixableRulesWhileTyping'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.rulesToDisableWhileFixing',
-    new: 'linter-eslint.autofix.rulesToDisableWhileFixing'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.rulesToSilenceWhileTyping',
-    new: 'linter-eslint.disabling.rulesToSilenceWhileTyping'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.disableEslintIgnore',
-    new: 'linter-eslint.advanced.disableEslintIgnore'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.disableFSCache',
-    new: 'linter-eslint.advanced.disableFSCache'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.showRuleIdInMessage',
-    new: 'linter-eslint.advanced.showRuleIdInMessage'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.eslintrcPath',
-    new: 'linter-eslint.global.eslintrcPath'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.advancedLocalNodeModules',
-    new: 'linter-eslint.advanced.advancedLocalNodeModules'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.eslintRulesDirs',
-    new: 'linter-eslint.advanced.eslintRulesDirs'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.useGlobalEslint',
-    new: 'linter-eslint.global.useGlobalEslint'
-  },
-  {
-    /* Added November, 2017 */
-    old: 'linter-eslint.globalNodePath',
-    new: 'linter-eslint.global.globalNodePath'
+    old: 'disableWhenNoEslintConfig',
+    new: 'disabling.disableWhenNoEslintConfig',
+  }, {
+    old: 'fixOnSave',
+    new: 'autofix.fixOnSave'
+  }, {
+    old: 'ignoreFixableRulesWhileTyping',
+    new: 'autofix.ignoreFixableRulesWhileTyping'
+  }, {
+    old: 'rulesToDisableWhileFixing',
+    new: 'autofix.rulesToDisableWhileFixing'
+  }, {
+    old: 'rulesToSilenceWhileTyping',
+    new: 'disabling.rulesToSilenceWhileTyping'
+  }, {
+    old: 'disableEslintIgnore',
+    new: 'advanced.disableEslintIgnore'
+  }, {
+    old: 'disableFSCache',
+    new: 'advanced.disableFSCache'
+  }, {
+    old: 'showRuleIdInMessage',
+    new: 'advanced.showRuleIdInMessage'
+  }, {
+    old: 'eslintrcPath',
+    new: 'global.eslintrcPath'
+  }, {
+    old: 'advancedLocalNodeModules',
+    new: 'advanced.advancedLocalNodeModules'
+  }, {
+    old: 'eslintRulesDirs',
+    new: 'advanced.eslintRulesDirs'
+  }, {
+    old: 'useGlobalEslint',
+    new: 'global.useGlobalEslint'
+  }, {
+    old: 'globalNodePath',
+    new: 'global.globalNodePath'
   },
 ]
 
 function migrateConfigOptions() {
+  const linterEslintConfig = atom.config.get('linter-eslint')
+
   /**
    * FIXME: Deprecated eslintRulesDir{String} option in favor of
    * eslintRulesDirs{Array<String>}. Remove in the next major release,
    * in v8.5.0, or after 2018-04.
    */
-  const oldRulesdir = atom.config.get('linter-eslint.eslintRulesDir')
+  const oldRulesdir = linterEslintConfig.eslintRulesDir
   if (oldRulesdir) {
-    const rulesDirs = atom.config.get('linter-eslint.eslintRulesDirs')
-    if (rulesDirs.length === 0) {
+    const newRulesDirs = linterEslintConfig.eslintRulesDirs
+    if (newRulesDirs.length === 0) {
       atom.config.set('linter-eslint.eslintRulesDirs', [oldRulesdir])
     }
     atom.config.unset('linter-eslint.eslintRulesDir')
@@ -86,7 +64,7 @@ function migrateConfigOptions() {
 
   // Copy old settings over to the new ones, then unset the old setting keys
   directMoveMigrations.forEach((migration) => {
-    const oldSetting = atom.config.get(migration.old)
+    const oldSetting = linterEslintConfig[migration.old]
     if (oldSetting !== undefined) {
       atom.config.set(migration.new, oldSetting)
       atom.config.unset(migration.old)
