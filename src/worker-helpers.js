@@ -176,9 +176,9 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
     return rulesDir
   }).filter(path => path)
 
-  if (givenConfigPath === null && config.advanced.eslintrcPath) {
+  if (givenConfigPath === null && config.global.eslintrcPath) {
     // If we didn't find a configuration use the fallback from the settings
-    cliEngineConfig.configFile = cleanPath(config.advanced.eslintrcPath)
+    cliEngineConfig.configFile = cleanPath(config.global.eslintrcPath)
   }
 
   return cliEngineConfig

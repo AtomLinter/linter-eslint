@@ -40,7 +40,7 @@ const directMoveMigrations = [
   {
     /* Added November, 2017 */
     old: 'linter-eslint.eslintrcPath',
-    new: 'linter-eslint.advanced.eslintrcPath'
+    new: 'linter-eslint.global.eslintrcPath'
   },
   {
     /* Added November, 2017 */

@@ -60,6 +60,13 @@
           "default": false,
           "order": 1
         },
+        "eslintrcPath": {
+          "title": ".eslintrc Path",
+          "description": "It will only be used when there's no config file in project",
+          "type": "string",
+          "default": "",
+          "order": 4
+        },
         "globalNodePath": {
           "title": "Global Node Installation Path",
           "description": "Write the value of `npm get prefix` here",
@@ -130,13 +137,6 @@
           "type": "boolean",
           "default": true,
           "order": 3
-        },
-        "eslintrcPath": {
-          "title": ".eslintrc Path",
-          "description": "It will only be used when there's no config file in project",
-          "type": "string",
-          "default": "",
-          "order": 4
         },
         "advancedLocalNodeModules": {
           "title": "Path to the local node_modules folder",
