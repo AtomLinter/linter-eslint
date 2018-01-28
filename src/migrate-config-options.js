@@ -49,6 +49,11 @@ const directMoveMigrations = [
   },
   {
     /* Added November, 2017 */
+    old: 'linter-eslint.eslintRulesDirs',
+    new: 'linter-eslint.advanced.eslintRulesDirs'
+  },
+  {
+    /* Added November, 2017 */
     old: 'linter-eslint.useGlobalEslint',
     new: 'linter-eslint.global.useGlobalEslint'
   },

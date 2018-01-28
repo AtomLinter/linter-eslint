@@ -38,16 +38,6 @@
       },
       "order": 3
     },
-    "eslintRulesDirs": {
-      "title": "ESLint Rules Directories",
-      "description": "Specify a comma separated list of directories for ESLint to load rules from.",
-      "type": "array",
-      "default": [],
-      "items": {
-        "type": "string"
-      },
-      "order": 4
-    },
     "global": {
       "type": "object",
       "order": 5,
@@ -117,6 +107,7 @@
     },
     "advanced": {
       "type": "object",
+      "collapsed": true,
       "order": 7,
       "properties": {
         "disableEslintIgnore": {
@@ -137,6 +128,16 @@
           "type": "boolean",
           "default": true,
           "order": 3
+        },
+        "eslintRulesDirs": {
+          "title": "ESLint Rules Directories",
+          "description": "Specify a comma separated list of directories for ESLint to load rules from.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "order": 4
         },
         "advancedLocalNodeModules": {
           "title": "Path to the local node_modules folder",

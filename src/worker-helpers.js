@@ -168,7 +168,7 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileDir, give
     cliEngineConfig.ignorePath = ignoreFile
   }
 
-  cliEngineConfig.rulePaths = config.eslintRulesDirs.map((path) => {
+  cliEngineConfig.rulePaths = config.advanced.eslintRulesDirs.map((path) => {
     const rulesDir = cleanPath(path)
     if (!Path.isAbsolute(rulesDir)) {
       return findCached(fileDir, rulesDir)
