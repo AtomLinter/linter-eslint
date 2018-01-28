@@ -53,7 +53,7 @@ eslint --init
 ```
 
 Alternatively you can create the `.eslintrc` file by yourself. It is a good
-idea to have a look at the [the ESLint documentation](http://eslint.org/docs/user-guide/configuring),
+idea to have a look at the [ESLint documentation](http://eslint.org/docs/user-guide/configuring),
 including the [list of rules](http://eslint.org/docs/rules/).
 
 ## A Note About Settings
