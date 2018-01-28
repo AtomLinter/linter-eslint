@@ -13,12 +13,14 @@ const globalNodePath = process.platform === 'win32' ?
   getFixturesPath('global-eslint')
 
 function createConfig(overrides = {}) {
-  return {
-    ...overrides,
-    global: { ...overrides.global },
-    disabling: { ...overrides.disabling },
-    advanced: { ...overrides.advanced },
-  }
+  return Object.assign(
+    {},
+    overrides,
+    { global: Object.assign({}, overrides.global) },
+    { autofix: Object.assign({}, overrides.autofix) },
+    { disabling: Object.assign({}, overrides.disabling) },
+    { advanced: Object.assign({}, overrides.advanced) },
+  )
 }
 
 describe('Worker Helpers', () => {
