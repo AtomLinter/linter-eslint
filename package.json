@@ -9,20 +9,6 @@
     "atom": ">=1.13.0 <2.0.0"
   },
   "configSchema": {
-    "fixOnSave": {
-      "title": "Fix errors on save",
-      "description": "Have eslint attempt to fix some errors automatically when saving the file.",
-      "type": "boolean",
-      "default": false,
-      "order": 1
-    },
-    "lintHtmlFiles": {
-      "title": "Lint HTML Files",
-      "description": "You should also add `eslint-plugin-html` to your .eslintrc plugins",
-      "type": "boolean",
-      "default": false,
-      "order": 2
-    },
     "scopes": {
       "title": "List of scopes to run ESLint on, run `Editor: Log Cursor Scope` to determine the scopes for a file.",
       "type": "array",
@@ -36,11 +22,49 @@
       "items": {
         "type": "string"
       },
-      "order": 3
+      "order": 1
+    },
+    "lintHtmlFiles": {
+      "title": "Lint HTML Files",
+      "description": "You should also add `eslint-plugin-html` to your .eslintrc plugins",
+      "type": "boolean",
+      "default": false,
+      "order": 2
+    },
+    "autofix": {
+      "type": "object",
+      "order": 3,
+      "title": "Automatic Fixes",
+      "properties": {
+        "fixOnSave": {
+          "title": "Fix errors on save",
+          "description": "Have eslint attempt to fix some errors automatically when saving the file.",
+          "type": "boolean",
+          "default": false,
+          "order": 1
+        },
+        "ignoreFixableRulesWhileTyping": {
+          "title": "Ignore fixable rules while typing",
+          "description": "Have the linter ignore all fixable rules during linting when editing a document. The list is automatically updated on each lint job, and requires at least one run to be populated. Only supported when using ESLint v4+.",
+          "type": "boolean",
+          "default": false,
+          "order": 2
+        },
+        "rulesToDisableWhileFixing": {
+          "title": "Disable specific rules from fixes",
+          "description": "Prevent rules from being auto-fixed by ESLint. Applies to fixes made during saves as well as when running the `Linter Eslint: Fix File` command.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "order": 3
+        }
+      }
     },
     "global": {
       "type": "object",
-      "order": 5,
+      "order": 4,
       "title": "Global ESLint",
       "properties": {
         "useGlobalEslint": {
@@ -68,30 +92,13 @@
     },
     "disabling": {
       "type": "object",
-      "order": 6,
+      "order": 5,
       "properties": {
         "disableWhenNoEslintConfig": {
           "title": "Disable when no ESLint config is found (in package.json or .eslintrc)",
           "type": "boolean",
           "default": true,
           "order": 1
-        },
-        "ignoreFixableRulesWhileTyping": {
-          "title": "Ignore fixable rules while typing",
-          "description": "Have the linter ignore all fixable rules during linting when editing a document. The list is automatically updated on each lint job, and requires at least one run to be populated. Only supported when using ESLint v4+.",
-          "type": "boolean",
-          "default": false,
-          "order": 2
-        },
-        "rulesToDisableWhileFixing": {
-          "title": "Disable specific rules from fixes",
-          "description": "Prevent rules from being auto-fixed by ESLint. Applies to fixes made during saves as well as when running the `Linter Eslint: Fix File` command.",
-          "type": "array",
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "order": 3
         },
         "rulesToSilenceWhileTyping": {
           "title": "Silence specific rules while typing",
@@ -101,14 +108,15 @@
           "items": {
             "type": "string"
           },
-          "order": 4
+          "order": 2
         }
       }
     },
     "advanced": {
       "type": "object",
       "collapsed": true,
-      "order": 7,
+      "title": "Uncommon",
+      "order": 6,
       "properties": {
         "disableEslintIgnore": {
           "title": "Don't use .eslintignore files",

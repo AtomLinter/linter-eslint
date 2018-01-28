@@ -121,7 +121,7 @@ module.exports = {
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(async () => {
         if (hasValidScope(editor, scopes)
-          && atom.config.get('linter-eslint.fixOnSave')
+          && atom.config.get('linter-eslint.autofix.fixOnSave')
         ) {
           await this.fixJob(true)
         }
@@ -159,12 +159,12 @@ module.exports = {
     ))
 
     this.subscriptions.add(atom.config.observe(
-      'linter-eslint.disabling.rulesToDisableWhileFixing',
+      'linter-eslint.autofix.rulesToDisableWhileFixing',
       (ids) => { ignoredRulesWhenFixing = idsToIgnoredRules(ids) }
     ))
 
     this.subscriptions.add(atom.config.observe(
-      'linter-eslint.disabling.ignoreFixableRulesWhileTyping',
+      'linter-eslint.autofix.ignoreFixableRulesWhileTyping',
       (value) => { ignoreFixableRulesWhileTyping = value }
     ))
 

@@ -9,13 +9,18 @@ const directMoveMigrations = [
   },
   {
     /* Added November, 2017 */
+    old: 'linter-eslint.fixOnSave',
+    new: 'linter-eslint.autofix.fixOnSave'
+  },
+  {
+    /* Added November, 2017 */
     old: 'linter-eslint.ignoreFixableRulesWhileTyping',
-    new: 'linter-eslint.disabling.ignoreFixableRulesWhileTyping'
+    new: 'linter-eslint.autofix.ignoreFixableRulesWhileTyping'
   },
   {
     /* Added November, 2017 */
     old: 'linter-eslint.rulesToDisableWhileFixing',
-    new: 'linter-eslint.disabling.rulesToDisableWhileFixing'
+    new: 'linter-eslint.autofix.rulesToDisableWhileFixing'
   },
   {
     /* Added November, 2017 */
