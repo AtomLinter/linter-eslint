@@ -1,6 +1,6 @@
 'use babel'
 
-import { setLintHtml, setScopes, setArray, setIgnoredFixes } from './make-handler'
+import { setLintHtml, setScopes, setIgnoredFixes } from './make-handler'
 
 // appVarName is variable name for setting used throughout the app
 //
@@ -22,22 +22,20 @@ export default [
   { appVarName: 'fixOnSave' },
   { appVarName: 'ignoreFixableRulesWhileTyping' },
   {
-    appVarName: 'lintHtmlFiles',
-    pkgJsonName: 'lintHtmlFiles',
-    makeHandler: setLintHtml
-  },
-  {
     appVarName: 'showRule',
     pkgJsonName: 'showRuleIdInMessage'
   },
   {
-    appVarName: 'scopes',
-    makeHandler: setScopes
+    appVarName: 'ignoredRulesWhenModified',
+    pkgJsonName: 'rulesToSilenceWhileTyping'
   },
   {
-    appVarName: 'ignoredRulesWhenModified',
-    pkgJsonName: 'rulesToSilenceWhileTyping',
-    makeHandler: setArray
+    appVarName: 'lintHtmlFiles',
+    makeHandler: setLintHtml
+  },
+  {
+    appVarName: 'scopes',
+    makeHandler: setScopes
   },
   {
     appVarName: 'ignoredRulesWhenFixing',

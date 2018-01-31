@@ -6,10 +6,12 @@ const setScopes = config => (array) => {
   const { lintHtmlFiles, embeddedScope, scopes } = config
   // Overwrite with new scopes
   replaceArrayInPlace(scopes, array)
-  // Add html to scopes if needed.
+
+  // Add source.js.embedded.html to scopes if needed
   if (lintHtmlFiles && !scopes.includes(embeddedScope)) {
     scopes.push(embeddedScope)
   }
+
   return config
 }
 

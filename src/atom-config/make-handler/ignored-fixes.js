@@ -2,9 +2,8 @@
 
 import { idsToIgnoredRules } from '../../rules'
 
-/* eslint-disable no-param-reassign */
-
 const setIgnoredFixes = config => (array) => {
+  // eslint-disable-next-line no-param-reassign
   config.ignoredRulesWhenFixing = idsToIgnoredRules(array)
   return config
 }

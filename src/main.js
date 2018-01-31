@@ -7,6 +7,7 @@ import { idsToIgnoredRules } from './rules'
 import {
   atomConfig,
   jobConfig,
+  getMigrations,
   subscribe as configSubscribe
 } from './atom-config'
 
@@ -73,8 +74,9 @@ const scheduleIdleTasks = () => {
 
 module.exports = {
   activate() {
+    getMigrations().map(makeIdleCallback)
     this.subscriptions = new CompositeDisposable()
-    this.configSubscriptions = configSubscribe()
+    this.subscriptions.add(...(configSubscribe()))
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(async () => {
@@ -135,7 +137,6 @@ module.exports = {
       worker.task.kill()
     }
     this.subscriptions.dispose()
-    this.configSubscriptions.dispose()
   },
 
   provideLinter() {
@@ -244,14 +245,15 @@ module.exports = {
       return
     }
 
-    const { disableWhenNoEslintConfig } = atomConfig
+    const { disableWhenNoEslintConfig, ignoredRulesWhenFixing } = atomConfig
+    const { isLintDisabled } = configInspector
+
     // Do not try to fix if linting should be disabled
-    if (configInspector.isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
+    if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
       return
     }
 
     let rules = {}
-    const { ignoredRulesWhenFixing } = atomConfig
     if (Object.keys(ignoredRulesWhenFixing).length > 0) {
       rules = ignoredRulesWhenFixing
     }

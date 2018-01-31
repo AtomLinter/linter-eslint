@@ -12,9 +12,10 @@ export const replaceArrayInPlace = (oldArray, newArray) => {
   return oldArray
 }
 
-// Replace 1 item in an array
+// Delete first instance of 1 item in an array
 //
-export const spliceReplace1 = (elem, array) => {
-  array.splice(array.indexOf(elem), 1)
+export const spliceDeleteFirst = (elem, array) => {
+  const i = array.indexOf(elem)
+  if (i >= 0) { array.splice(i, 1) }
   return array
 }

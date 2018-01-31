@@ -1,7 +1,7 @@
 'use babel'
 
-/* eslint-disable no-param-reassign */
 const setValue = (config, rule) => (value) => {
+  // eslint-disable-next-line no-param-reassign
   config[rule] = value
   return config
 }
