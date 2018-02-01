@@ -1,3 +1,5 @@
+'use babel'
+
 import ruleURI from 'eslint-rule-documentation'
 
 // Private properties
@@ -63,3 +65,5 @@ export default class Rules {
     return new Map(this[rules])
   }
 }
+
+export { default as idsToIgnoredRules } from './ids-to-ignored-rules'

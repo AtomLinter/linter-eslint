@@ -3,6 +3,13 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable } from 'atom'
 import { hasValidScope } from './validate/editor'
+import { idsToIgnoredRules } from './rules'
+import {
+  atomConfig,
+  jobConfig,
+  getMigrations,
+  subscribe as configSubscribe
+} from './atom-config'
 
 // Internal variables
 const idleCallbacks = new Set()
@@ -65,80 +72,16 @@ const scheduleIdleTasks = () => {
   }
 }
 
-// Configuration
-const scopes = []
-let showRule
-let lintHtmlFiles
-let ignoredRulesWhenModified
-let ignoredRulesWhenFixing
-let disableWhenNoEslintConfig
-let ignoreFixableRulesWhileTyping
-
-// Internal functions
-/**
- * Given an Array or iterable containing a list of Rule IDs, return an Object
- * to be sent to ESLint's configuration that disables those rules.
- * @param  {[iterable]} ruleIds Iterable containing ruleIds to ignore
- * @return {Object}             Object containing properties for each rule to ignore
- */
-const idsToIgnoredRules = ruleIds =>
-  Array.from(ruleIds).reduce(
-    // 0 is the severity to turn off a rule
-    (ids, id) => Object.assign(ids, { [id]: 0 })
-    , {}
-  )
-
-
 module.exports = {
   activate() {
+    getMigrations().map(makeIdleCallback)
     this.subscriptions = new CompositeDisposable()
-
-    /**
-     * FIXME: Deprecated eslintRulesDir{String} option in favor of
-     * eslintRulesDirs{Array<String>}. Remove in the next major release,
-     * in v8.5.0, or after 2018-04.
-     */
-    const oldRulesdir = atom.config.get('linter-eslint.eslintRulesDir')
-    if (oldRulesdir) {
-      const rulesDirs = atom.config.get('linter-eslint.eslintRulesDirs')
-      if (rulesDirs.length === 0) {
-        atom.config.set('linter-eslint.eslintRulesDirs', [oldRulesdir])
-      }
-      atom.config.unset('linter-eslint.eslintRulesDir')
-    }
-
-    const embeddedScope = 'source.js.embedded.html'
-    this.subscriptions.add(atom.config.observe(
-      'linter-eslint.lintHtmlFiles',
-      (value) => {
-        lintHtmlFiles = value
-        if (lintHtmlFiles) {
-          scopes.push(embeddedScope)
-        } else if (scopes.indexOf(embeddedScope) !== -1) {
-          scopes.splice(scopes.indexOf(embeddedScope), 1)
-        }
-      }
-    ))
-
-    this.subscriptions.add(atom.config.observe(
-      'linter-eslint.scopes',
-      (value) => {
-        // Remove any old scopes
-        scopes.splice(0, scopes.length)
-        // Add the current scopes
-        Array.prototype.push.apply(scopes, value)
-        // Ensure HTML linting still works if the setting is updated
-        if (lintHtmlFiles && !scopes.includes(embeddedScope)) {
-          scopes.push(embeddedScope)
-        }
-      }
-    ))
+    this.subscriptions.add(...(configSubscribe()))
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(async () => {
-        if (hasValidScope(editor, scopes)
-          && atom.config.get('linter-eslint.fixOnSave')
-        ) {
+        const { fixOnSave, scopes } = atomConfig
+        if (hasValidScope(editor, scopes) && fixOnSave) {
           await this.fixJob(true)
         }
       })
@@ -159,31 +102,6 @@ module.exports = {
       }
     }))
 
-    this.subscriptions.add(atom.config.observe(
-      'linter-eslint.showRuleIdInMessage',
-      (value) => { showRule = value }
-    ))
-
-    this.subscriptions.add(atom.config.observe(
-      'linter-eslint.disableWhenNoEslintConfig',
-      (value) => { disableWhenNoEslintConfig = value }
-    ))
-
-    this.subscriptions.add(atom.config.observe(
-      'linter-eslint.rulesToSilenceWhileTyping',
-      (ids) => { ignoredRulesWhenModified = ids }
-    ))
-
-    this.subscriptions.add(atom.config.observe(
-      'linter-eslint.rulesToDisableWhileFixing',
-      (ids) => { ignoredRulesWhenFixing = idsToIgnoredRules(ids) }
-    ))
-
-    this.subscriptions.add(atom.config.observe(
-      'linter-eslint.ignoreFixableRulesWhileTyping',
-      (value) => { ignoreFixableRulesWhileTyping = value }
-    ))
-
     this.subscriptions.add(atom.contextMenu.add({
       'atom-text-editor:not(.mini), .overlayer': [{
         label: 'ESLint Fix',
@@ -201,6 +119,7 @@ module.exports = {
             (elem.component && activeEditor.component &&
               elem.component === activeEditor.component))
           // Only show if it was the active editor and it is a valid scope
+          const { scopes } = atomConfig
           return evtIsActiveEditor && hasValidScope(activeEditor, scopes)
         }
       }]
@@ -223,7 +142,7 @@ module.exports = {
   provideLinter() {
     return {
       name: 'ESLint',
-      grammarScopes: scopes,
+      grammarScopes: atomConfig.scopes,
       scope: 'file',
       lintsOnChange: true,
       lint: async (textEditor) => {
@@ -254,6 +173,11 @@ module.exports = {
 
         let rules = {}
         if (textEditor.isModified()) {
+          const {
+            ignoredRulesWhenModified,
+            ignoreFixableRulesWhileTyping
+          } = atomConfig
+
           if (ignoreFixableRulesWhileTyping) {
             // Note that the fixable rules will only have values after the first lint job
             const ignoredRules = new Set(worker.rules.getFixableRules())
@@ -268,7 +192,7 @@ module.exports = {
           const response = await worker.sendJob({
             type: 'lint',
             contents: text,
-            config: atom.config.get('linter-eslint'),
+            config: jobConfig(),
             rules,
             filePath,
             projectPath: atom.project.relativizePath(filePath)[0] || ''
@@ -282,7 +206,11 @@ module.exports = {
             */
             return null
           }
-          return worker.processJobResponse(response, textEditor, showRule)
+          return worker.processJobResponse(
+            response,
+            textEditor,
+            atomConfig.showRule
+          )
         } catch (error) {
           return linterMessage.fromException(textEditor, error)
         }
@@ -317,8 +245,11 @@ module.exports = {
       return
     }
 
+    const { disableWhenNoEslintConfig, ignoredRulesWhenFixing } = atomConfig
+    const { isLintDisabled } = configInspector
+
     // Do not try to fix if linting should be disabled
-    if (configInspector.isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
+    if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
       return
     }
 
@@ -330,7 +261,7 @@ module.exports = {
     try {
       const response = await worker.sendJob({
         type: 'fix',
-        config: atom.config.get('linter-eslint'),
+        config: jobConfig(),
         contents: text,
         rules,
         filePath,
