@@ -1,25 +1,17 @@
 'use babel'
 
 import Path from 'path'
-import fs from 'fs-plus'
 import ChildProcess from 'child_process'
-import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
 import getPath from 'consistent-path'
+import { cleanPath } from '../file-system'
+import { isDirectory } from '../validate/fs'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', '..', 'node_modules', 'eslint')),
   NODE_PREFIX_PATH: null,
   LAST_MODULES_PATH: null
 }
-
-/**
- * Takes a path and translates `~` to the user's home directory, and replaces
- * all environment variables with their value.
- * @param  {string} path The path to remove "strangeness" from
- * @return {string}      The cleaned path
- */
-const cleanPath = path => (path ? resolveEnv(fs.normalize(path)) : '')
 
 export function getNodePrefixPath() {
   if (Cache.NODE_PREFIX_PATH === null) {
@@ -36,16 +28,6 @@ export function getNodePrefixPath() {
     }
   }
   return Cache.NODE_PREFIX_PATH
-}
-
-function isDirectory(dirPath) {
-  let isDir
-  try {
-    isDir = fs.statSync(dirPath).isDirectory()
-  } catch (e) {
-    isDir = false
-  }
-  return isDir
 }
 
 export function findESLintDirectory(modulesDir, config, projectPath) {
