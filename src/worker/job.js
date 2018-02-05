@@ -4,9 +4,15 @@
 
 import Path from 'path'
 import { FindCache, findCached } from 'atom-linter'
-import * as Helpers from './helpers'
+import {
+  findESLintDirectory,
+  getESLintInstance,
+  didRulesChange,
+  getRules,
+  getCLIEngineOptions
+} from './helpers'
 import { isLintDisabled } from '../eslint-config-inspector'
-import { getConfigPath } from '../file-system'
+import { getConfigPath, cdToProjectRoot } from '../file-system'
 
 process.title = 'linter-eslint helper'
 
@@ -16,8 +22,8 @@ let shouldSendRules = false
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
-  const rules = Helpers.getRules(cliEngine)
-  shouldSendRules = Helpers.didRulesChange(rulesMetadata, rules)
+  const rules = getRules(cliEngine)
+  shouldSendRules = didRulesChange(rulesMetadata, rules)
   if (shouldSendRules) {
     // Rebuild rulesMetadata
     rulesMetadata.clear()
@@ -41,17 +47,22 @@ module.exports = async () => {
   process.on('message', ({
     contents, type, config, filePath, projectPath, rules, emitKey
   }) => {
+    const {
+      disableFSCache,
+      disableEslintIgnore,
+      disableWhenNoEslintConfig,
+    } = config
+
     // We catch all worker errors so that we can create a separate error emitter
     // for each emitKey, rather than adding multiple listeners for `task:error`
     try {
-      if (config.disableFSCache) {
+      if (disableFSCache) {
         FindCache.clear()
       }
 
       const fileDir = Path.dirname(filePath)
-      const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
+      const eslint = getESLintInstance(fileDir, config, projectPath)
 
-      const { disableWhenNoEslintConfig } = config
       if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
         emit(emitKey, { messages: [] })
         return
@@ -59,10 +70,12 @@ module.exports = async () => {
 
       const configPath = getConfigPath(fileDir)
 
-      const relativeFilePath = Helpers.getRelativePath(fileDir, filePath, config, projectPath)
+      // ESLint does some of it's own searching for project files. Make
+      //  sure it does that search from the correct working directory
+      cdToProjectRoot({ disableEslintIgnore, projectPath, fileDir })
 
-      const cliEngineOptions = Helpers
-        .getCLIEngineOptions(type, config, rules, relativeFilePath, fileDir, configPath)
+      const cliEngineOptions =
+        getCLIEngineOptions(type, config, rules, fileDir, configPath)
 
       let response
       if (type === 'lint') {
@@ -71,14 +84,14 @@ module.exports = async () => {
           messages: report.results.length ? report.results[0].messages : []
         }
         if (shouldSendRules) {
-          // You can't emit Maps, convert to Array of Arrays to send back.
+        // You can't emit Maps, convert to Array of Arrays to send back.
           response.updatedRules = Array.from(rulesMetadata)
         }
       } else if (type === 'fix') {
         response = fixJob({ cliEngineOptions, contents, eslint, filePath })
       } else if (type === 'debug') {
         const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
-        response = Helpers.findESLintDirectory(modulesDir, config, projectPath)
+        response = findESLintDirectory(modulesDir, config, projectPath)
       }
       emit(emitKey, response)
     } catch (workerErr) {

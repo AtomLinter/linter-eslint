@@ -4,7 +4,7 @@ import Path from 'path'
 import ChildProcess from 'child_process'
 import { findCached } from 'atom-linter'
 import getPath from 'consistent-path'
-import { cleanPath } from '../file-system'
+import { cleanPath, getIgnoreFile } from '../file-system'
 import { isDirectory } from '../validate/fs'
 
 const Cache = {
@@ -96,34 +96,15 @@ export function getESLintInstance(fileDir, config, projectPath) {
   return getESLintFromDirectory(modulesDir, config, projectPath)
 }
 
-export function getRelativePath(fileDir, filePath, config, projectPath) {
-  const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
-
-  // If we can find an .eslintignore file, we can set cwd there
-  // (because they are expected to be at the project root)
-  if (ignoreFile) {
-    const ignoreDir = Path.dirname(ignoreFile)
-    process.chdir(ignoreDir)
-    return Path.relative(ignoreDir, filePath)
-  }
-  // Otherwise, we'll set the cwd to the atom project root as long as that exists
-  if (projectPath) {
-    process.chdir(projectPath)
-    return Path.relative(projectPath, filePath)
-  }
-  // If all else fails, use the file location itself
-  process.chdir(fileDir)
-  return Path.basename(filePath)
-}
-
-export function getCLIEngineOptions(type, config, rules, filePath, fileDir, givenConfigPath) {
+export function getCLIEngineOptions(type, config, rules, fileDir, givenConfigPath) {
+  const { disableEslintIgnore } = config
   const cliEngineConfig = {
     rules,
-    ignore: !config.disableEslintIgnore,
+    ignore: !disableEslintIgnore,
     fix: type === 'fix'
   }
 
-  const ignoreFile = config.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
+  const ignoreFile = getIgnoreFile({ disableEslintIgnore, fileDir })
   if (ignoreFile) {
     cliEngineConfig.ignorePath = ignoreFile
   }
