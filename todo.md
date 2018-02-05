@@ -1,44 +1,25 @@
+# Todo
 
-const noOp = () => {}
+List of *specific* tasks to deal with. This is not intended as a broad-overview, but rather to show small individual list items that are planned for near upcoming commits, or have been noted, but skipped over, and need to be returned to later.
 
-describe('test for cleanPath', () => noOp)
+### Specs
 
-// cdToProjectRoot  is a  simple composition  of functions that clearly behave
-// as described.  So this should be low priority to write, but useful to have
-// for high test-coverage and any future refactoring. Use disabled specs
-// for getRelativePath (below) as a reference, since they were theoretically
-// (although not actually ) testing this integration.
-//
-describe('integration test for cdToProjectRoot', noOp)
+* `cleanPath`
+* `cdToProjectRoot` integration
+  * This is a  simple composition  of functions that clearly behave as described.  So this should be low priority to write, but useful to have for high test-coverage and any future refactoring. Use specs from `getRelativePath` as a [Reference](reference), since they were theoretically supposed to be testing this integration.
+* Memoizers
 
-/** *********************
- * dependency injecton *
- ********************** */
+### Implicit dependencies
 
-// Several functions spotted that have implicit dependencies changing these
-// to accept their dependencies as arguments will significantly alter  the
-// testing required.
-//
+Some functions that are currently using implicit dependencies.
 
-describe('fix cdToFirstTruthy implicit dependency on process', noOp)
-describe('fix getIgnore implicit dependency on findCached', noOp)
+* `cdToFirstTruthy` requires `process`
+* `getIgnore` requires `findCached`
 
-/** ***********
- * Reference *
- ************ */
+### Reference
 
-const getFixturesPath = noOp
-const Path = {
-  relative: noOp,
-  join: noOp,
-  dirname: noOp,
-  basename: noOp
-}
-const Helpers = { getRelativePath: noOp }
-const copyFileToTempDir = noOp
-const rimraf = { sync: noOp }
-
-xdescribe('getRelativePath', () => {
+```javascript
+describe('getRelativePath', () => {
   it('return path relative of ignore file if found', () => {
     const fixtureDir = getFixturesPath('eslintignore')
     const fixtureFile = Path.join(fixtureDir, 'ignored.js')
@@ -86,3 +67,4 @@ xdescribe('getRelativePath', () => {
     rimraf.sync(tempDir)
   })
 })
+```

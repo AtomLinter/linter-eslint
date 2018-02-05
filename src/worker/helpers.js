@@ -1,33 +1,13 @@
 'use babel'
 
 import Path from 'path'
-import ChildProcess from 'child_process'
 import { findCached } from 'atom-linter'
-import getPath from 'consistent-path'
-import { cleanPath, getIgnoreFile } from '../file-system'
+import { cleanPath, getIgnoreFile, getNodePrefixPath } from '../file-system'
 import { isDirectory } from '../validate/fs'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', '..', 'node_modules', 'eslint')),
-  NODE_PREFIX_PATH: null,
   LAST_MODULES_PATH: null
-}
-
-export function getNodePrefixPath() {
-  if (Cache.NODE_PREFIX_PATH === null) {
-    const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
-    try {
-      Cache.NODE_PREFIX_PATH =
-        ChildProcess.spawnSync(npmCommand, ['get', 'prefix'], {
-          env: Object.assign(Object.assign({}, process.env), { PATH: getPath() })
-        }).output[1].toString().trim()
-    } catch (e) {
-      const errMsg = 'Unable to execute `npm get prefix`. Please make sure ' +
-        'Atom is getting $PATH correctly.'
-      throw new Error(errMsg)
-    }
-  }
-  return Cache.NODE_PREFIX_PATH
 }
 
 export function findESLintDirectory(modulesDir, config, projectPath) {

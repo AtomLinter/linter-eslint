@@ -4,7 +4,6 @@
  * Modify the call signature of existing function *
  ************************************************* */
 
-
 import curry from 'ramda/src/curry'
 import addIndex from 'ramda/src/addIndex'
 import filter from 'ramda/src/filter'

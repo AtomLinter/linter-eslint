@@ -2,7 +2,7 @@
 
 import { join } from 'path'
 
-import getConfigPath from '../../src/file-system/get-config-path'
+import getConfigPath from '../../src/file-system/config-path'
 
 const configsFixturePath = (...args) =>
   join(__dirname, '..', 'fixtures', 'configs', ...args)

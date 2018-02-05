@@ -1,6 +1,7 @@
 'use babel'
 
-export * from './typecasting'
-export * from './predicate'
 export * from './data-extraction'
+export * from './memo'
+export * from './predicate'
 export * from './signature-mod'
+export * from './typecasting'
