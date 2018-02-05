@@ -61,7 +61,7 @@ module.exports = async () => {
       }
 
       const fileDir = Path.dirname(filePath)
-      const eslint = getESLintInstance(fileDir, config, projectPath)
+      const eslint = getESLintInstance({ fileDir, config, projectPath })
 
       if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
         emit(emitKey, { messages: [] })
@@ -75,7 +75,9 @@ module.exports = async () => {
       cdToProjectRoot({ disableEslintIgnore, projectPath, fileDir })
 
       const cliEngineOptions =
-        getCLIEngineOptions(type, config, rules, fileDir, configPath)
+        getCLIEngineOptions({
+          type, config, rules, fileDir, configPath
+        })
 
       let response
       if (type === 'lint') {
@@ -91,7 +93,7 @@ module.exports = async () => {
         response = fixJob({ cliEngineOptions, contents, eslint, filePath })
       } else if (type === 'debug') {
         const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
-        response = findESLintDirectory(modulesDir, config, projectPath)
+        response = findESLintDirectory({ modulesDir, config, projectPath })
       }
       emit(emitKey, response)
     } catch (workerErr) {

@@ -10,7 +10,7 @@ const Cache = {
   LAST_MODULES_PATH: null
 }
 
-export function findESLintDirectory(modulesDir, config, projectPath) {
+export function findESLintDirectory({ modulesDir, config, projectPath }) {
   let eslintDir = null
   let locationType = null
   if (config.useGlobalEslint) {
@@ -47,8 +47,8 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
   }
 }
 
-export function getESLintFromDirectory(modulesDir, config, projectPath) {
-  const { path: ESLintDirectory } = findESLintDirectory(modulesDir, config, projectPath)
+export function getESLintFromDirectory({ modulesDir, config, projectPath }) {
+  const { path: ESLintDirectory } = findESLintDirectory({ modulesDir, config, projectPath })
   try {
     // eslint-disable-next-line import/no-dynamic-require
     return require(ESLintDirectory)
@@ -70,13 +70,15 @@ export function refreshModulesPath(modulesDir) {
   }
 }
 
-export function getESLintInstance(fileDir, config, projectPath) {
+export function getESLintInstance({ fileDir, config, projectPath }) {
   const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
   refreshModulesPath(modulesDir)
-  return getESLintFromDirectory(modulesDir, config, projectPath)
+  return getESLintFromDirectory({ modulesDir, config, projectPath })
 }
 
-export function getCLIEngineOptions(type, config, rules, fileDir, givenConfigPath) {
+export function getCLIEngineOptions({
+  type, config, rules, fileDir, givenConfigPath
+}) {
   const { disableEslintIgnore } = config
   const cliEngineConfig = {
     rules,
