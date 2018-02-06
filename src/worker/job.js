@@ -5,15 +5,18 @@
 import Path from 'path'
 import { FindCache, findCached } from 'atom-linter'
 import {
+  cdToProjectRoot,
   findESLintDirectory,
+  getConfigPath,
+  getModulesDirAndRefresh
+} from '../file-system'
+import {
   getESLintInstance,
   didRulesChange,
   getRules,
   getCLIEngineOptions,
-  getModulesDirAndRefresh
 } from './helpers'
 import { isLintDisabled } from '../eslint-config-inspector'
-import { getConfigPath, cdToProjectRoot } from '../file-system'
 
 process.title = 'linter-eslint helper'
 
@@ -95,16 +98,15 @@ module.exports = async () => {
       //  sure it does that search from the correct working directory
       cdToProjectRoot({ disableEslintIgnore, projectPath, fileDir })
 
-      const cliEngineOptions =
-        getCLIEngineOptions({
-          type,
-          rules,
-          fileDir,
-          configPath,
-          disableEslintIgnore,
-          eslintRulesDirs,
-          eslintrcPath
-        })
+      const cliEngineOptions = getCLIEngineOptions({
+        type,
+        rules,
+        fileDir,
+        configPath,
+        disableEslintIgnore,
+        eslintRulesDirs,
+        eslintrcPath
+      })
 
       let response
       if (type === 'lint') {

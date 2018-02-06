@@ -1,75 +1,8 @@
 'use babel'
 
-import Path from 'path'
+import { isAbsolute as isAbsolutePath } from 'path'
 import { findCached } from 'atom-linter'
-import { cleanPath, getIgnoreFile, getNodePrefixPath } from '../file-system'
-import { isDirectory } from '../validate/fs'
-
-const Cache = {
-  ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', '..', 'node_modules', 'eslint')),
-  LAST_MODULES_PATH: null
-}
-
-export function findESLintDirectory({
-  modulesDir,
-  projectPath,
-  useGlobalEslint,
-  globalNodePath,
-  advancedLocalNodeModules
-}) {
-  let eslintDir = null
-  let locationType = null
-  if (useGlobalEslint) {
-    locationType = 'global'
-    const configGlobal = cleanPath(globalNodePath)
-    const prefixPath = configGlobal || getNodePrefixPath()
-    // NPM on Windows and Yarn on all platforms
-    eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
-    if (!isDirectory(eslintDir)) {
-      // NPM on platforms other than Windows
-      eslintDir = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
-    }
-  } else if (!advancedLocalNodeModules) {
-    locationType = 'local project'
-    eslintDir = Path.join(modulesDir || '', 'eslint')
-  } else if (Path.isAbsolute(cleanPath(advancedLocalNodeModules))) {
-    locationType = 'advanced specified'
-    eslintDir = Path.join(cleanPath(advancedLocalNodeModules), 'eslint')
-  } else {
-    locationType = 'advanced specified'
-    eslintDir = Path.join(projectPath || '', cleanPath(advancedLocalNodeModules), 'eslint')
-  }
-  if (isDirectory(eslintDir)) {
-    return {
-      path: eslintDir,
-      type: locationType,
-    }
-  } else if (useGlobalEslint) {
-    throw new Error('ESLint not found, please ensure the global Node path is set correctly.')
-  }
-  return {
-    path: Cache.ESLINT_LOCAL_PATH,
-    type: 'bundled fallback',
-  }
-}
-
-export function refreshModulesPath(modulesDir) {
-  if (Cache.LAST_MODULES_PATH !== modulesDir) {
-    Cache.LAST_MODULES_PATH = modulesDir
-    process.env.NODE_PATH = modulesDir || ''
-    // eslint-disable-next-line no-underscore-dangle
-    require('module').Module._initPaths()
-  }
-}
-
-export const getModulesDir = fileDir =>
-  Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
-
-export const getModulesDirAndRefresh = (fileDir) => {
-  const modulesDir = getModulesDir(fileDir)
-  refreshModulesPath(modulesDir)
-  return modulesDir
-}
+import { cleanPath, getIgnoreFile } from '../file-system'
 
 
 export const getESLintInstance = (eslintDir) => {
@@ -103,7 +36,7 @@ export function getCLIEngineOptions({
 
   cliEngineConfig.rulePaths = eslintRulesDirs.map((path) => {
     const rulesDir = cleanPath(path)
-    if (!Path.isAbsolute(rulesDir)) {
+    if (!isAbsolutePath(rulesDir)) {
       return findCached(fileDir, rulesDir)
     }
     return rulesDir

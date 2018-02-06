@@ -2,11 +2,11 @@
 
 import { join } from 'path'
 import {
-  findESLintDirectory,
   getESLintInstance,
   getRules,
-  didRulesChange
+  didRulesChange,
 } from '../src/worker/helpers'
+import { findESLintDirectory } from '../src/file-system'
 
 const getFixturesPath = (...names) => join(__dirname, 'fixtures', ...names)
 
