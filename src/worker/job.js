@@ -9,7 +9,8 @@ import {
   getESLintInstance,
   didRulesChange,
   getRules,
-  getCLIEngineOptions
+  getCLIEngineOptions,
+  getModulesDirAndRefresh
 } from './helpers'
 import { isLintDisabled } from '../eslint-config-inspector'
 import { getConfigPath, cdToProjectRoot } from '../file-system'
@@ -45,14 +46,23 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
 
 module.exports = async () => {
   process.on('message', ({
-    contents, type, config, filePath, projectPath, rules, emitKey
-  }) => {
-    const {
+    contents,
+    emitKey,
+    filePath,
+    projectPath,
+    rules,
+    type,
+    config: {
+      advancedLocalNodeModules,
       disableFSCache,
       disableEslintIgnore,
       disableWhenNoEslintConfig,
-    } = config
-
+      globalNodePath,
+      eslintrcPath,
+      eslintRulesDirs,
+      useGlobalEslint
+    },
+  }) => {
     // We catch all worker errors so that we can create a separate error emitter
     // for each emitKey, rather than adding multiple listeners for `task:error`
     try {
@@ -60,8 +70,19 @@ module.exports = async () => {
         FindCache.clear()
       }
 
+      const getEslintDir = modulesDir => findESLintDirectory({
+        modulesDir,
+        projectPath,
+        useGlobalEslint,
+        globalNodePath,
+        advancedLocalNodeModules
+      })
+
       const fileDir = Path.dirname(filePath)
-      const eslint = getESLintInstance({ fileDir, config, projectPath })
+      const modulesDirectory = getModulesDirAndRefresh(fileDir)
+      const { path: eslintDir } = getEslintDir(modulesDirectory)
+
+      const eslint = getESLintInstance(eslintDir)
 
       if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
         emit(emitKey, { messages: [] })
@@ -76,7 +97,13 @@ module.exports = async () => {
 
       const cliEngineOptions =
         getCLIEngineOptions({
-          type, config, rules, fileDir, configPath
+          type,
+          rules,
+          fileDir,
+          configPath,
+          disableEslintIgnore,
+          eslintRulesDirs,
+          eslintrcPath
         })
 
       let response
@@ -93,7 +120,7 @@ module.exports = async () => {
         response = fixJob({ cliEngineOptions, contents, eslint, filePath })
       } else if (type === 'debug') {
         const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
-        response = findESLintDirectory({ modulesDir, config, projectPath })
+        response = getEslintDir(modulesDir)
       }
       emit(emitKey, response)
     } catch (workerErr) {

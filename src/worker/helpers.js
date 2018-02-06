@@ -10,12 +10,18 @@ const Cache = {
   LAST_MODULES_PATH: null
 }
 
-export function findESLintDirectory({ modulesDir, config, projectPath }) {
+export function findESLintDirectory({
+  modulesDir,
+  projectPath,
+  useGlobalEslint,
+  globalNodePath,
+  advancedLocalNodeModules
+}) {
   let eslintDir = null
   let locationType = null
-  if (config.useGlobalEslint) {
+  if (useGlobalEslint) {
     locationType = 'global'
-    const configGlobal = cleanPath(config.globalNodePath)
+    const configGlobal = cleanPath(globalNodePath)
     const prefixPath = configGlobal || getNodePrefixPath()
     // NPM on Windows and Yarn on all platforms
     eslintDir = Path.join(prefixPath, 'node_modules', 'eslint')
@@ -23,41 +29,27 @@ export function findESLintDirectory({ modulesDir, config, projectPath }) {
       // NPM on platforms other than Windows
       eslintDir = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
-  } else if (!config.advancedLocalNodeModules) {
+  } else if (!advancedLocalNodeModules) {
     locationType = 'local project'
     eslintDir = Path.join(modulesDir || '', 'eslint')
-  } else if (Path.isAbsolute(cleanPath(config.advancedLocalNodeModules))) {
+  } else if (Path.isAbsolute(cleanPath(advancedLocalNodeModules))) {
     locationType = 'advanced specified'
-    eslintDir = Path.join(cleanPath(config.advancedLocalNodeModules), 'eslint')
+    eslintDir = Path.join(cleanPath(advancedLocalNodeModules), 'eslint')
   } else {
     locationType = 'advanced specified'
-    eslintDir = Path.join(projectPath || '', cleanPath(config.advancedLocalNodeModules), 'eslint')
+    eslintDir = Path.join(projectPath || '', cleanPath(advancedLocalNodeModules), 'eslint')
   }
   if (isDirectory(eslintDir)) {
     return {
       path: eslintDir,
       type: locationType,
     }
-  } else if (config.useGlobalEslint) {
+  } else if (useGlobalEslint) {
     throw new Error('ESLint not found, please ensure the global Node path is set correctly.')
   }
   return {
     path: Cache.ESLINT_LOCAL_PATH,
     type: 'bundled fallback',
-  }
-}
-
-export function getESLintFromDirectory({ modulesDir, config, projectPath }) {
-  const { path: ESLintDirectory } = findESLintDirectory({ modulesDir, config, projectPath })
-  try {
-    // eslint-disable-next-line import/no-dynamic-require
-    return require(ESLintDirectory)
-  } catch (e) {
-    if (config.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
-      throw new Error('ESLint not found, try restarting Atom to clear caches.')
-    }
-    // eslint-disable-next-line import/no-dynamic-require
-    return require(Cache.ESLINT_LOCAL_PATH)
   }
 }
 
@@ -70,16 +62,34 @@ export function refreshModulesPath(modulesDir) {
   }
 }
 
-export function getESLintInstance({ fileDir, config, projectPath }) {
-  const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
+export const getModulesDir = fileDir =>
+  Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
+
+export const getModulesDirAndRefresh = (fileDir) => {
+  const modulesDir = getModulesDir(fileDir)
   refreshModulesPath(modulesDir)
-  return getESLintFromDirectory({ modulesDir, config, projectPath })
+  return modulesDir
+}
+
+
+export const getESLintInstance = (eslintDir) => {
+  try {
+    // eslint-disable-next-line import/no-dynamic-require
+    return require(eslintDir)
+  } catch (e) {
+    throw new Error('ESLint not found, try restarting Atom to clear caches.')
+  }
 }
 
 export function getCLIEngineOptions({
-  type, config, rules, fileDir, givenConfigPath
+  type,
+  rules,
+  fileDir,
+  configPath,
+  disableEslintIgnore,
+  eslintRulesDirs,
+  eslintrcPath
 }) {
-  const { disableEslintIgnore } = config
   const cliEngineConfig = {
     rules,
     ignore: !disableEslintIgnore,
@@ -91,7 +101,7 @@ export function getCLIEngineOptions({
     cliEngineConfig.ignorePath = ignoreFile
   }
 
-  cliEngineConfig.rulePaths = config.eslintRulesDirs.map((path) => {
+  cliEngineConfig.rulePaths = eslintRulesDirs.map((path) => {
     const rulesDir = cleanPath(path)
     if (!Path.isAbsolute(rulesDir)) {
       return findCached(fileDir, rulesDir)
@@ -99,9 +109,9 @@ export function getCLIEngineOptions({
     return rulesDir
   }).filter(path => path)
 
-  if (givenConfigPath === null && config.eslintrcPath) {
+  if (configPath === null && eslintrcPath) {
     // If we didn't find a configuration use the fallback from the settings
-    cliEngineConfig.configFile = cleanPath(config.eslintrcPath)
+    cliEngineConfig.configFile = cleanPath(eslintrcPath)
   }
 
   return cliEngineConfig

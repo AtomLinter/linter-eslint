@@ -23,7 +23,6 @@ export const keyedFilter = curry((f, o) => {
       ...(f(o[k], k, o) ? { [k]: o[k] } : null)
     }), {})
 })
-
 // Map over object properties with property keys passed
 // as second argument to transforming function.
 //

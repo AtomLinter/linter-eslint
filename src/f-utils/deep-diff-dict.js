@@ -1,20 +1,18 @@
 'use babel'
 
-import deepEq from 'fast-deep-equal'
-
-const { keys } = Object
-
 /** ********************
  * deepDiffDictionary *
  ********************* */
+
+import deepEq from 'fast-deep-equal'
 
 // Diff 2 object dictionaries with deep comparison
 //
 // deepDiffDictionary :: Object a -> Object b -> Object c
 const deepDiffDictionary = (a, b) => {
   const uniqueKeys = Array.from(new Set([
-    ...keys(a),
-    ...keys(b)
+    ...Object.keys(a),
+    ...Object.keys(b)
   ]))
 
   /* eslint-disable no-param-reassign */

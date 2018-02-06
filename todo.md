@@ -4,10 +4,12 @@ List of *specific* tasks to deal with. This is not intended as a broad-overview,
 
 ### Specs
 
-* `cleanPath`
+* `cleanPath` - Needs spec.
+* `getESLintInstance` - Deprecated. Inspect tests for lost code coverage [Reference](reference)
+* `getRelativePath` - Deprecated. Inspect tests for lost code coverage [Reference](reference)
 * `cdToProjectRoot` integration
-  * This is a  simple composition  of functions that clearly behave as described.  So this should be low priority to write, but useful to have for high test-coverage and any future refactoring. Use specs from `getRelativePath` as a [Reference](reference), since they were theoretically supposed to be testing this integration.
-* Memoizers
+  * This is a  simple composition  of functions that clearly behave as described.  So this should be low priority to write, but may need sooner attention because it replaced `getRelativePath`, thus eliminating related specs.
+* Memoizers - Need specs
 
 ### Implicit dependencies
 
@@ -17,8 +19,79 @@ Some functions that are currently using implicit dependencies.
 * `getIgnore` requires `findCached`
 
 ### Reference
+```js
+describe('getESLintInstance && getESLintFromDirectory', () => {
+  const pathPart = join('testing', 'eslint', 'node_modules')
 
-```javascript
+  it('tries to find an indirect local eslint using an absolute path', () => {
+    const path = getFixturesPath('indirect-local-eslint', pathPart)
+    const eslint = getESLintInstance({
+      fileDir: '',
+      useGlobalEslint: false,
+      advancedLocalNodeModules: path
+    })
+    expect(eslint).toBe('located')
+  })
+
+  it('tries to find an indirect local eslint using a relative path', () => {
+    const path = getFixturesPath('indirect-local-eslint', pathPart)
+    const [projectPath, relativePath] = atom.project.relativizePath(path)
+
+    const eslint = getESLintInstance({
+      fileDir: '',
+      useGlobalEslint: false,
+      advancedLocalNodeModules: relativePath,
+      projectPath
+    })
+
+    expect(eslint).toBe('located')
+  })
+
+  it('tries to find a local eslint', () => {
+    const eslint = getESLintInstance({
+      fileDir: getFixturesPath('local-eslint'),
+    })
+    expect(eslint).toBe('located')
+  })
+
+  // TODO Broken spec. Previously was throwing only because of calling
+  // path.join with an object param. Needs to make temp folder outside project
+  xit('cries if local eslint is not found', () => {
+    expect(() => {
+      getESLintInstance({
+        fileDir: getFixturesPath('files'),
+      })
+    }).toThrow()
+  })
+
+  it('tries to find a global eslint if config is specified', () => {
+    const eslint = getESLintInstance({
+      fileDir: getFixturesPath('local-eslint'),
+      useGlobalEslint: true,
+      globalNodePath
+    })
+    expect(eslint).toBe('located')
+  })
+
+  it('cries if global eslint is not found', () => {
+    expect(() => {
+      getESLintInstance({
+        fileDir: getFixturesPath('local-eslint'),
+        useGlobalEslint: true,
+        globalNodePath: getFixturesPath('files')
+      })
+    }).toThrow()
+  })
+
+  it('tries to find a local eslint with nested node_modules', () => {
+    const fileDir = getFixturesPath('local-eslint', 'lib', 'foo.js')
+    const eslint = getESLintInstance({ fileDir })
+    expect(eslint).toBe('located')
+  })
+```
+
+
+```js
 describe('getRelativePath', () => {
   it('return path relative of ignore file if found', () => {
     const fixtureDir = getFixturesPath('eslintignore')

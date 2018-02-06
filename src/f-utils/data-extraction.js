@@ -1,5 +1,9 @@
 'use babel'
 
+/** **************************
+ * Extract data from object *
+ *************************** */
+
 import curry from 'ramda/src/curry'
 import path from 'ramda/src/path'
 
