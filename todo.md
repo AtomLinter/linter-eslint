@@ -5,7 +5,8 @@ List of *specific* tasks to deal with. This is not intended as a broad-overview,
 ### Specs
 
 * `cleanPath` - Needs spec.
-* `getESLintInstance` - Deprecated. Inspect tests for lost code coverage [Reference](reference)
+* `getModuleDirAndRefresh` - Needs spec
+* `getESLintInstance` - Specs deprecated. Inspect tests for lost code coverage [Reference](reference)
 * `getRelativePath` - Deprecated. Inspect tests for lost code coverage [Reference](reference)
 * `cdToProjectRoot` integration
   * This is a  simple composition  of functions that clearly behave as described.  So this should be low priority to write, but may need sooner attention because it replaced `getRelativePath`, thus eliminating related specs.

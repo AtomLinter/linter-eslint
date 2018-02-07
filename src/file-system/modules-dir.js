@@ -4,7 +4,7 @@ import {
   dirname,
 } from 'path'
 import { findCached } from 'atom-linter'
-import bundledEslintPath from './bundled-eslint'
+import bundledESLintPath from './bundled-eslint'
 import { memoWithCacheParam } from '../f-utils'
 
 // Given a cached path and a directory, return the cache or a new valid
@@ -39,6 +39,6 @@ const getModulesDirAndRefresh = memoWithCacheParam(getModulesDirAndRefreshCached
 
 // Prefill cache with bundled fallback
 //
-getModulesDirAndRefresh(bundledEslintPath())
+getModulesDirAndRefresh(bundledESLintPath())
 
 export default getModulesDirAndRefresh

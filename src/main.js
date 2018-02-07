@@ -3,7 +3,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable } from 'atom'
 import { hasValidScope } from './validate/editor'
-import { idsToIgnoredRules } from './rules'
+import { fromIdsToIgnored } from './rules'
 import {
   atomConfig,
   jobConfig,
@@ -19,7 +19,6 @@ const idleCallbacks = new Set()
 // takes to require this file as that causes delays in Atom loading this package
 let path
 let worker
-let workerHelpers
 let configInspector
 let debug
 let linterMessage
@@ -30,9 +29,6 @@ const loadDeps = () => {
   }
   if (!worker) {
     worker = require('./worker')
-  }
-  if (!workerHelpers) {
-    workerHelpers = require('./worker/helpers')
   }
   if (!configInspector) {
     configInspector = require('./eslint-config-inspector')
@@ -182,9 +178,9 @@ module.exports = {
             // Note that the fixable rules will only have values after the first lint job
             const ignoredRules = new Set(worker.rules.getFixableRules())
             ignoredRulesWhenModified.forEach(ruleId => ignoredRules.add(ruleId))
-            rules = idsToIgnoredRules(ignoredRules)
+            rules = fromIdsToIgnored(ignoredRules)
           } else {
-            rules = idsToIgnoredRules(ignoredRulesWhenModified)
+            rules = fromIdsToIgnored(ignoredRulesWhenModified)
           }
         }
 

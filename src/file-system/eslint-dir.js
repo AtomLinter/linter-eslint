@@ -2,14 +2,14 @@
 
 import { join, path as isAbsolutePath } from 'path'
 
-import bundledEslintPath from './bundled-eslint'
+import bundledESLintPath from './bundled-eslint'
 import { cleanPath } from './fs-utils'
 import getNodePrefixPath from './node-prefix-path'
 import { isDirectory } from '../validate/fs'
 
 // Cascade through possible locations for ESLint directory
 //
-function findESLintDirectory({
+function findEslintDir({
   modulesDir,
   projectPath,
   useGlobalEslint,
@@ -47,9 +47,9 @@ function findESLintDirectory({
     throw new Error('ESLint not found, please ensure the global Node path is set correctly.')
   }
   return {
-    path: bundledEslintPath(),
+    path: bundledESLintPath(),
     type: 'bundled fallback',
   }
 }
 
-export default findESLintDirectory
+export default findEslintDir

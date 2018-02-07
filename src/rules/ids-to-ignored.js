@@ -6,11 +6,11 @@
  * @param  {[iterable]} ruleIds Iterable containing ruleIds to ignore
  * @return {Object}             Object containing properties for each rule to ignore
  */
-const idsToIgnoredRules = ruleIds =>
+const fromIdsToIgnored = ruleIds =>
   Array.from(ruleIds).reduce(
     // 0 is the severity to turn off a rule
     (ids, id) => Object.assign(ids, { [id]: 0 })
     , {}
   )
 
-export default idsToIgnoredRules
+export default fromIdsToIgnored

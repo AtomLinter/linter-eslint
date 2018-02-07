@@ -6,32 +6,32 @@ import Path from 'path'
 import { FindCache, findCached } from 'atom-linter'
 import {
   cdToProjectRoot,
-  findESLintDirectory,
+  findEslintDir,
   getConfigPath,
+  getEslintInstance,
   getModulesDirAndRefresh
 } from '../file-system'
-import {
-  getESLintInstance,
-  didRulesChange,
-  getRules,
-  getCLIEngineOptions,
-} from './helpers'
+import getCLIEngineOptions from './cli-engine-options'
 import { isLintDisabled } from '../eslint-config-inspector'
+import {
+  fromCliEngine as rulesFromEngine,
+  didChange as rulesDidChange,
+} from '../rules'
 
 process.title = 'linter-eslint helper'
 
-const rulesMetadata = new Map()
+const knownRules = new Map()
 let shouldSendRules = false
 
 function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
-  const rules = getRules(cliEngine)
-  shouldSendRules = didRulesChange(rulesMetadata, rules)
+  const rules = rulesFromEngine(cliEngine)
+  shouldSendRules = rulesDidChange(knownRules, rules)
   if (shouldSendRules) {
-    // Rebuild rulesMetadata
-    rulesMetadata.clear()
-    rules.forEach((properties, rule) => rulesMetadata.set(rule, properties))
+    // Rebuild knownRules
+    knownRules.clear()
+    rules.forEach((properties, rule) => knownRules.set(rule, properties))
   }
   return report
 }
@@ -73,7 +73,7 @@ module.exports = async () => {
         FindCache.clear()
       }
 
-      const getEslintDir = modulesDir => findESLintDirectory({
+      const getEslintDir = modulesDir => findEslintDir({
         modulesDir,
         projectPath,
         useGlobalEslint,
@@ -85,7 +85,7 @@ module.exports = async () => {
       const modulesDirectory = getModulesDirAndRefresh(fileDir)
       const { path: eslintDir } = getEslintDir(modulesDirectory)
 
-      const eslint = getESLintInstance(eslintDir)
+      const eslint = getEslintInstance(eslintDir)
 
       if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
         emit(emitKey, { messages: [] })
@@ -116,7 +116,7 @@ module.exports = async () => {
         }
         if (shouldSendRules) {
         // You can't emit Maps, convert to Array of Arrays to send back.
-          response.updatedRules = Array.from(rulesMetadata)
+          response.updatedRules = Array.from(knownRules)
         }
       } else if (type === 'fix') {
         response = fixJob({ cliEngineOptions, contents, eslint, filePath })
