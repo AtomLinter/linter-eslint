@@ -2,45 +2,48 @@
 
 /* global emit */
 
-import Path from 'path'
-import { FindCache, findCached } from 'atom-linter'
-import {
-  cdToProjectRoot,
-  findEslintDir,
-  getConfigPath,
-  getEslintInstance,
-  getModulesDirAndRefresh
-} from '../file-system'
+import { FindCache } from 'atom-linter'
+import { dirname } from 'path'
+
 import getCLIEngineOptions from './cli-engine-options'
 import { isLintDisabled } from '../eslint-config-inspector'
 import {
-  fromCliEngine as rulesFromEngine,
+  cdToProjectRoot,
+  findCachedDir,
+  findEslintDirCurried,
+  getEslintInstance,
+  getModulesDirAndRefresh
+} from '../file-system'
+import {
   didChange as rulesDidChange,
+  fromCliEngine as rulesFromEngine,
 } from '../rules'
 
 process.title = 'linter-eslint helper'
 
-const knownRules = new Map()
-let shouldSendRules = false
+let knownRules = new Map()
 
-function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
+function lintJob({
+  cliEngineOptions, contents, eslint, filePath, toFix
+}) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
-  const rules = rulesFromEngine(cliEngine)
-  shouldSendRules = rulesDidChange(knownRules, rules)
-  if (shouldSendRules) {
-    // Rebuild knownRules
-    knownRules.clear()
-    rules.forEach((properties, rule) => knownRules.set(rule, properties))
+  const updatedRules = rulesFromEngine(cliEngine)
+  const response = {
+    messages: report.results.length ? report.results[0].messages : []
   }
-  return report
+  if (rulesDidChange(knownRules, updatedRules)) {
+    knownRules = updatedRules
+    // Cannot emit Maps. Convert to Array of Arrays to send back.
+    response.updatedRules = Array.from(knownRules)
+  }
+  return toFix
+    ? toFix({ report, outputFixes: eslint.CLIEngine.outputFixes })
+    : response
 }
 
-function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
-  const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
-
-  eslint.CLIEngine.outputFixes(report)
-
+const toFix = ({ report, outputFixes }) => {
+  outputFixes(report)
   if (!report.results.length || !report.results[0].messages.length) {
     return 'Linter-ESLint: Fix complete.'
   }
@@ -73,17 +76,16 @@ module.exports = async () => {
         FindCache.clear()
       }
 
-      const getEslintDir = modulesDir => findEslintDir({
-        modulesDir,
+      const findEslintDir = findEslintDirCurried({
         projectPath,
         useGlobalEslint,
         globalNodePath,
         advancedLocalNodeModules
       })
 
-      const fileDir = Path.dirname(filePath)
-      const modulesDirectory = getModulesDirAndRefresh(fileDir)
-      const { path: eslintDir } = getEslintDir(modulesDirectory)
+      const fileDir = dirname(filePath)
+      const modulesDir = getModulesDirAndRefresh(fileDir)
+      const { path: eslintDir } = findEslintDir(modulesDir)
 
       const eslint = getEslintInstance(eslintDir)
 
@@ -92,38 +94,30 @@ module.exports = async () => {
         return
       }
 
-      const configPath = getConfigPath(fileDir)
-
-      // ESLint does some of it's own searching for project files. Make
-      //  sure it does that search from the correct working directory
-      cdToProjectRoot({ disableEslintIgnore, projectPath, fileDir })
-
       const cliEngineOptions = getCLIEngineOptions({
         type,
         rules,
         fileDir,
-        configPath,
         disableEslintIgnore,
         eslintRulesDirs,
         eslintrcPath
       })
 
-      let response
-      if (type === 'lint') {
-        const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
-        response = {
-          messages: report.results.length ? report.results[0].messages : []
-        }
-        if (shouldSendRules) {
-        // You can't emit Maps, convert to Array of Arrays to send back.
-          response.updatedRules = Array.from(knownRules)
-        }
-      } else if (type === 'fix') {
-        response = fixJob({ cliEngineOptions, contents, eslint, filePath })
-      } else if (type === 'debug') {
-        const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
-        response = getEslintDir(modulesDir)
+      // ESLint does some of it's own searching for project files. Make
+      //  sure it does that search from the correct working directory
+      cdToProjectRoot({ disableEslintIgnore, projectPath, fileDir })
+
+      const responses = {
+        lint: () => lintJob({ cliEngineOptions, contents, eslint, filePath }),
+
+        fix: () => lintJob({
+          cliEngineOptions, contents, eslint, filePath, toFix
+        }),
+
+        debug: () =>
+          findEslintDir(findCachedDir(fileDir, 'node_modules/eslint'))
       }
+      const response = responses[type]()
       emit(emitKey, response)
     } catch (workerErr) {
       emit(`workerError:${emitKey}`, { msg: workerErr.message, stack: workerErr.stack })

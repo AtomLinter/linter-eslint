@@ -4,8 +4,8 @@ import {
   dirname,
 } from 'path'
 import { findCached } from 'atom-linter'
-import bundledESLintPath from './bundled-eslint'
-import { memoWithCacheParam } from '../f-utils'
+import bundledEslintPath from './bundled-eslint'
+import { passInMemo } from '../f-utils'
 
 // Given a cached path and a directory, return the cache or a new valid
 // node_modules directory based on the input. If new path found, then add
@@ -35,10 +35,10 @@ export const getModulesDirAndRefreshCached = (cache, fileDir) => {
 
 // Wrap in a memoizer to store and pass in the cache on each call.
 //
-const getModulesDirAndRefresh = memoWithCacheParam(getModulesDirAndRefreshCached)
+const getModulesDirAndRefresh = passInMemo(getModulesDirAndRefreshCached)
 
 // Prefill cache with bundled fallback
 //
-getModulesDirAndRefresh(bundledESLintPath())
+getModulesDirAndRefresh(bundledEslintPath())
 
 export default getModulesDirAndRefresh

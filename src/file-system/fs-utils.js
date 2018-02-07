@@ -1,7 +1,8 @@
 'use babel'
 
+import { findCached } from 'atom-linter'
 import resolveEnv from 'resolve-env'
-import { dirname as pathDirname, normalize } from 'path'
+import { dirname, normalize } from 'path'
 
 /** ***********************************
  *  Small, generic file system utilities *
@@ -24,10 +25,18 @@ export const cdToFirstTruthy = (paths) => {
 
 // Call dirname with any string, else return null
 //
-export const makeMaybeDirname = dirname => file =>
+export const makeMaybeDirname = dir => file =>
   (file && typeof file === 'string'
-    ? dirname(file)
+    ? dir(file)
     : null)
 
-// Preload dependencies for
-export const maybeDirname = makeMaybeDirname(pathDirname)
+// Preload dependencies
+export const maybeDirname = makeMaybeDirname(dirname)
+
+
+// Get directory of a file located by findCached
+//
+export const makeFindCachedDir = (dir, find) => (startingDir, filename) =>
+  dir(find(startingDir, filename) || '')
+
+export const findCachedDir = makeFindCachedDir(dirname, findCached)

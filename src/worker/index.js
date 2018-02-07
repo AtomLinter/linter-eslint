@@ -22,8 +22,10 @@ export const sendJob = makeSendJob(workerTask)
  * @return {Promise}               The messages transformed into Linter messages
  */
 export const processJobResponse = (response, textEditor, showRule) => {
-  if (response.updatedRules) {
-    rules.replaceRules(response.updatedRules)
-  }
+  try {
+    if (response.updatedRules) {
+      rules.replaceRules(response.updatedRules)
+    }
+  } catch (e) { console.error(e) }
   return eslintToLinter(response.messages, textEditor, showRule, rules)
 }

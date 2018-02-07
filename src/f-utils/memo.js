@@ -19,7 +19,7 @@ export const memo = (f) => {
 
 // Simple memoizer that passes cache to called function as the first param.
 //
-export const memoWithCacheParam = (f) => {
+export const passInMemo = (f) => {
   let cache
   return (...args) => {
     cache = f(cache, ...args)

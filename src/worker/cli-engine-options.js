@@ -2,13 +2,12 @@
 
 import { isAbsolute as isAbsolutePath } from 'path'
 import { findCached } from 'atom-linter'
-import { cleanPath, getIgnoreFile } from '../file-system'
+import { cleanPath, getConfigPath, getIgnoreFile } from '../file-system'
 
 const getCLIEngineOptions = ({
   type,
   rules,
   fileDir,
-  configPath,
   disableEslintIgnore,
   eslintRulesDirs,
   eslintrcPath
@@ -32,7 +31,7 @@ const getCLIEngineOptions = ({
     return rulesDir
   }).filter(path => path)
 
-  if (configPath === null && eslintrcPath) {
+  if (getConfigPath(fileDir) === null && eslintrcPath) {
     // If we didn't find a configuration use the fallback from the settings
     cliEngineConfig.configFile = cleanPath(eslintrcPath)
   }
