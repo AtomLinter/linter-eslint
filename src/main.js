@@ -28,7 +28,7 @@ const loadDeps = () => {
     path = require('path')
   }
   if (!worker) {
-    worker = require('./worker')
+    worker = require('./worker-manager')
   }
   if (!configInspector) {
     configInspector = require('./eslint-config-inspector')

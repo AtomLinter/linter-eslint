@@ -1,7 +1,7 @@
 'use babel'
 
 import Rules from '../rules'
-import createWorkerTask from '../worker/task'
+import createWorkerTask from './task'
 import makeSendJob from './send-job'
 import { fromEslint as eslintToLinter } from '../linter-message'
 

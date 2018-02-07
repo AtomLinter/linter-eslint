@@ -1,7 +1,7 @@
 'use babel'
 
 import { join } from 'path'
-import { sendJob } from '../worker'
+import { sendJob } from '../worker-manager'
 
 const debugInfo = async () => {
   const textEditor = atom.workspace.getActiveTextEditor()

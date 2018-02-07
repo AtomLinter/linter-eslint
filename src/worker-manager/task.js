@@ -3,7 +3,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Task } from 'atom'
 
-const createWorkerTask = () => {
+const createWorkerTask = (script = '../worker-process') => {
   let task = null
   let started = false
   const isConnected = () => !!(task && task.childProcess.connected)
@@ -19,7 +19,7 @@ const createWorkerTask = () => {
       if (isConnected === false) {
         task.kill()
       }
-      task = new Task(require.resolve('./job.js'))
+      task = new Task(require.resolve(script))
     }
     // Return if a start request already sent
     if (started) return false
