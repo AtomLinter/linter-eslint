@@ -7,6 +7,7 @@ import { dirname } from 'path'
 
 import getCLIEngineOptions from './cli-engine-options'
 import { isLintDisabled } from '../eslint-config-inspector'
+import { diffCachedMap } from '../f-utils'
 import {
   cdToProjectRoot,
   findCachedDir,
@@ -14,32 +15,37 @@ import {
   getEslintInstance,
   getModulesDirAndRefresh
 } from '../file-system'
-import {
-  didChange as rulesDidChange,
-  fromCliEngine as rulesFromEngine,
-} from '../rules'
+import { fromCliEngine as rulesFromEngine } from '../rules'
 
 process.title = 'linter-eslint helper'
 
-let knownRules = new Map()
+const diffCachedRules = diffCachedMap(new Map())
 
-function lintJob({
-  cliEngineOptions, contents, eslint, filePath, toFix
-}) {
+const lintJob = ({
+  cliEngineOptions,
+  contents,
+  eslint,
+  filePath,
+  toFix
+}) => {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
+
   const updatedRules = rulesFromEngine(cliEngine)
+  const { results } = report
+
+  const rulesDiff = diffCachedRules(updatedRules)
+
+  const messages = {
+    lint: () => (results.length ? results[0].messages : []),
+    fix: () => toFix({ report, outputFixes: eslint.CLIEngine.outputFixes })
+  }
+
   const response = {
-    messages: report.results.length ? report.results[0].messages : []
+    messages: toFix ? messages.fix() : messages.lint(),
+    rulesDiff
   }
-  if (rulesDidChange(knownRules, updatedRules)) {
-    knownRules = updatedRules
-    // Cannot emit Maps. Convert to Array of Arrays to send back.
-    response.updatedRules = Array.from(knownRules)
-  }
-  return toFix
-    ? toFix({ report, outputFixes: eslint.CLIEngine.outputFixes })
-    : response
+  return response
 }
 
 const toFix = ({ report, outputFixes }) => {

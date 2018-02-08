@@ -1,6 +1,7 @@
 'use babel'
 
 import ruleURI from 'eslint-rule-documentation'
+import reduce from 'ramda/src/reduce'
 
 // Private properties
 const rules = Symbol('rules')
@@ -15,6 +16,7 @@ export default class Rules {
    */
   constructor(newRules) {
     this.replaceRules(newRules)
+    this[rules] = new Map()
   }
 
   /**
@@ -26,16 +28,59 @@ export default class Rules {
   }
 
   /**
+   * Updated rules based on diff object
+   * @param {Object} added  List of added rules
+   * @param {Object} removed List of removed rules
+   */
+  updateRules({ added = {}, removed = {} } = {}) {
+    Object.keys(removed)
+      .forEach(k => this[rules].delete(k))
+    Object.keys(added)
+      .forEach(k => this[rules].set(k, added[k]))
+    return this[rules]
+  }
+
+  /**
    * [getFixableRules description]
    * @return {Array} The ruleIds of the currently known fixable rules
    */
   getFixableRules() {
-    return Array.from(this[rules]).reduce((fixable, [rule, props]) => {
+    return reduce((fixable, [ruleId, props]) => {
       if (props && props.meta && props.meta.fixable) {
-        return [...fixable, rule]
+        return [...fixable, ruleId]
       }
       return fixable
-    }, [])
+    }, [], this[rules])
+  }
+
+  /**
+   *Transform Array or Iiterable containing list of Rule IDs, to Object
+   * dictionary with Rule ID as key and 0 as values. This format will
+   *  disable these rules when used in ESLint configuration.
+   * @param  {[iterable]} ruleIds Iterable containing ruleIds to ignore
+   * @return {Object}             Dictionary of disabled rules
+   */
+  // eslint-disable-next-line class-methods-use-this
+  toIgnored(ruleIds) {
+    return reduce(
+      (disabled, id) =>
+      // 0 is the severity to turn off a rule
+        Object.assign(disabled, { [id]: 0 })
+      , {}, ruleIds
+    )
+  }
+
+  /**
+   * Get an Object dictionary with Rule IDs as the key and all 0 values.
+   *  Includes known fixable rules and any additional rules provided.
+   * @param  {Array}  [ruleIds=[]] List of additional rules to ignore
+   * @return {Object}              Dictionary of disabled rules.
+   */
+  getIgnoredRules(ruleIds = []) {
+    return this.toIgnored(new Set([
+      ...this.getFixableRules(),
+      ...ruleIds
+    ]))
   }
 
   /**

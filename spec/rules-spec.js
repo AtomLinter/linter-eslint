@@ -1,6 +1,6 @@
 'use babel'
 
-import Rules from '../src/rules'
+import { Rules } from '../src/rules'
 
 describe('The Rules class', () => {
   describe('replaceRules', () => {

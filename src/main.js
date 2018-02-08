@@ -3,7 +3,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable } from 'atom'
 import { hasValidScope } from './validate/editor'
-import { fromIdsToIgnored } from './rules'
 import {
   atomConfig,
   jobConfig,
@@ -22,6 +21,7 @@ let worker
 let configInspector
 let debug
 let linterMessage
+let knownRules
 
 const loadDeps = () => {
   if (!path) {
@@ -38,6 +38,9 @@ const loadDeps = () => {
   }
   if (!linterMessage) {
     linterMessage = require('./linter-message')
+  }
+  if (!knownRules) {
+    knownRules = require('./rules').default
   }
 }
 
@@ -112,8 +115,8 @@ module.exports = {
           //   against the components of the elements
           const evtIsActiveEditor = evt.path.some(elem =>
             // Atom v1.19.0+
-            (elem.component && activeEditor.component &&
-              elem.component === activeEditor.component))
+            (elem.component && activeEditor.component
+              && elem.component === activeEditor.component))
           // Only show if it was the active editor and it is a valid scope
           const { scopes } = atomConfig
           return evtIsActiveEditor && hasValidScope(activeEditor, scopes)
@@ -174,14 +177,9 @@ module.exports = {
             ignoreFixableRulesWhileTyping
           } = atomConfig
 
-          if (ignoreFixableRulesWhileTyping) {
-            // Note that the fixable rules will only have values after the first lint job
-            const ignoredRules = new Set(worker.rules.getFixableRules())
-            ignoredRulesWhenModified.forEach(ruleId => ignoredRules.add(ruleId))
-            rules = fromIdsToIgnored(ignoredRules)
-          } else {
-            rules = fromIdsToIgnored(ignoredRulesWhenModified)
-          }
+          rules = ignoreFixableRulesWhileTyping
+            ? knownRules().getIgnoredRules(ignoredRulesWhenModified)
+            : knownRules().toIgnored(ignoredRulesWhenModified)
         }
 
         try {
@@ -202,11 +200,11 @@ module.exports = {
             */
             return null
           }
-          return worker.processJobResponse(
+          return linterMessage.processJobResponse({
             response,
             textEditor,
-            atomConfig.showRule
-          )
+            showRule: atomConfig.showRule
+          })
         } catch (error) {
           return linterMessage.fromException(textEditor, error)
         }
@@ -249,22 +247,20 @@ module.exports = {
       return
     }
 
-    let rules = {}
-    if (Object.keys(ignoredRulesWhenFixing).length > 0) {
-      rules = ignoredRulesWhenFixing
-    }
-
     try {
-      const response = await worker.sendJob({
+      const { messages, rulesDiff } = await worker.sendJob({
         type: 'fix',
         config: jobConfig(),
         contents: text,
-        rules,
+        rules: ignoredRulesWhenFixing,
         filePath,
         projectPath
       })
+
+      knownRules().updateRules(rulesDiff)
+
       if (!isSave) {
-        atom.notifications.addSuccess(response)
+        atom.notifications.addSuccess(messages)
       }
     } catch (err) {
       atom.notifications.addWarning(err.message)

@@ -64,7 +64,7 @@ const fromEslintToLinterMessage = async (messages, textEditor, showRule, rules) 
     }
 
     if (ruleId) {
-      ret.url = rules.getRuleUrl(ruleId)
+      ret.url = rules().getRuleUrl(ruleId)
     }
 
     let range

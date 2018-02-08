@@ -1,10 +1,10 @@
 'use babel'
 
-import { fromIdsToIgnored } from '../../rules'
+import { toIgnored } from '../../rules'
 
 const setIgnoredFixes = config => (array) => {
   // eslint-disable-next-line no-param-reassign
-  config.ignoredRulesWhenFixing = fromIdsToIgnored(array)
+  config.ignoredRulesWhenFixing = toIgnored(array)
   return config
 }
 
