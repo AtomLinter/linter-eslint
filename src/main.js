@@ -133,7 +133,7 @@ module.exports = {
     if (worker) {
       // If the helpers module hasn't been loaded then there was no chance a
       // worker was started anyway.
-      worker.task.kill()
+      worker.task.kill(true)
     }
     this.subscriptions.dispose()
   },
@@ -145,23 +145,18 @@ module.exports = {
       scope: 'file',
       lintsOnChange: true,
       lint: async (textEditor) => {
-        if (!atom.workspace.isTextEditor(textEditor)) {
-          // If we somehow get fed an invalid TextEditor just immediately return
-          return null
-        }
+        // Cannot get valid lint  if we somehow got invalid TextEditor
+        if (!atom.workspace.isTextEditor(textEditor)) return null
 
         const filePath = textEditor.getPath()
-        if (!filePath) {
-          // The editor currently has no path, we can't report messages back to
-          // Linter so just return null
-          return null
-        }
+        // Cannot report back to Linter if the editor has no path.
+        if (!filePath) return null
 
         loadDeps()
 
+        // If the path is a URL (Nuclide remote file) return a message
+        // telling the user we are unable to work on remote files.
         if (filePath.includes('://')) {
-          // If the path is a URL (Nuclide remote file) return a message
-          // telling the user we are unable to work on remote files.
           return linterMessage.simple(textEditor, {
             severity: 'warning',
             excerpt: 'Remote file open, linter-eslint is disabled for this file.',
@@ -170,7 +165,7 @@ module.exports = {
 
         const text = textEditor.getText()
 
-        let rules = {}
+        let rules
         if (textEditor.isModified()) {
           const {
             ignoredRulesWhenModified,
@@ -191,16 +186,8 @@ module.exports = {
             filePath,
             projectPath: atom.project.relativizePath(filePath)[0] || ''
           })
-          if (textEditor.getText() !== text) {
-            /*
-            The editor text has been modified since the lint was triggered,
-            as we can't be sure that the results will map properly back to
-            the new contents, simply return `null` to tell the
-            `provideLinter` consumer not to update the saved results.
-            */
-            return null
-          }
           return linterMessage.processJobResponse({
+            text,
             response,
             textEditor,
             showRule: atomConfig.showRule
@@ -215,17 +202,18 @@ module.exports = {
   async fixJob(isSave = false) {
     const textEditor = atom.workspace.getActiveTextEditor()
 
+    // Silently return if the TextEditor is invalid
     if (!textEditor || !atom.workspace.isTextEditor(textEditor)) {
-      // Silently return if the TextEditor is invalid
       return
     }
 
     loadDeps()
 
+    // Abort for unsaved text editors
     if (textEditor.isModified()) {
-      // Abort for invalid or unsaved text editors
       const message = 'Linter-ESLint: Please save before fixing'
       atom.notifications.addError(message)
+      return
     }
 
     const filePath = textEditor.getPath()
@@ -234,12 +222,14 @@ module.exports = {
 
     // Get the text from the editor, so we can use executeOnText
     const text = textEditor.getText()
-    // Do not try to make fixes on an empty file
-    if (text.length === 0) {
-      return
-    }
 
-    const { disableWhenNoEslintConfig, ignoredRulesWhenFixing } = atomConfig
+    // Do not try to make fixes on an empty file
+    if (text.length === 0) return
+
+    const {
+      disableWhenNoEslintConfig,
+      ignoredRulesWhenFixing
+    } = atomConfig
     const { isLintDisabled } = configInspector
 
     // Do not try to fix if linting should be disabled

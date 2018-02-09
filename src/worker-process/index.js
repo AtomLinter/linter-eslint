@@ -59,7 +59,7 @@ const toFix = ({ report, outputFixes }) => {
 module.exports = async () => {
   process.on('message', ({
     contents,
-    emitKey,
+    jobId,
     filePath,
     projectPath,
     rules,
@@ -76,7 +76,7 @@ module.exports = async () => {
     },
   }) => {
     // We catch all worker errors so that we can create a separate error emitter
-    // for each emitKey, rather than adding multiple listeners for `task:error`
+    // for each jobId, rather than adding multiple listeners for `task:error`
     try {
       if (disableFSCache) {
         FindCache.clear()
@@ -95,8 +95,10 @@ module.exports = async () => {
 
       const eslint = getEslintInstance(eslintDir)
 
+      // TODO This should be moved to worker-manager/send-job.js
+      // to avoid sending useless jobs to worker.
       if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
-        emit(emitKey, { messages: [] })
+        emit('success', { jobId, response: { messages: [] } })
         return
       }
 
@@ -117,16 +119,21 @@ module.exports = async () => {
         lint: () => lintJob({ cliEngineOptions, contents, eslint, filePath }),
 
         fix: () => lintJob({
-          cliEngineOptions, contents, eslint, filePath, toFix
+          cliEngineOptions,
+          contents,
+          eslint,
+          filePath,
+          toFix
         }),
 
         debug: () =>
           findEslintDir(findCachedDir(fileDir, 'node_modules/eslint'))
       }
       const response = responses[type]()
-      emit(emitKey, response)
-    } catch (workerErr) {
-      emit(`workerError:${emitKey}`, { msg: workerErr.message, stack: workerErr.stack })
+      emit('success', { jobId, response })
+    } catch (error) {
+      const { message, stack } = error
+      emit('fail', { jobId, response: { message, stack } })
     }
   })
 }

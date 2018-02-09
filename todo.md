@@ -1,16 +1,6 @@
 # Todo
 
-List of *specific* tasks to deal with. This is not intended as a broad-overview, but rather to show small individual list items that are planned for near upcoming commits, or have been noted, but skipped over, and need to be returned to later.
-
-### Specs
-
-* `cleanPath` - Needs spec.
-* `getModuleDirAndRefresh` - Needs spec
-* `getESLintInstance` - Specs deprecated. Inspect tests for lost code coverage [Reference](reference)
-* `getRelativePath` - Deprecated. Inspect tests for lost code coverage [Reference](reference)
-* `cdToProjectRoot` integration
-  * This is a  simple composition  of functions that clearly behave as described.  So this should be low priority to write, but may need sooner attention because it replaced `getRelativePath`, thus eliminating related specs.
-* Memoizers - Need specs
+List of *specific* tasks to deal with. This is *not* intended as a broad-overview, but rather to show small individual list items that are planned for near upcoming commits, or have been noted, but skipped over, and need to be returned to later.
 
 ### Implicit dependencies
 
@@ -18,6 +8,22 @@ Some functions that are currently using implicit dependencies.
 
 * `cdToFirstTruthy` requires `process`
 * `getIgnore` requires `findCached`
+
+### Other
+
+* Centralize all `isLintDisabled` checks to `sendJob.js`. Cost is very low to wait until reaching `sendJob` and very high if we wait to check in worker.
+
+
+### Specs
+
+Except for deprecated specs, these functions should be mostly covered by the existing integration tests. Providing new specs for the smaller pieces should allow removing at-least-some of the existing integration tests, increasing code-coverage while reducing the overhead and time for running the test suite.
+
+* `cleanPath` - Needs spec.
+* `getModuleDirAndRefresh` - Needs spec
+* `getESLintInstance` - Specs deprecated. Inspect tests for lost code coverage [Reference](reference)
+* `getRelativePath` - Function deprecated. Inspect tests for lost code coverage [Reference](reference)
+* `cdToProjectRoot` Simple composition, but an integration test would still be nice to have.
+* Memoizers - Need specs
 
 ### Reference
 ```js
