@@ -127,7 +127,9 @@
     "crypto-random-string": "^1.0.0",
     "eslint": "^4.9.0",
     "eslint-rule-documentation": "^1.0.18",
+    "fast-deep-equal": "^1.0.0",
     "fs-plus": "^3.0.1",
+    "ramda": "^0.25.0",
     "resolve-env": "^1.0.0",
     "user-home": "^2.0.0"
   },
