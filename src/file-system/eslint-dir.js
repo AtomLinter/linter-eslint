@@ -1,11 +1,10 @@
-'use babel'
 
-import { join, path as isAbsolutePath } from 'path'
+const { join, path: isAbsolutePath } = require('path')
 
-import bundledEslintPath from './bundled-eslint'
-import { cleanPath } from './fs-utils'
-import getNodePrefixPath from './node-prefix-path'
-import { isDirectory } from '../validate/fs'
+const bundledEslintPath = require('./bundled-eslint')
+const { cleanPath } = require('./fs-utils')
+const getNodePrefixPath = require('./node-prefix-path')
+const { isDirectory } = require('../validate/fs')
 
 // Cascade through possible locations for ESLint directory
 //
@@ -53,7 +52,10 @@ function findEslintDir({
 }
 
 
-export const findEslintDirCurried = props => modulesDir =>
+const findEslintDirCurried = props => modulesDir =>
   findEslintDir(Object.assign({}, props, { modulesDir }))
 
-export default findEslintDir
+module.exports = {
+  findEslintDir,
+  findEslintDirCurried
+}

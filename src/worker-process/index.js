@@ -1,21 +1,19 @@
-'use babel'
-
 /* global emit */
 
-import { FindCache } from 'atom-linter'
-import { dirname } from 'path'
+const { FindCache } = require('atom-linter')
+const { dirname } = require('path')
 
-import getCLIEngineOptions from './cli-engine-options'
-import { isLintDisabled } from '../eslint-config-inspector'
-import { diffCachedMap } from '../f-utils'
-import {
+const getCLIEngineOptions = require('./cli-engine-options')
+const { isLintDisabled } = require('../eslint-config-inspector')
+const { diffCachedMap } = require('../f-utils/diff-cached-map')
+const {
   cdToProjectRoot,
   findCachedDir,
   findEslintDirCurried,
   getEslintInstance,
   getModulesDirAndRefresh
-} from '../file-system'
-import { fromCliEngine as rulesFromEngine } from '../rules'
+} = require('../file-system')
+const { fromCliEngine: rulesFromEngine } = require('../rules')
 
 process.title = 'linter-eslint helper'
 
@@ -56,7 +54,7 @@ const toFix = ({ report, outputFixes }) => {
   return 'Linter-ESLint: Fix attempt complete, but linting errors remain.'
 }
 
-module.exports = async () => {
+module.exports = () => {
   process.on('message', ({
     contents,
     jobId,

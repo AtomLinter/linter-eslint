@@ -1,25 +1,24 @@
-'use babel'
 
-import { pipe } from '../f-utils/mini-ramda'
-import { dirToIgnoreDir } from './ignore-file'
-import { cdToFirstTruthy } from './fs-utils'
+const pipe = require('ramda/src/pipe')
+const { getIgnoreDir } = require('./ignore-file')
+const { cdToFirstTruthy } = require('./fs-utils')
 
 // Transform list of props describing project roots into array
 // of project root possibilities sorted by which should take priority
 // if it exists.
 //
-export const makeGetRootPaths = dirToIgnDir => ({
+const makeGetRootPaths = getIgnDir => ({
   disableEslintIgnore,
   projectPath,
   fileDir
 }) => ([
-  dirToIgnDir({ disableEslintIgnore, fileDir }),
+  getIgnDir({ disableEslintIgnore, fileDir }),
   projectPath,
   fileDir
 ])
 
 // Preload dependencies for more convenient use
-export const getRootPaths = makeGetRootPaths(dirToIgnoreDir)
+const getRootPaths = makeGetRootPaths(getIgnoreDir)
 
 /**
  * Create side-effect of changing working directory, based on props provided.
@@ -35,4 +34,8 @@ export const getRootPaths = makeGetRootPaths(dirToIgnoreDir)
  */
 const cdToProjectRoot = pipe(getRootPaths, cdToFirstTruthy)
 
-export default cdToProjectRoot
+module.exports = {
+  cdToProjectRoot,
+  makeGetRootPaths,
+  getRootPaths,
+}

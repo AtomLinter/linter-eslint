@@ -1,8 +1,7 @@
-'use babel'
 
-import { isAbsolute as isAbsolutePath } from 'path'
-import { findCached } from 'atom-linter'
-import { cleanPath, getConfigPath, getIgnoreFile } from '../file-system'
+const { isAbsolute: isAbsolutePath } = require('path')
+const { findCached } = require('atom-linter')
+const { cleanPath, getConfigPath, getIgnoreFile } = require('../file-system')
 
 const getCLIEngineOptions = ({
   type,
@@ -39,4 +38,4 @@ const getCLIEngineOptions = ({
   return cliEngineConfig
 }
 
-export default getCLIEngineOptions
+module.exports = getCLIEngineOptions

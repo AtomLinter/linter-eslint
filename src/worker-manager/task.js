@@ -1,7 +1,6 @@
-'use babel'
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { Task } from 'atom'
+const { Task } = require('atom')
 
 // Some validators.
 //
@@ -122,4 +121,4 @@ const createWorkerTask = (script = '../worker-process') => {
   return { start, kill, on, send }
 }
 
-export default createWorkerTask
+module.exports = createWorkerTask

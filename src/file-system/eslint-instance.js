@@ -1,4 +1,3 @@
-'use babel'
 
 const getEslintInstance = (eslintDir) => {
   try {
@@ -9,4 +8,4 @@ const getEslintInstance = (eslintDir) => {
   }
 }
 
-export default getEslintInstance
+module.exports = getEslintInstance

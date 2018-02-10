@@ -1,10 +1,8 @@
-'use babel'
 
-import debugInfo from './info'
+const debugInfo = require('./info')
 
-const debugReport = async () => {
-  const debug = await debugInfo()
-  const details = [
+const debugReport = () => debugInfo()
+  .then(debug => [
     `Atom version: ${debug.atomVersion}`,
     `linter-eslint version: ${debug.linterEslintVersion}`,
     `ESLint version: ${debug.eslintVersion}`,
@@ -13,8 +11,6 @@ const debugReport = async () => {
     `Using ${debug.eslintType} ESLint from: ${debug.eslintPath}`,
     `Current file's scopes: ${JSON.stringify(debug.editorScopes, null, 2)}`,
     `linter-eslint configuration: ${JSON.stringify(debug.linterEslintConfig, null, 2)}`
-  ]
-  return details.join('\n')
-}
+  ].join('\n'))
 
-export default debugReport
+module.exports = debugReport

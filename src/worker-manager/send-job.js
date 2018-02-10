@@ -1,6 +1,5 @@
-'use babel'
 
-import cryptoRandomString from 'crypto-random-string'
+const cryptoRandomString = require('crypto-random-string')
 
 /**
  * Curried wrapper to allow preloading a worker.
@@ -55,4 +54,4 @@ const makeSendJob = worker =>
   }
 
 
-export default makeSendJob
+module.exports = makeSendJob

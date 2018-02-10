@@ -1,6 +1,5 @@
-'use babel'
 
-import { spliceDeleteFirst } from '../../m-utils'
+const { spliceDeleteFirst } = require('../../m-utils')
 
 
 const hasHtmlScope = config =>
@@ -22,4 +21,4 @@ const setLintHtml = config => (value) => {
   return config
 }
 
-export default setLintHtml
+module.exports = setLintHtml

@@ -1,4 +1,3 @@
-'use babel'
 
 /**
  * Gets the list of rules used for a lint job
@@ -24,4 +23,4 @@ function getRules(cliEngine) {
   return new Map()
 }
 
-export default getRules
+module.exports = getRules

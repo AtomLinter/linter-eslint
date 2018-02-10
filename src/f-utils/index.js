@@ -1,8 +1,14 @@
-'use babel'
 
-export * from './data-extraction'
-export * from './memo'
-export * from './predicate'
-export * from './signature-mod'
-export * from './typecasting'
-export { default as diffCachedMap } from './diff-cached-map'
+/** **********************
+ * Functional utilities *
+ *********************** */
+
+module.exports = Object.assign(
+  {},
+  require('./data-extraction'),
+  require('./memo'),
+  require('./merge'),
+  require('./predicate'),
+  require('./signature-mod'),
+  require('./typecasting')
+)

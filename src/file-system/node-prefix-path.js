@@ -1,8 +1,7 @@
-'use babel'
 
-import ChildProcess from 'child_process'
-import getPath from 'consistent-path'
-import { memo } from '../f-utils'
+const ChildProcess = require('child_process')
+const getPath = require('consistent-path')
+const { memo } = require('../f-utils')
 
 // Get node prefix as reported by npm
 //
@@ -19,8 +18,10 @@ const getNodePrefixPath = () => {
       .output[1]
       .toString().trim()
   } catch (e) {
-    throw new Error(preErrMsg)
+    const preErr = new Error(preErrMsg)
+    preErr.stack = e.stack
+    throw preErr
   }
 }
 
-export default memo(getNodePrefixPath)
+module.exports = memo(getNodePrefixPath)

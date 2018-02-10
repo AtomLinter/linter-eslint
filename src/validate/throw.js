@@ -1,4 +1,3 @@
-'use babel'
 
 const throwIfFail = (msg, passed) => {
   if (!passed) {
@@ -7,4 +6,4 @@ const throwIfFail = (msg, passed) => {
   return true
 }
 
-export default throwIfFail
+module.exports = throwIfFail

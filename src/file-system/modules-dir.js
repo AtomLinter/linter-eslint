@@ -1,17 +1,14 @@
-'use babel'
 
-import {
-  dirname,
-} from 'path'
-import { findCached } from 'atom-linter'
-import bundledEslintPath from './bundled-eslint'
-import { passInMemo } from '../f-utils'
+const { dirname } = require('path')
+const { findCached } = require('atom-linter')
+const bundledEslintPath = require('./bundled-eslint')
+const { passInMemo } = require('../f-utils')
 
 // Given a cached path and a directory, return the cache or a new valid
 // node_modules directory based on the input. If new path found, then add
 // it to Node's module path before returning.
 //
-export const getModulesDirAndRefreshCached = (cache, fileDir) => {
+const getModulesDirAndRefreshCached = (cache, fileDir) => {
   // If given an invalid directory, just send back cached path
   const eslintDir = findCached(fileDir, 'node_modules/eslint')
   if (!eslintDir) {
@@ -41,4 +38,7 @@ const getModulesDirAndRefresh = passInMemo(getModulesDirAndRefreshCached)
 //
 getModulesDirAndRefresh(bundledEslintPath())
 
-export default getModulesDirAndRefresh
+module.exports = {
+  getModulesDirAndRefresh,
+  getModulesDirAndRefreshCached
+}

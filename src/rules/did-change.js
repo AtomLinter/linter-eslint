@@ -1,4 +1,3 @@
-'use babel'
 
 /**
  * Given an exiting rule list and a new rule list, determines whether there
@@ -9,9 +8,8 @@
  * @param  {Map} currentRules A Map of the current rules
  * @return {boolean}             Whether or not there were changes
  */
-const didRulesChange = (currentRules, newRules) =>
+const rulesDidChange = (currentRules, newRules) =>
   !(currentRules.size === newRules.size &&
     Array.from(currentRules.keys()).every(ruleId => newRules.has(ruleId)))
 
-
-export default didRulesChange
+module.exports = rulesDidChange

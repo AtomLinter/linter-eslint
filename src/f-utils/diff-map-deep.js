@@ -1,10 +1,9 @@
-'use babel'
 
 /** ********************
  * deepDiffMap *
  ********************* */
 
-import deepEq from 'fast-deep-equal'
+const deepEq = require('fast-deep-equal')
 
 // Diff two Maps which have keys compatible with Object keys
 // using a deep Object comparison on the values
@@ -35,4 +34,4 @@ const diffMapDeep = (a, b) => {
   return uniqueKeys.reduce(diff, { added: {}, removed: {} })
 }
 
-export default diffMapDeep
+module.exports = diffMapDeep

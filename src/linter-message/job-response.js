@@ -1,7 +1,6 @@
-'use babel'
 
-import knownRules from '../rules'
-import eslintToLinter from './from-eslint'
+const { rules } = require('../rules')
+const eslintToLinter = require('./from-eslint')
 
 /**
  * Processes the response from the lint job
@@ -28,8 +27,8 @@ const processJobResponse = ({
   }
 
   const { rulesDiff, messages } = response
-  knownRules().updateRules(rulesDiff)
-  return eslintToLinter(messages, textEditor, showRule, knownRules)
+  rules().updateRules(rulesDiff)
+  return eslintToLinter(messages, textEditor, showRule, rules)
 }
 
-export default processJobResponse
+module.exports = processJobResponse

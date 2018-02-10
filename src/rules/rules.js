@@ -1,7 +1,6 @@
-'use babel'
 
-import ruleURI from 'eslint-rule-documentation'
-import reduce from 'ramda/src/reduce'
+const ruleURI = require('eslint-rule-documentation')
+const reduce = require('ramda/src/reduce')
 
 // Private properties
 const rules = Symbol('rules')
@@ -9,7 +8,7 @@ const rules = Symbol('rules')
 /**
  * Stores a list of rules from ESLint
  */
-export default class Rules {
+module.exports = class Rules {
   /**
    * Instantiates a Rules object, optionally with an existing list of rules
    * @param {Array} newRules Array of Arrays of the rule and properties

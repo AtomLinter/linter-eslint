@@ -1,10 +1,9 @@
-'use babel'
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { Range } from 'atom'
-import { generateRange } from 'atom-linter'
-import { throwIfInvalidPoint } from '../validate/editor'
-import invalidTrace from './invalid-trace'
+const { Range } = require('atom')
+const { generateRange } = require('atom-linter')
+const { throwIfInvalidPoint } = require('../validate/editor')
+const invalidTrace = require('./invalid-trace')
 
 /**
  * Given a raw response from ESLint, this processes the messages into a format
@@ -15,8 +14,9 @@ import invalidTrace from './invalid-trace'
  * @param  {Rules}      rules      List of known rules with helper methods
  * @return {Promise}               The messages transformed into Linter messages
  */
-const fromEslintToLinterMessage = async (messages, textEditor, showRule, rules) =>
-  Promise.all(messages.map(async ({
+const fromEslintToLinterMessage = (messages, textEditor, showRule, rules) =>
+  // `invalidTrace` in catch block at bottom returns a promise.
+  Promise.all(messages.map(({
     fatal, message: originalMessage, line, severity, ruleId, column, fix, endLine, endColumn
   }) => {
     const message = fatal ? originalMessage.split('\n')[0] : originalMessage
@@ -86,7 +86,7 @@ const fromEslintToLinterMessage = async (messages, textEditor, showRule, rules) 
         ret.solutions = [linterFix]
       }
     } catch (err) {
-      ret = await invalidTrace({
+      ret = invalidTrace({
         msgLine,
         msgCol,
         msgEndLine,
@@ -102,4 +102,4 @@ const fromEslintToLinterMessage = async (messages, textEditor, showRule, rules) 
     return ret
   }))
 
-export default fromEslintToLinterMessage
+module.exports = fromEslintToLinterMessage

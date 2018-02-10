@@ -1,6 +1,5 @@
-'use babel'
 
-import { toIgnored } from '../../rules'
+const { toIgnored } = require('../../rules')
 
 const setIgnoredFixes = config => (array) => {
   // eslint-disable-next-line no-param-reassign
@@ -8,4 +7,4 @@ const setIgnoredFixes = config => (array) => {
   return config
 }
 
-export default setIgnoredFixes
+module.exports = setIgnoredFixes

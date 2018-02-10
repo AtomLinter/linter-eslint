@@ -1,12 +1,14 @@
-'use babel'
 
-import { statSync } from 'fs'
+const { statSync } = require('fs')
 
-// eslint-disable-next-line import/prefer-default-export
-export const isDirectory = (dirPath) => {
+const isDirectory = (dirPath) => {
   try {
     return statSync(dirPath).isDirectory()
   } catch (e) {
     return false
   }
+}
+
+module.exports = {
+  isDirectory
 }

@@ -1,14 +1,15 @@
-'use babel'
 
-import Rules from './rules'
+const Rules = require('./rules')
 
 const rules = new Rules()
 
 const getRulesInstance = () => rules
+const { toIgnored } = rules
 
-export default getRulesInstance
-
-export const { toIgnored } = rules
-export { Rules }
-export { default as fromCliEngine } from './cli-engine'
-export { default as didChange } from './did-change'
+module.exports = {
+  Rules,
+  rules: getRulesInstance,
+  toIgnored,
+  fromCliEngine: require('./cli-engine'),
+  didChange: require('./did-change')
+}

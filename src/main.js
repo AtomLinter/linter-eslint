@@ -1,14 +1,13 @@
-'use babel'
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { CompositeDisposable } from 'atom'
-import { hasValidScope } from './validate/editor'
-import {
+const { CompositeDisposable } = require('atom')
+const { hasValidScope } = require('./validate/editor')
+const {
   atomConfig,
   jobConfig,
   getMigrations,
-  subscribe as configSubscribe
-} from './atom-config'
+  subscribe: configSubscribe
+} = require('./atom-config')
 
 // Internal variables
 const idleCallbacks = new Set()
@@ -40,7 +39,7 @@ const loadDeps = () => {
     linterMessage = require('./linter-message')
   }
   if (!knownRules) {
-    knownRules = require('./rules').default
+    knownRules = require('./rules').rules
   }
 }
 
@@ -78,27 +77,27 @@ module.exports = {
     this.subscriptions.add(...(configSubscribe()))
 
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
-      editor.onDidSave(async () => {
+      editor.onDidSave(() => {
         const { fixOnSave, scopes } = atomConfig
         if (hasValidScope(editor, scopes) && fixOnSave) {
-          await this.fixJob(true)
+          return this.fixJob(true)
         }
+        return null
       })
     }))
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
-      'linter-eslint:debug': async () => {
+      'linter-eslint:debug': () => {
         loadDeps()
-        const debugString = await debug.report()
-        const notificationOptions = { detail: debugString, dismissable: true }
-        atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
+        return debug.report().then((debugReport) => {
+          const notificationOptions = { detail: debugReport, dismissable: true }
+          atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
+        })
       }
     }))
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
-      'linter-eslint:fix-file': async () => {
-        await this.fixJob()
-      }
+      'linter-eslint:fix-file': () => this.fixJob()
     }))
 
     this.subscriptions.add(atom.contextMenu.add({
@@ -144,7 +143,7 @@ module.exports = {
       grammarScopes: atomConfig.scopes,
       scope: 'file',
       lintsOnChange: true,
-      lint: async (textEditor) => {
+      lint: (textEditor) => {
         // Cannot get valid lint  if we somehow got invalid TextEditor
         if (!atom.workspace.isTextEditor(textEditor)) return null
 
@@ -177,34 +176,31 @@ module.exports = {
             : knownRules().toIgnored(ignoredRulesWhenModified)
         }
 
-        try {
-          const response = await worker.sendJob({
-            type: 'lint',
-            contents: text,
-            config: jobConfig(),
-            rules,
-            filePath,
-            projectPath: atom.project.relativizePath(filePath)[0] || ''
-          })
-          return linterMessage.processJobResponse({
+        return worker.sendJob({
+          type: 'lint',
+          contents: text,
+          config: jobConfig(),
+          rules,
+          filePath,
+          projectPath: atom.project.relativizePath(filePath)[0] || ''
+        })
+          .then(response => linterMessage.processJobResponse({
             text,
             response,
             textEditor,
             showRule: atomConfig.showRule
-          })
-        } catch (error) {
-          return linterMessage.fromException(textEditor, error)
-        }
+          }))
+          .catch(error => linterMessage.fromException(textEditor, error))
       }
     }
   },
 
-  async fixJob(isSave = false) {
+  fixJob(isSave = false) {
     const textEditor = atom.workspace.getActiveTextEditor()
 
     // Silently return if the TextEditor is invalid
     if (!textEditor || !atom.workspace.isTextEditor(textEditor)) {
-      return
+      return null
     }
 
     loadDeps()
@@ -213,7 +209,7 @@ module.exports = {
     if (textEditor.isModified()) {
       const message = 'Linter-ESLint: Please save before fixing'
       atom.notifications.addError(message)
-      return
+      return null
     }
 
     const filePath = textEditor.getPath()
@@ -224,7 +220,7 @@ module.exports = {
     const text = textEditor.getText()
 
     // Do not try to make fixes on an empty file
-    if (text.length === 0) return
+    if (text.length === 0) return null
 
     const {
       disableWhenNoEslintConfig,
@@ -234,26 +230,24 @@ module.exports = {
 
     // Do not try to fix if linting should be disabled
     if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
-      return
+      return null
     }
 
-    try {
-      const { messages, rulesDiff } = await worker.sendJob({
-        type: 'fix',
-        config: jobConfig(),
-        contents: text,
-        rules: ignoredRulesWhenFixing,
-        filePath,
-        projectPath
+    return worker.sendJob({
+      type: 'fix',
+      config: jobConfig(),
+      contents: text,
+      rules: ignoredRulesWhenFixing,
+      filePath,
+      projectPath
+    })
+      .then(({ messages, rulesDiff }) => {
+        knownRules().updateRules(rulesDiff)
+
+        if (!isSave) {
+          atom.notifications.addSuccess(messages)
+        }
       })
-
-      knownRules().updateRules(rulesDiff)
-
-      if (!isSave) {
-        atom.notifications.addSuccess(messages)
-      }
-    } catch (err) {
-      atom.notifications.addWarning(err.message)
-    }
-  },
+      .catch(err => atom.notifications.addWarning(err.message))
+  }
 }

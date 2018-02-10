@@ -1,4 +1,3 @@
-'use babel'
 
 /** ***********************************************
  * Memoizers for creating self-caching functions *
@@ -7,7 +6,7 @@
 // Simple, basic memoizer. Returns cached value if exists. Else calls
 // given function with given arguments, caching and returning result.
 //
-export const memo = (f) => {
+const memo = (f) => {
   let cache
   return (...args) => {
     if (cache !== undefined) return cache
@@ -19,10 +18,15 @@ export const memo = (f) => {
 
 // Simple memoizer that passes cache to called function as the first param.
 //
-export const passInMemo = (f) => {
+const passInMemo = (f) => {
   let cache
   return (...args) => {
     cache = f(cache, ...args)
     return cache
   }
+}
+
+module.exports = {
+  memo,
+  passInMemo
 }

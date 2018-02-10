@@ -1,9 +1,28 @@
-'use babel'
 
-export { default as getConfigPath } from './config-path'
-export { default as findEslintDir, findEslintDirCurried } from './eslint-dir'
-export { default as getEslintInstance } from './eslint-instance'
-export { default as getModulesDirAndRefresh } from './modules-dir'
-export * from './fs-utils'
-export { getIgnoreFile } from './ignore-file'
-export { default as cdToProjectRoot } from './root-path'
+const {
+  findEslintDir,
+  findEslintDirCurried
+} = require('./eslint-dir')
+const {
+  cleanPath,
+  cdToFirstTruthy,
+  maybeDirname,
+  findCachedDir
+} = require('./fs-utils')
+const { getIgnoreFile } = require('./ignore-file')
+const { getModulesDirAndRefresh } = require('./modules-dir')
+const { cdToProjectRoot } = require('./root-path')
+
+module.exports = {
+  cleanPath,
+  cdToFirstTruthy,
+  cdToProjectRoot,
+  findCachedDir,
+  findEslintDir,
+  findEslintDirCurried,
+  getConfigPath: require('./config-path'),
+  getEslintInstance: require('./eslint-instance'),
+  getIgnoreFile,
+  getModulesDirAndRefresh,
+  maybeDirname,
+}

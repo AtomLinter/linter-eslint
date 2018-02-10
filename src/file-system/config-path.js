@@ -1,7 +1,6 @@
-'use babel'
 
-import { basename, resolve, dirname } from 'path'
-import { findCached } from 'atom-linter'
+const { basename, resolve, dirname } = require('path')
+const { findCached } = require('atom-linter')
 
 const getConfigPath = (fileDir) => {
   const configFile =
@@ -30,4 +29,4 @@ const getConfigPath = (fileDir) => {
   return null
 }
 
-export default getConfigPath
+module.exports = getConfigPath
