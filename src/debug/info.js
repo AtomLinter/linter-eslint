@@ -1,9 +1,8 @@
-'use babel'
 
-import { join } from 'path'
-import { sendJob } from '../worker'
+const { join } = require('path')
+const { sendJob } = require('../worker-manager')
 
-const debugInfo = async () => {
+const debugInfo = () => {
   const textEditor = atom.workspace.getActiveTextEditor()
   let filePath
   let editorScopes
@@ -26,29 +25,24 @@ const debugInfo = async () => {
   }
   const config = atom.config.get('linter-eslint')
   const hoursSinceRestart = Math.round((process.uptime() / 3600) * 10) / 10
-  let returnVal
-  try {
-    const response = await sendJob({
-      type: 'debug',
-      config,
-      filePath
-    })
-    returnVal = {
-      atomVersion: atom.getVersion(),
-      linterEslintVersion: linterEslintMeta.version,
-      linterEslintConfig: config,
-      // eslint-disable-next-line import/no-dynamic-require
-      eslintVersion: require(join(response.path, 'package.json')).version,
-      hoursSinceRestart,
-      platform: process.platform,
-      eslintType: response.type,
-      eslintPath: response.path,
-      editorScopes,
-    }
-  } catch (error) {
-    atom.notifications.addError(`${error}`)
-  }
-  return returnVal
+
+  return sendJob({
+    type: 'debug',
+    config,
+    filePath
+  }).then(response => ({
+    atomVersion: atom.getVersion(),
+    linterEslintVersion: linterEslintMeta.version,
+    linterEslintConfig: config,
+    // eslint-disable-next-line import/no-dynamic-require
+    eslintVersion: require(join(response.path, 'package.json')).version,
+    hoursSinceRestart,
+    platform: process.platform,
+    eslintType: response.type,
+    eslintPath: response.path,
+    editorScopes,
+  }))
+    .catch(error => atom.notifications.addError(`${error}`))
 }
 
-export default debugInfo
+module.exports = debugInfo

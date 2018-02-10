@@ -1,6 +1,7 @@
-'use babel'
 
-export { default as setValue } from './value'
-export { default as setLintHtml } from './lint-html'
-export { default as setScopes } from './scopes'
-export { default as setIgnoredFixes } from './ignored-fixes'
+module.exports = {
+  setValue: require('./value'),
+  setLintHtml: require('./lint-html'),
+  setScopes: require('./scopes'),
+  setIgnoredFixes: require('./ignored-fixes')
+}

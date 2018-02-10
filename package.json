@@ -6,7 +6,8 @@
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.13.0 <2.0.0"
+    "atom": ">=1.13.0 <2.0.0",
+    "node": "7.4.0"
   },
   "configSchema": {
     "lintHtmlFiles": {
@@ -136,6 +137,7 @@
   "devDependencies": {
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^6.0.0",
     "jasmine-fix": "^1.3.1",
     "rimraf": "^2.6.2"
   },
@@ -150,7 +152,35 @@
     }
   },
   "eslintConfig": {
+    "plugins": [
+      "node"
+    ],
+    "extends": "airbnb-base",
+    "globals": {
+      "atom": "true"
+    },
+    "env": {
+      "node": true,
+      "browser": true,
+      "es6": true
+    },
+    "overrides": [
+      {
+        "files": [
+          "spec/**/*.js"
+        ],
+        "rules": {
+          "node/no-unsupported-features": "off"
+        }
+      }
+    ],
     "rules": {
+      "node/no-unsupported-features": [
+        "error",
+        {
+          "version": "7.4.0"
+        }
+      ],
       "no-console": "off",
       "semi": [
         "error",
@@ -181,19 +211,11 @@
           }
         }
       ]
-    },
-    "extends": "airbnb-base",
-    "globals": {
-      "atom": "true"
-    },
-    "env": {
-      "node": true,
-      "browser": true
     }
   },
   "atomTranspilers": [
     {
-      "glob": "{src,spec}/*.js",
+      "glob": "{spec}/*.js",
       "transpiler": "atom-babel6-transpiler",
       "options": {
         "setBabelEnv": false,

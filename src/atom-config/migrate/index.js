@@ -1,4 +1,3 @@
-'use babel'
 
 const migrations = [
   {
@@ -17,4 +16,4 @@ const migrations = [
 
 const migrate = () => migrations.map(migration => migration.migrate)
 
-export default migrate
+module.exports = migrate

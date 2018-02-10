@@ -1,6 +1,5 @@
-'use babel'
 
-import simpleReport from './simple'
+const simpleReport = require('./simple')
 
 /**
  * Generates a message to the user in order to nicely display the Error being
@@ -17,4 +16,4 @@ const fromExceptionToLinterMessage = (textEditor, error) => {
   return simpleReport(textEditor, { severity: 'error', excerpt, description })
 }
 
-export default fromExceptionToLinterMessage
+module.exports = fromExceptionToLinterMessage

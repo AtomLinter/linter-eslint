@@ -1,16 +1,11 @@
-'use babel'
 
-// eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import configs from './config-mappings'
-import { setValue } from './make-handler'
-
-// idleCallback setup for migrating any old config settings
-//
-export { default as getMigrations } from './migrate'
+const rPick = require('ramda/src/pick')
+const configs = require('./config-mappings')
+const { setValue } = require('./make-handler')
 
 // Object to store known config settings
 //
-export const atomConfig = {
+const atomConfig = {
   // Add objects/arrays up-front to establish pointers.
   scopes: [],
   ignoredRulesWhenModified: [],
@@ -34,5 +29,23 @@ const subscribeTo = ({ appVarName, pkgJsonName, makeHandler = setValue }) =>
 const getAtomConfigSubscriptions = () =>
   configs.map(subscribeTo)
 
-export const subscribe = getAtomConfigSubscriptions
-export { default as jobConfig } from './job-config'
+// Current config filtered to what is needed by a lint job or fix job
+//
+const jobConfig = () => rPick([
+  'disableFSCache',
+  'disableWhenNoEslintConfig',
+  'useGlobalEslint',
+  'globalNodePath',
+  'advancedLocalNodeModules',
+  'disableEslintIgnore',
+  'eslintRulesDirs',
+  'eslintrcPath'
+], atomConfig)
+
+module.exports = {
+  atomConfig,
+  subscribe: getAtomConfigSubscriptions,
+  jobConfig,
+  // idleCallback setup for migrating any old config settings
+  getMigrations: require('./migrate'),
+}

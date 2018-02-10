@@ -1,6 +1,5 @@
-'use babel'
 
-import { setLintHtml, setScopes, setIgnoredFixes } from './make-handler'
+const { setLintHtml, setScopes, setIgnoredFixes } = require('./make-handler')
 
 // appVarName is variable name for setting used throughout the app
 //
@@ -10,7 +9,7 @@ import { setLintHtml, setScopes, setIgnoredFixes } from './make-handler'
 // makeHandler is semi-curried subscription handler
 //   defaults to simple value setter setValue
 //
-export default [
+module.exports = [
   { appVarName: 'useGlobalEslint' },
   { appVarName: 'disableWhenNoEslintConfig' },
   { appVarName: 'eslintrcPath' },

@@ -1,7 +1,6 @@
-'use babel'
 
-import { getConfigPath } from '../file-system'
-import isAtHomeRoot from './is-at-home-root'
+const { getConfigPath } = require('../file-system')
+const isAtHomeRoot = require('./is-at-home-root')
 
 const isLintDisabled = ({ fileDir, disableWhenNoEslintConfig }) => {
   const configPath = getConfigPath(fileDir)
@@ -12,4 +11,4 @@ const isLintDisabled = ({ fileDir, disableWhenNoEslintConfig }) => {
   return noProjectConfig && disableWhenNoEslintConfig
 }
 
-export default isLintDisabled
+module.exports = isLintDisabled

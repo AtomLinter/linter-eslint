@@ -1,6 +1,5 @@
-'use babel'
 
-import { generateRange } from 'atom-linter'
+const { generateRange } = require('atom-linter')
 
 /**
  * Turn the given options into a Linter message array
@@ -25,4 +24,4 @@ const simpleLinterMessage = (textEditor, {
   },
 }]
 
-export default simpleLinterMessage
+module.exports = simpleLinterMessage

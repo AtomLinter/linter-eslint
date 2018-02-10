@@ -1,4 +1,3 @@
-'use babel'
 
 const setValue = (config, rule) => (value) => {
   // eslint-disable-next-line no-param-reassign
@@ -6,4 +5,4 @@ const setValue = (config, rule) => (value) => {
   return config
 }
 
-export default setValue
+module.exports = setValue

@@ -1,7 +1,6 @@
-'use babel'
 
-import userHome from 'user-home'
-import { dirname } from 'path'
+const userHome = require('user-home')
+const { dirname } = require('path')
 
 /**
  * Check if a config is directly inside a user's home directory.
@@ -13,4 +12,4 @@ import { dirname } from 'path'
  */
 const isConfigAtHomeRoot = configPath => dirname(configPath) === userHome
 
-export default isConfigAtHomeRoot
+module.exports = isConfigAtHomeRoot

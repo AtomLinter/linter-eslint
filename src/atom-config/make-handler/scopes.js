@@ -1,6 +1,5 @@
-'use babel'
 
-import { replaceArrayInPlace } from '../../m-utils'
+const { replaceArrayInPlace } = require('../../m-utils')
 
 const setScopes = config => (array) => {
   const { lintHtmlFiles, embeddedScope, scopes } = config
@@ -15,4 +14,4 @@ const setScopes = config => (array) => {
   return config
 }
 
-export default setScopes
+module.exports = setScopes
