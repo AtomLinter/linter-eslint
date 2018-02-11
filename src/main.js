@@ -3,7 +3,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable } from 'atom'
 import { hasValidScope } from './validate/editor'
-import { idsToIgnoredRules } from './rules'
 import {
   atomConfig,
   jobConfig,
@@ -19,20 +18,17 @@ const idleCallbacks = new Set()
 // takes to require this file as that causes delays in Atom loading this package
 let path
 let worker
-let workerHelpers
 let configInspector
 let debug
 let linterMessage
+let knownRules
 
 const loadDeps = () => {
   if (!path) {
     path = require('path')
   }
   if (!worker) {
-    worker = require('./worker')
-  }
-  if (!workerHelpers) {
-    workerHelpers = require('./worker/helpers')
+    worker = require('./worker-manager')
   }
   if (!configInspector) {
     configInspector = require('./eslint-config-inspector')
@@ -42,6 +38,9 @@ const loadDeps = () => {
   }
   if (!linterMessage) {
     linterMessage = require('./linter-message')
+  }
+  if (!knownRules) {
+    knownRules = require('./rules').default
   }
 }
 
@@ -116,8 +115,8 @@ module.exports = {
           //   against the components of the elements
           const evtIsActiveEditor = evt.path.some(elem =>
             // Atom v1.19.0+
-            (elem.component && activeEditor.component &&
-              elem.component === activeEditor.component))
+            (elem.component && activeEditor.component
+              && elem.component === activeEditor.component))
           // Only show if it was the active editor and it is a valid scope
           const { scopes } = atomConfig
           return evtIsActiveEditor && hasValidScope(activeEditor, scopes)
@@ -134,7 +133,7 @@ module.exports = {
     if (worker) {
       // If the helpers module hasn't been loaded then there was no chance a
       // worker was started anyway.
-      worker.task.kill()
+      worker.task.kill(true)
     }
     this.subscriptions.dispose()
   },
@@ -146,23 +145,18 @@ module.exports = {
       scope: 'file',
       lintsOnChange: true,
       lint: async (textEditor) => {
-        if (!atom.workspace.isTextEditor(textEditor)) {
-          // If we somehow get fed an invalid TextEditor just immediately return
-          return null
-        }
+        // Cannot get valid lint  if we somehow got invalid TextEditor
+        if (!atom.workspace.isTextEditor(textEditor)) return null
 
         const filePath = textEditor.getPath()
-        if (!filePath) {
-          // The editor currently has no path, we can't report messages back to
-          // Linter so just return null
-          return null
-        }
+        // Cannot report back to Linter if the editor has no path.
+        if (!filePath) return null
 
         loadDeps()
 
+        // If the path is a URL (Nuclide remote file) return a message
+        // telling the user we are unable to work on remote files.
         if (filePath.includes('://')) {
-          // If the path is a URL (Nuclide remote file) return a message
-          // telling the user we are unable to work on remote files.
           return linterMessage.simple(textEditor, {
             severity: 'warning',
             excerpt: 'Remote file open, linter-eslint is disabled for this file.',
@@ -171,21 +165,16 @@ module.exports = {
 
         const text = textEditor.getText()
 
-        let rules = {}
+        let rules
         if (textEditor.isModified()) {
           const {
             ignoredRulesWhenModified,
             ignoreFixableRulesWhileTyping
           } = atomConfig
 
-          if (ignoreFixableRulesWhileTyping) {
-            // Note that the fixable rules will only have values after the first lint job
-            const ignoredRules = new Set(worker.rules.getFixableRules())
-            ignoredRulesWhenModified.forEach(ruleId => ignoredRules.add(ruleId))
-            rules = idsToIgnoredRules(ignoredRules)
-          } else {
-            rules = idsToIgnoredRules(ignoredRulesWhenModified)
-          }
+          rules = ignoreFixableRulesWhileTyping
+            ? knownRules().getIgnoredRules(ignoredRulesWhenModified)
+            : knownRules().toIgnored(ignoredRulesWhenModified)
         }
 
         try {
@@ -197,20 +186,12 @@ module.exports = {
             filePath,
             projectPath: atom.project.relativizePath(filePath)[0] || ''
           })
-          if (textEditor.getText() !== text) {
-            /*
-            The editor text has been modified since the lint was triggered,
-            as we can't be sure that the results will map properly back to
-            the new contents, simply return `null` to tell the
-            `provideLinter` consumer not to update the saved results.
-            */
-            return null
-          }
-          return worker.processJobResponse(
+          return linterMessage.processJobResponse({
+            text,
             response,
             textEditor,
-            atomConfig.showRule
-          )
+            showRule: atomConfig.showRule
+          })
         } catch (error) {
           return linterMessage.fromException(textEditor, error)
         }
@@ -221,17 +202,18 @@ module.exports = {
   async fixJob(isSave = false) {
     const textEditor = atom.workspace.getActiveTextEditor()
 
+    // Silently return if the TextEditor is invalid
     if (!textEditor || !atom.workspace.isTextEditor(textEditor)) {
-      // Silently return if the TextEditor is invalid
       return
     }
 
     loadDeps()
 
+    // Abort for unsaved text editors
     if (textEditor.isModified()) {
-      // Abort for invalid or unsaved text editors
       const message = 'Linter-ESLint: Please save before fixing'
       atom.notifications.addError(message)
+      return
     }
 
     const filePath = textEditor.getPath()
@@ -240,12 +222,14 @@ module.exports = {
 
     // Get the text from the editor, so we can use executeOnText
     const text = textEditor.getText()
-    // Do not try to make fixes on an empty file
-    if (text.length === 0) {
-      return
-    }
 
-    const { disableWhenNoEslintConfig, ignoredRulesWhenFixing } = atomConfig
+    // Do not try to make fixes on an empty file
+    if (text.length === 0) return
+
+    const {
+      disableWhenNoEslintConfig,
+      ignoredRulesWhenFixing
+    } = atomConfig
     const { isLintDisabled } = configInspector
 
     // Do not try to fix if linting should be disabled
@@ -253,22 +237,20 @@ module.exports = {
       return
     }
 
-    let rules = {}
-    if (Object.keys(ignoredRulesWhenFixing).length > 0) {
-      rules = ignoredRulesWhenFixing
-    }
-
     try {
-      const response = await worker.sendJob({
+      const { messages, rulesDiff } = await worker.sendJob({
         type: 'fix',
         config: jobConfig(),
         contents: text,
-        rules,
+        rules: ignoredRulesWhenFixing,
         filePath,
         projectPath
       })
+
+      knownRules().updateRules(rulesDiff)
+
       if (!isSave) {
-        atom.notifications.addSuccess(response)
+        atom.notifications.addSuccess(messages)
       }
     } catch (err) {
       atom.notifications.addWarning(err.message)

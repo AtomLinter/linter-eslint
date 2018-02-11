@@ -1,11 +1,8 @@
 'use babel'
 
-// Curated list of ramda functions actually in use.
-//
-// This provides for importing these functions on a namespace
-// without importing the entire library.
-//
-
+/** ***************************************************
+  * Curated list of ramda functions actually in use. *
+  **************************************************** */
 
 // From standpoint of category theory, compose is preferable construct
 // over pipe. But the top-down flow of pipe may reduce learning curve
