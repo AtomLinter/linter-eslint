@@ -3,9 +3,9 @@
 // Dependencies
 // NOTE: Requiring files adds significant time to package startup. To avoid this
 // delay, we are *not* requiring at the top of this file. Use idleCallbacks to
-// attempt to pre-cache requires for fast resolution if scheduler allows.
-// Since all requires are statically defined and inside some function,
-// Atom should be able snapshot our package.
+// attempt to pre-cache requires for fast resolution if scheduler allows. Since
+// all requires are statically defined and inside some function, Atom should be
+// able "snapshot" the package.
 //
 const dependencies = [
   () => require('./validate/editor'),
@@ -27,27 +27,31 @@ const idleTasks = [
   () => require('atom-package-deps').install('linter-eslint'),
 ]
 
-// Run idle tasks with all reasonable attempts to avoid blocking..
+// Run idle tasks with all reasonable attempts to avoid blocking.
 //
 const makeIdleRunner = () => {
-  let callbackId
+  const { requestIdleCallback, cancelIdleCallback } = window
+  let id
   let tasks
 
   const loadLazily = (deadline) => {
+    // While time alotted by scheduler and work remaining
     while (deadline.timeRemaining() && tasks.length) {
-      // Using pop instead of shift for performance, so lists
-      // should be prioritized bottom to top.
+      // Remove and run function from end of list.
       tasks.pop()()
     }
-    if (tasks.length > 0) {
-      callbackId = window.requestIdleCallback(loadLazily)
-    }
+
+    // If work remains, request more time
+    if (tasks.length) id = requestIdleCallback(loadLazily)
   }
 
   return (requestedTasks) => {
+    // Spread avoids external mutation and allows non-array iterable
     tasks = [...requestedTasks]
-    callbackId = requestIdleCallback(loadLazily)
-    return { dispose: () => window.cancelIdleCallback(callbackId) }
+    // Init first request
+    id = requestIdleCallback(loadLazily)
+    // Return a disposable
+    return { dispose: () => cancelIdleCallback(id) }
   }
 }
 
@@ -73,7 +77,7 @@ module.exports = {
     // this.subscriptions = new CompositeDisposable()
     this.subscriptions = makeCompositeDisposable()
 
-    // Get dependency loading on Atom's todo list
+    // Put dependency loading on Atom's todo-list
     this.subscriptions.add(makeIdleRunner()(dependencies))
 
     const {
