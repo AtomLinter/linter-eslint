@@ -48,7 +48,7 @@ const migrations = [
         new: 'global.eslintrcPath'
       }, {
         old: 'advancedLocalNodeModules',
-        new: 'advanced.advancedLocalNodeModules'
+        new: 'advanced.localNodeModules'
       }, {
         old: 'eslintRulesDirs',
         new: 'advanced.eslintRulesDirs'

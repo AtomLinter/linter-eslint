@@ -79,7 +79,7 @@ describe('Worker Helpers', () => {
       const path = Path.join(getFixturesPath('indirect-local-eslint'), pathPart)
       const config = createConfig({
         global: { useGlobalEslint: false },
-        advanced: { advancedLocalNodeModules: path }
+        advanced: { localNodeModules: path }
       })
       const eslint = Helpers.getESLintInstance('', config)
       expect(eslint).toBe('located')
@@ -90,7 +90,7 @@ describe('Worker Helpers', () => {
       const [projectPath, relativePath] = atom.project.relativizePath(path)
       const config = createConfig({
         global: { useGlobalEslint: false },
-        advanced: { advancedLocalNodeModules: relativePath }
+        advanced: { localNodeModules: relativePath }
       })
       const eslint = Helpers.getESLintInstance('', config, projectPath)
 

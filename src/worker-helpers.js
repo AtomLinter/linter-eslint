@@ -61,15 +61,15 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
       // NPM on platforms other than Windows
       eslintDir = Path.join(prefixPath, 'lib', 'node_modules', 'eslint')
     }
-  } else if (!config.advanced.advancedLocalNodeModules) {
+  } else if (!config.advanced.localNodeModules) {
     locationType = 'local project'
     eslintDir = Path.join(modulesDir || '', 'eslint')
-  } else if (Path.isAbsolute(cleanPath(config.advanced.advancedLocalNodeModules))) {
+  } else if (Path.isAbsolute(cleanPath(config.advanced.localNodeModules))) {
     locationType = 'advanced specified'
-    eslintDir = Path.join(cleanPath(config.advanced.advancedLocalNodeModules), 'eslint')
+    eslintDir = Path.join(cleanPath(config.advanced.localNodeModules), 'eslint')
   } else {
     locationType = 'advanced specified'
-    eslintDir = Path.join(projectPath || '', cleanPath(config.advanced.advancedLocalNodeModules), 'eslint')
+    eslintDir = Path.join(projectPath || '', cleanPath(config.advanced.localNodeModules), 'eslint')
   }
   if (isDirectory(eslintDir)) {
     return {
