@@ -14,7 +14,7 @@
  *   current linter-eslint atom config as an argument, and can act on it however
  *   it needs to.
  */
-const migrations = [
+const activeMigrations = [
   {
     added: 'January, 2018',
     description: 'Organized config settings into sections',
@@ -83,22 +83,24 @@ const migrations = [
  * linter-eslint.  Ideally, we would call this only when upgrading to a new
  * version.
  */
-function migrateConfigOptions() {
-  const linterEslintConfig = atom.config.get('linter-eslint')
-  migrations.forEach((migration) => {
-    if (migration.moves && Array.isArray(migration.moves)) {
-      // Copy old settings over to the new ones, then unset the old setting keys
-      migration.moves.forEach((move) => {
-        const oldSetting = linterEslintConfig[move.old]
-        if (oldSetting !== undefined) {
-          atom.config.set(move.new, oldSetting)
-          atom.config.unset(move.old)
-        }
-      })
-    } else if (typeof migration.migrate === 'function') {
-      migration.migrate(linterEslintConfig)
-    }
-  })
+function migrateConfigOptions(migrations = activeMigrations) {
+  if (migrations.length) {
+    const linterEslintConfig = atom.config.get('linter-eslint')
+    migrations.forEach((migration) => {
+      if (migration.moves && Array.isArray(migration.moves)) {
+        // Copy old settings over to the new ones, then unset the old setting keys
+        migration.moves.forEach((move) => {
+          const oldSetting = linterEslintConfig[move.old]
+          if (oldSetting !== undefined) {
+            atom.config.set(`linter-eslint.${move.new}`, oldSetting)
+            atom.config.unset(`linter-eslint.${move.old}`)
+          }
+        })
+      } else if (typeof migration.migrate === 'function') {
+        migration.migrate(linterEslintConfig)
+      }
+    })
+  }
 }
 
 module.exports = migrateConfigOptions
