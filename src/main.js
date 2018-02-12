@@ -1,84 +1,95 @@
 'use babel'
 
-// eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
-import { CompositeDisposable } from 'atom'
-import { hasValidScope } from './validate/editor'
-import {
-  atomConfig,
-  jobConfig,
-  getMigrations,
-  subscribe as configSubscribe
-} from './atom-config'
-
-// Internal variables
-const idleCallbacks = new Set()
-
 // Dependencies
-// NOTE: We are not directly requiring these in order to reduce the time it
-// takes to require this file as that causes delays in Atom loading this package
-let path
-let worker
-let configInspector
-let debug
-let linterMessage
-let knownRules
+// NOTE: Requiring files adds significant time to package startup. To avoid this
+// delay, we are *not* requiring at the top of this file. Use idleCallbacks to
+// attempt to pre-cache requires for fast resolution if scheduler allows.
+// Since all requires are statically defined and inside some function,
+// Atom should be able snapshot our package.
+//
+const dependencies = [
+  () => require('./validate/editor'),
+  () => require('./linter-message'),
+  () => require('./worker-manager'),
+  () => require('./eslint-config-inspector'),
+  () => require('./debug'),
+  () => require('./rules'),
+  () => require('path'),
+  () => require('./atom-config'),
+]
 
-const loadDeps = () => {
-  if (!path) {
-    path = require('path')
-  }
-  if (!worker) {
-    worker = require('./worker-manager')
-  }
-  if (!configInspector) {
-    configInspector = require('./eslint-config-inspector')
-  }
-  if (!debug) {
-    debug = require('./debug')
-  }
-  if (!linterMessage) {
-    linterMessage = require('./linter-message')
-  }
-  if (!knownRules) {
-    knownRules = require('./rules').default
-  }
-}
+// Miscellaneous idle tasks.
+//
+const idleTasks = [
+  // Pre-start the worker
+  () => require('./worker-manager').task.start(),
+  // Install peer packages
+  () => require('atom-package-deps').install('linter-eslint'),
+]
 
-const makeIdleCallback = (work) => {
+// Run idle tasks with all reasonable attempts to avoid blocking..
+//
+const makeIdleRunner = () => {
   let callbackId
-  const callBack = () => {
-    idleCallbacks.delete(callbackId)
-    work()
-  }
-  callbackId = window.requestIdleCallback(callBack)
-  idleCallbacks.add(callbackId)
-}
+  let tasks
 
-const scheduleIdleTasks = () => {
-  const linterEslintInstallPeerPackages = () => {
-    require('atom-package-deps').install('linter-eslint')
-  }
-  const linterEslintLoadDependencies = loadDeps
-  const linterEslintStartWorker = () => {
-    loadDeps()
-    worker.task.start()
+  const loadLazily = (deadline) => {
+    while (deadline.timeRemaining() && tasks.length) {
+      // Using pop instead of shift for performance, so lists
+      // should be prioritized bottom to top.
+      tasks.pop()()
+    }
+    if (tasks.length > 0) {
+      callbackId = window.requestIdleCallback(loadLazily)
+    }
   }
 
-  if (!atom.inSpecMode()) {
-    makeIdleCallback(linterEslintInstallPeerPackages)
-    makeIdleCallback(linterEslintLoadDependencies)
-    makeIdleCallback(linterEslintStartWorker)
+  return (requestedTasks) => {
+    tasks = [...requestedTasks]
+    callbackId = requestIdleCallback(loadLazily)
+    return { dispose: () => window.cancelIdleCallback(callbackId) }
   }
 }
+
+// // Simplified composite disposable avoids requiring atom core in main
+// //
+const makeCompositeDisposable = () => {
+  const disposables = new Set()
+  return {
+    add: (disposable) => {
+      if (!(disposable.dispose instanceof Function)) {
+        throw new Error('disposable must have dispose method')
+      }
+      disposables.add(disposable)
+    },
+    dispose: () => disposables.forEach(d => d.dispose())
+  }
+}
+
 
 module.exports = {
   activate() {
-    getMigrations().map(makeIdleCallback)
-    this.subscriptions = new CompositeDisposable()
+    // const { CompositeDisposable } = require('atom')
+    // this.subscriptions = new CompositeDisposable()
+    this.subscriptions = makeCompositeDisposable()
+
+    // Get dependency loading on Atom's todo list
+    this.subscriptions.add(makeIdleRunner()(dependencies))
+
+    const {
+      atomConfig,
+      getMigrations,
+      subscribe: configSubscribe
+    } = require('./atom-config')
+
+    // Subscribe to Atom configuration settings
     this.subscriptions.add(...(configSubscribe()))
 
+    // Subscribe to Save event so we can run fixOnSave
     this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
       editor.onDidSave(async () => {
+        const { hasValidScope } = require('./validate/editor')
+
         const { fixOnSave, scopes } = atomConfig
         if (hasValidScope(editor, scopes) && fixOnSave) {
           await this.fixJob(true)
@@ -86,59 +97,75 @@ module.exports = {
       })
     }))
 
+    // Subscribe to Debug command
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
-        loadDeps()
-        const debugString = await debug.report()
-        const notificationOptions = { detail: debugString, dismissable: true }
+        const { report } = require('./debug')
+
+        const debugReport = await report()
+        const notificationOptions = { detail: debugReport, dismissable: true }
         atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
       }
     }))
 
+    // Subscribe to Fix File command
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:fix-file': async () => {
         await this.fixJob()
       }
     }))
 
+    // Add context menu entry for Fix File
     this.subscriptions.add(atom.contextMenu.add({
       'atom-text-editor:not(.mini), .overlayer': [{
         label: 'ESLint Fix',
         command: 'linter-eslint:fix-file',
         shouldDisplay: (evt) => {
           const activeEditor = atom.workspace.getActiveTextEditor()
-          if (!activeEditor) {
-            return false
-          }
-          // Black magic!
+          if (!activeEditor) return false
+
+          // Some scary voodoo black magic! Atom v1.19.0+
           // Compares the private component property of the active TextEditor
-          //   against the components of the elements
+          //   against the components property of the TextEditor DOM elements
           const evtIsActiveEditor = evt.path.some(elem =>
-            // Atom v1.19.0+
             (elem.component && activeEditor.component
               && elem.component === activeEditor.component))
+
           // Only show if it was the active editor and it is a valid scope
           const { scopes } = atomConfig
+          const { hasValidScope } = require('./validate/editor')
+
           return evtIsActiveEditor && hasValidScope(activeEditor, scopes)
         }
       }]
     }))
 
-    scheduleIdleTasks()
+    // Load miscellaneous idle tasks and potential settings migrations
+    if (!atom.inSpecMode()) {
+      this.subscriptions.add(makeIdleRunner()(getMigrations()))
+      this.subscriptions.add(makeIdleRunner()(idleTasks))
+    }
   },
 
   deactivate() {
-    idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
-    idleCallbacks.clear()
-    if (worker) {
-      // If the helpers module hasn't been loaded then there was no chance a
-      // worker was started anyway.
-      worker.task.kill(true)
-    }
+    const { task } = require('./worker-manager')
+    if (task) task.kill(true)
     this.subscriptions.dispose()
   },
 
   provideLinter() {
+    const {
+      atomConfig,
+      jobConfig
+    } = require('./atom-config')
+    const {
+      fromException,
+      processJobResponse,
+      simple: simpleMessage
+    } = require('./linter-message')
+    const { default: rules } = require('./rules')
+    const { sendJob } = require('./worker-manager')
+
     return {
       name: 'ESLint',
       grammarScopes: atomConfig.scopes,
@@ -152,12 +179,10 @@ module.exports = {
         // Cannot report back to Linter if the editor has no path.
         if (!filePath) return null
 
-        loadDeps()
-
         // If the path is a URL (Nuclide remote file) return a message
         // telling the user we are unable to work on remote files.
         if (filePath.includes('://')) {
-          return linterMessage.simple(textEditor, {
+          return simpleMessage(textEditor, {
             severity: 'warning',
             excerpt: 'Remote file open, linter-eslint is disabled for this file.',
           })
@@ -165,49 +190,61 @@ module.exports = {
 
         const text = textEditor.getText()
 
-        let rules
+        let ignored
         if (textEditor.isModified()) {
           const {
             ignoredRulesWhenModified,
             ignoreFixableRulesWhileTyping
           } = atomConfig
 
-          rules = ignoreFixableRulesWhileTyping
-            ? knownRules().getIgnoredRules(ignoredRulesWhenModified)
-            : knownRules().toIgnored(ignoredRulesWhenModified)
+          ignored = ignoreFixableRulesWhileTyping
+            ? rules().getIgnoredRules(ignoredRulesWhenModified)
+            : rules().toIgnored(ignoredRulesWhenModified)
         }
 
         try {
-          const response = await worker.sendJob({
+          const response = await sendJob({
             type: 'lint',
             contents: text,
             config: jobConfig(),
-            rules,
+            rules: ignored,
             filePath,
             projectPath: atom.project.relativizePath(filePath)[0] || ''
           })
-          return linterMessage.processJobResponse({
+          return processJobResponse({
             text,
             response,
             textEditor,
             showRule: atomConfig.showRule
           })
         } catch (error) {
-          return linterMessage.fromException(textEditor, error)
+          return fromException(textEditor, error)
         }
       }
     }
   },
 
   async fixJob(isSave = false) {
+    const {
+      atomConfig,
+      jobConfig
+    } = require('./atom-config')
+    const { isLintDisabled } = require('./eslint-config-inspector')
+    const { dirname } = require('path')
+    const { default: rules } = require('./rules')
+    const { sendJob } = require('./worker-manager')
+
+    const {
+      disableWhenNoEslintConfig,
+      ignoredRulesWhenFixing,
+    } = atomConfig
+
     const textEditor = atom.workspace.getActiveTextEditor()
 
     // Silently return if the TextEditor is invalid
     if (!textEditor || !atom.workspace.isTextEditor(textEditor)) {
       return
     }
-
-    loadDeps()
 
     // Abort for unsaved text editors
     if (textEditor.isModified()) {
@@ -217,7 +254,7 @@ module.exports = {
     }
 
     const filePath = textEditor.getPath()
-    const fileDir = path.dirname(filePath)
+    const fileDir = dirname(filePath)
     const projectPath = atom.project.relativizePath(filePath)[0]
 
     // Get the text from the editor, so we can use executeOnText
@@ -226,19 +263,13 @@ module.exports = {
     // Do not try to make fixes on an empty file
     if (text.length === 0) return
 
-    const {
-      disableWhenNoEslintConfig,
-      ignoredRulesWhenFixing
-    } = atomConfig
-    const { isLintDisabled } = configInspector
-
     // Do not try to fix if linting should be disabled
     if (isLintDisabled({ fileDir, disableWhenNoEslintConfig })) {
       return
     }
 
     try {
-      const { messages, rulesDiff } = await worker.sendJob({
+      const { messages, rulesDiff } = await sendJob({
         type: 'fix',
         config: jobConfig(),
         contents: text,
@@ -247,7 +278,7 @@ module.exports = {
         projectPath
       })
 
-      knownRules().updateRules(rulesDiff)
+      rules().updateRules(rulesDiff)
 
       if (!isSave) {
         atom.notifications.addSuccess(messages)
