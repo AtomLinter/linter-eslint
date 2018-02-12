@@ -119,7 +119,6 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "atom-babel6-transpiler": "^1.1.3",
     "atom-linter": "^10.0.0",
     "atom-package-deps": "^4.6.0",
     "babel-preset-env": "^1.6.1",
@@ -190,31 +189,5 @@
       "node": true,
       "browser": true
     }
-  },
-  "atomTranspilers": [
-    {
-      "glob": "{src,spec}/*.js",
-      "transpiler": "atom-babel6-transpiler",
-      "options": {
-        "setBabelEnv": false,
-        "babel": {
-          "presets": [
-            [
-              "env",
-              {
-                "targets": {
-                  "node": "current"
-                }
-              }
-            ]
-          ],
-          "sourceMaps": "inline",
-          "babelrc": false
-        },
-        "cacheKeyFiles": [
-          "package.json"
-        ]
-      }
-    }
-  ]
+  }
 }
