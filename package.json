@@ -9,72 +9,6 @@
     "atom": ">=1.13.0 <2.0.0"
   },
   "configSchema": {
-    "lintHtmlFiles": {
-      "title": "Lint HTML Files",
-      "description": "You should also add `eslint-plugin-html` to your .eslintrc plugins",
-      "type": "boolean",
-      "default": false
-    },
-    "useGlobalEslint": {
-      "title": "Use global ESLint installation",
-      "description": "Make sure you have it in your $PATH",
-      "type": "boolean",
-      "default": false
-    },
-    "showRuleIdInMessage": {
-      "title": "Show Rule ID in Messages",
-      "type": "boolean",
-      "default": true
-    },
-    "disableWhenNoEslintConfig": {
-      "title": "Disable when no ESLint config is found (in package.json or .eslintrc)",
-      "type": "boolean",
-      "default": true
-    },
-    "eslintrcPath": {
-      "title": ".eslintrc Path",
-      "description": "It will only be used when there's no config file in project",
-      "type": "string",
-      "default": ""
-    },
-    "globalNodePath": {
-      "title": "Global Node Installation Path",
-      "description": "Write the value of `npm get prefix` here",
-      "type": "string",
-      "default": ""
-    },
-    "advancedLocalNodeModules": {
-      "title": "Path to the local node_modules folder",
-      "description": "Optionally specify the path to the local node_modules folder",
-      "type": "string",
-      "default": ""
-    },
-    "eslintRulesDirs": {
-      "title": "ESLint Rules Directories",
-      "description": "Specify a comma separated list of directories for ESLint to load rules from.",
-      "type": "array",
-      "default": [],
-      "items": {
-        "type": "string"
-      }
-    },
-    "disableEslintIgnore": {
-      "title": "Don't use .eslintignore files",
-      "type": "boolean",
-      "default": false
-    },
-    "disableFSCache": {
-      "title": "Disable FileSystem Cache",
-      "description": "Paths of node_modules, .eslintignore and others are cached",
-      "type": "boolean",
-      "default": false
-    },
-    "fixOnSave": {
-      "title": "Fix errors on save",
-      "description": "Have eslint attempt to fix some errors automatically when saving the file.",
-      "type": "boolean",
-      "default": false
-    },
     "scopes": {
       "title": "List of scopes to run ESLint on, run `Editor: Log Cursor Scope` to determine the scopes for a file.",
       "type": "array",
@@ -87,31 +21,140 @@
       ],
       "items": {
         "type": "string"
-      }
+      },
+      "order": 1
     },
-    "rulesToSilenceWhileTyping": {
-      "title": "Silence specific rules while typing",
-      "description": "Useful when Atom fixes errors on save like `no-trailing-spaces` or `eol-last`.",
-      "type": "array",
-      "default": [],
-      "items": {
-        "type": "string"
-      }
-    },
-    "rulesToDisableWhileFixing": {
-      "title": "Disable specific rules from fixes",
-      "description": "Prevent rules from being auto-fixed by ESLint. Applies to fixes made during saves as well as when running the `Linter Eslint: Fix File` command.",
-      "type": "array",
-      "default": [],
-      "items": {
-        "type": "string"
-      }
-    },
-    "ignoreFixableRulesWhileTyping": {
-      "title": "Ignore fixable rules while typing",
-      "description": "Have the linter ignore all fixable rules during linting when editing a document. The list is automatically updated on each lint job, and requires at least one run to be populated. Only supported when using ESLint v4+.",
+    "lintHtmlFiles": {
+      "title": "Lint HTML Files",
+      "description": "You should also add `eslint-plugin-html` to your .eslintrc plugins",
       "type": "boolean",
-      "default": false
+      "default": false,
+      "order": 2
+    },
+    "autofix": {
+      "type": "object",
+      "order": 3,
+      "title": "Automatic Fixes",
+      "properties": {
+        "fixOnSave": {
+          "title": "Fix errors on save",
+          "description": "Have eslint attempt to fix some errors automatically when saving the file.",
+          "type": "boolean",
+          "default": false,
+          "order": 1
+        },
+        "ignoreFixableRulesWhileTyping": {
+          "title": "Ignore fixable rules while typing",
+          "description": "Have the linter ignore all fixable rules during linting when editing a document. The list is automatically updated on each lint job, and requires at least one run to be populated. Only supported when using ESLint v4+.",
+          "type": "boolean",
+          "default": false,
+          "order": 2
+        },
+        "rulesToDisableWhileFixing": {
+          "title": "Disable specific rules from fixes",
+          "description": "Prevent rules from being auto-fixed by ESLint. Applies to fixes made during saves as well as when running the `Linter Eslint: Fix File` command.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "order": 3
+        }
+      }
+    },
+    "global": {
+      "type": "object",
+      "order": 4,
+      "title": "Global ESLint",
+      "properties": {
+        "useGlobalEslint": {
+          "title": "Use global ESLint installation",
+          "description": "Make sure you have it in your $PATH",
+          "type": "boolean",
+          "default": false,
+          "order": 1
+        },
+        "eslintrcPath": {
+          "title": ".eslintrc Path",
+          "description": "It will only be used when there's no config file in project",
+          "type": "string",
+          "default": "",
+          "order": 4
+        },
+        "globalNodePath": {
+          "title": "Global Node Installation Path",
+          "description": "Write the value of `npm get prefix` here",
+          "type": "string",
+          "default": "",
+          "order": 2
+        }
+      }
+    },
+    "disabling": {
+      "type": "object",
+      "order": 5,
+      "properties": {
+        "disableWhenNoEslintConfig": {
+          "title": "Disable when no ESLint config is found (in package.json or .eslintrc)",
+          "type": "boolean",
+          "default": true,
+          "order": 1
+        },
+        "rulesToSilenceWhileTyping": {
+          "title": "Silence specific rules while typing",
+          "description": "Useful when Atom fixes errors on save like `no-trailing-spaces` or `eol-last`.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "order": 2
+        }
+      }
+    },
+    "advanced": {
+      "type": "object",
+      "collapsed": true,
+      "title": "Uncommon",
+      "order": 6,
+      "properties": {
+        "disableEslintIgnore": {
+          "title": "Don't use .eslintignore files",
+          "type": "boolean",
+          "default": false,
+          "order": 1
+        },
+        "disableFSCache": {
+          "title": "Disable FileSystem Cache",
+          "description": "Paths of node_modules, .eslintignore and others are normally cached",
+          "type": "boolean",
+          "default": false,
+          "order": 2
+        },
+        "showRuleIdInMessage": {
+          "title": "Show Rule ID in Messages",
+          "type": "boolean",
+          "default": true,
+          "order": 3
+        },
+        "eslintRulesDirs": {
+          "title": "ESLint Rules Directories",
+          "description": "Specify a comma separated list of directories for ESLint to load rules from.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "order": 4
+        },
+        "localNodeModules": {
+          "title": "Path to the local node_modules folder",
+          "description": "Optionally specify the path to the local node_modules folder",
+          "type": "string",
+          "default": "",
+          "order": 5
+        }
+      }
     }
   },
   "scripts": {
