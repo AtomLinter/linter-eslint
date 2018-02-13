@@ -1,61 +1,36 @@
 'use babel'
 
-// Dependencies
 // NOTE: Requiring files adds significant time to package startup. To avoid this
 // delay, we are *not* requiring at the top of this file. Use idleCallbacks to
-// attempt to pre-cache requires for fast resolution if scheduler allows. Since
-// all requires are statically defined and inside some function, Atom should be
-// able "snapshot" the package.
-//
-const dependencies = [
-  () => require('./validate/editor'),
-  () => require('./linter-message'),
-  () => require('./worker-manager'),
-  () => require('./eslint-config-inspector'),
-  () => require('./debug'),
-  () => require('./rules'),
-  () => require('path'),
-  () => require('./atom-config'),
-]
-
-// Miscellaneous idle tasks.
-//
-const idleTasks = [
-  // Pre-start the worker
-  () => require('./worker-manager').task.start(),
-  // Install peer packages
-  () => require('atom-package-deps').install('linter-eslint'),
-]
+// attempt to pre-cache requires for fast resolution if scheduler allows.
 
 // Run idle tasks with all reasonable attempts to avoid blocking.
 //
-const makeIdleRunner = () => {
+const linterEslintMakeIdleRunner = () => {
   const { requestIdleCallback, cancelIdleCallback } = window
   let id
-  let tasks
+  let tasks = []
 
-  const loadLazily = (deadline) => {
+  const linterEslintScheduleIdle = (deadline) => {
     // While time alotted by scheduler and work remaining
     while (deadline.timeRemaining() && tasks.length) {
       // Remove and run function from end of list.
       tasks.pop()()
     }
-
     // If work remains, request more time
-    if (tasks.length) id = requestIdleCallback(loadLazily)
+    if (tasks.length) {
+      id = requestIdleCallback(linterEslintScheduleIdle)
+    }
   }
 
-  return (requestedTasks) => {
-    // Spread avoids external mutation and allows non-array iterable
-    tasks = [...requestedTasks]
-    // Init first request
-    id = requestIdleCallback(loadLazily)
-    // Return a disposable
+  return (requestedTasks = []) => {
+    tasks = [...requestedTasks, ...tasks]
+    id = requestIdleCallback(linterEslintScheduleIdle)
     return { dispose: () => cancelIdleCallback(id) }
   }
 }
 
-// // Simplified composite disposable avoids requiring atom core in main
+// // Simplified composite disposable
 // //
 const makeCompositeDisposable = () => {
   const disposables = new Set()
@@ -73,18 +48,36 @@ const makeCompositeDisposable = () => {
 
 module.exports = {
   activate() {
-    // const { CompositeDisposable } = require('atom')
-    // this.subscriptions = new CompositeDisposable()
-    this.subscriptions = makeCompositeDisposable()
-
-    // Put dependency loading on Atom's todo-list
-    this.subscriptions.add(makeIdleRunner()(dependencies))
-
     const {
       atomConfig,
       getMigrations,
       subscribe: configSubscribe
     } = require('./atom-config')
+
+    const unlessSpec = f => () => !atom.inSpecMode() && f()
+
+    const idleTasks = [
+      // Migrate any outdated config settings
+      () => getMigrations(),
+      // Start the worker Task process
+      unlessSpec(() => require('./worker-manager').task.start()),
+      // Install peer packages
+      unlessSpec(() => require('atom-package-deps').install('linter-eslint')),
+      // Pre-cache dependency requires
+      () => require('./validate/editor'),
+      () => require('./linter-message'),
+      () => require('./worker-manager'),
+      () => require('./eslint-config-inspector'),
+      () => require('./debug'),
+      () => require('./rules'),
+      () => require('path'),
+    ]
+
+    this.subscriptions = makeCompositeDisposable()
+
+    // Put idle tasks on Atom's todo-list
+    const requestIdles = linterEslintMakeIdleRunner()
+    this.subscriptions.add(requestIdles(idleTasks))
 
     // Subscribe to Atom configuration settings
     this.subscriptions.add(...(configSubscribe()))
@@ -129,8 +122,8 @@ module.exports = {
           if (!activeEditor) return false
 
           // Some scary voodoo black magic! Atom v1.19.0+
-          // Compares the private component property of the active TextEditor
-          //   against the components property of the TextEditor DOM elements
+          // Compare private component property of active TextEditor to the
+          // component props of elements to find matching <TextEditor> DOM Node.
           const evtIsActiveEditor = evt.path.some(elem =>
             (elem.component && activeEditor.component
               && elem.component === activeEditor.component))
@@ -143,12 +136,6 @@ module.exports = {
         }
       }]
     }))
-
-    // Load miscellaneous idle tasks and potential settings migrations
-    if (!atom.inSpecMode()) {
-      this.subscriptions.add(makeIdleRunner()(getMigrations()))
-      this.subscriptions.add(makeIdleRunner()(idleTasks))
-    }
   },
 
   deactivate() {
