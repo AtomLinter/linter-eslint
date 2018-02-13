@@ -1,4 +1,4 @@
-# linter-eslint
+# <img alt="linter-eslint logo" src="logo.svg" width="48px" height="48px"/> linter-eslint
 
 [![Build Status](https://travis-ci.org/AtomLinter/linter-eslint.svg)](https://travis-ci.org/AtomLinter/linter-eslint)
 [![Dependency Status](https://david-dm.org/AtomLinter/linter-eslint.svg)](https://david-dm.org/AtomLinter/linter-eslint)

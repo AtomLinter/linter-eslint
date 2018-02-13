@@ -1,4 +1,4 @@
-# Contributing
+# <img alt="linter-eslint logo" src="logo.svg" width="48px" height="48px"/> Contributing
 
 ## Basic Steps
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="48mm" height="48mm" version="1.1" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <title>Linter-Eslint logo</title>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title>Linter-Eslint logo</dc:title>
+    <dc:date>February 12, 2018</dc:date>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>John 'Sky' Higgins @skylize</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g transform="translate(-32.933 -148.98)">
+  <g transform="matrix(.57347 0 0 .57347 14.547 81.049)" fill="#4b32c3" shape-rendering="auto">
+   <path d="m91.71 146.8-37.609 0.23444c-1.2031 7e-3 -2.2967 0.25967-2.8693 0.66146l-17.894 12.561c-0.57251 0.4021-0.5362 0.89287 0.09525 1.2874l15.432 9.6199c0.37701-0.85671 0.65951-1.3222 1.0157-1.7043l-13.467-8.1569c-0.59149-0.34415-0.50879-0.77396-0.01311-1.1276l15.973-11.114c0.49543-0.35317 2.3192-0.26844 3.4046-0.27782l33.935-0.29368c1.0862-9e-3 2.119 0.19714 2.7093 0.54138l18.458 10.752c0.0261 0.0153 0.0512 0.0308 0.0754 0.0466 0.52159 0.33688 0.55172 0.74427 0.0799 1.0812l-12.069 8.5374-0.0026 2.39 15.521-10.796c0.57235-0.40213 0.53585-0.8929-0.0957-1.2874l-19.715-12.328c-0.63021-0.39482-1.7602-0.63363-2.964-0.62641z" color="#000000" color-rendering="auto" dominant-baseline="auto" image-rendering="auto" solid-color="#000000" style="font-feature-settings:normal;font-variant-alternates:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;isolation:auto;mix-blend-mode:normal;shape-padding:0;text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:normal"/>
+   <path d="m52.972 123.62c-0.35773 0.0165-0.56631 0.31696-0.5839 0.84215l-0.78866 23.239c-0.0255 0.74362 0.33439 1.8414 0.94416 2.8795l19.048 32.427c0.60939 1.0373 1.3756 1.8573 2.0102 2.1515l19.838 9.1918c0.63483 0.29378 1.0412 0.0162 1.0661-0.72804l0.78866-23.239c0.02576-0.7434-0.33408-1.8409-0.94366-2.879l-7.9023-14.393-2.3254-0.15903 7.4383 13.46c0.55232 0.93545 1.2085 2.085 1.3585 2.8089 0.23142 1.887-0.09022 8.4894-0.09022 8.4894-2.11e-4 0.0302-0.2415 12.807-0.24301 12.835-0.0301 0.62007-0.36737 0.85041-0.8951 0.61129l-17.154-7.8114c-0.5538-0.25145-1.1201-0.88343-1.6722-1.8179-5.3492-9.8851-11.364-19.94-17.34-29.599-2.2539-3.7352-1.962-4.5222-1.9598-5.2057l0.68523-18.361c-0.11775-1.35 0.8106-1.3346 1.3648-1.083l13.7 6.5035c0.8383-0.82499 1.7933-1.3623 2.2662-1.4931-0.09116-0.0591-0.43709-0.20294-0.52262-0.24266l-17.605-8.3123c-0.17792-0.0824-0.34062-0.12105-0.48266-0.11462z" color="#000000" color-rendering="auto" dominant-baseline="auto" image-rendering="auto" solid-color="#000000" style="font-feature-settings:normal;font-variant-alternates:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;isolation:auto;mix-blend-mode:normal;shape-padding:0;text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:normal"/>
+   <path d="m93.288 124.31c-0.16676 1e-3 -0.35918 0.0636-0.56864 0.18439l-20.15 11.604c-0.64476 0.37092-1.3866 1.256-1.946 2.3218l-17.475 33.304c-0.55882 1.0651-0.8505 2.1486-0.76529 2.8429l2.6742 21.698c0.08562 0.69448 0.53575 0.89334 1.1808 0.52165l14.871-8.1734c-0.8381-0.52786-1.4409-1.246-2.0018-2.0826l-10.771 6.3097c-0.58187 0.36031-0.98915 0.21033-1.0682-0.39338l-2.471-18.852c-0.07879-0.60327 0.18184-1.5675 0.68382-2.5299l15.695-30.089c0.50273-0.9632 1.1707-1.7777 1.7521-2.1365l18.167-11.236c0.02578-0.0158 0.0513-0.0306 0.07653-0.0444 0.54237-0.30185 0.91603-0.13711 0.99172 0.43722l2.2311 16.107c0.47334 0.14282 0.93401 0.34247 1.3843 0.62419l5.18e-4 5.2e-4 0.71833 0.44932-2.5968-20.163c-0.0567-0.458-0.27369-0.7077-0.61264-0.705z" color="#000000" color-rendering="auto" dominant-baseline="auto" image-rendering="auto" solid-color="#000000" style="font-feature-settings:normal;font-variant-alternates:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;isolation:auto;mix-blend-mode:normal;shape-padding:0;text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:normal"/>
+   <path d="m73.261 157.56a0.30613 0.30613 0 0 0-0.26498 0.15302l-1.709 2.9598a0.30613 0.30613 0 0 0 0 0.30603l1.709 2.9601a0.30613 0.30613 0 0 0 0.26498 0.15301h3.418a0.30613 0.30613 0 0 0 0.26498-0.15301l1.709-2.9601a0.30613 0.30613 0 0 0 0-0.30603l-1.709-2.9598a0.30613 0.30613 0 0 0-0.26498-0.15302z" color="#000000" color-rendering="auto" dominant-baseline="auto" image-rendering="auto" solid-color="#000000" style="font-feature-settings:normal;font-variant-alternates:normal;font-variant-caps:normal;font-variant-ligatures:normal;font-variant-numeric:normal;font-variant-position:normal;isolation:auto;mix-blend-mode:normal;shape-padding:0;text-decoration-color:#000000;text-decoration-line:none;text-decoration-style:solid;text-indent:0;text-orientation:mixed;text-transform:none;white-space:normal"/>
+  </g>
+ </g>
+</svg>

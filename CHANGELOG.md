@@ -1,4 +1,4 @@
-# Changelog
+# <img alt="linter-eslint logo" src="logo.svg" width="48px" height="48px"/> Changelog
 
 ## v8.4.1
 
