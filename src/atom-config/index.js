@@ -2,6 +2,7 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import configs from './config-mappings'
+import addDerivedGetters from './derived'
 import { setValue } from './make-handler'
 
 // idleCallback setup for migrating any old config settings
@@ -16,8 +17,10 @@ export const atomConfig = {
   ignoredRulesWhenModified: [],
   ignoredRulesWhenFixing: {},
   // Embedded scope stored here for convenienct access in handlers.
-  embeddedScope: 'source.js.embedded.html'
+  embeddedScope: 'source.js.embedded.html',
 }
+
+addDerivedGetters(atomConfig)
 
 // Subscribe to any updates for a specific setting.
 //
