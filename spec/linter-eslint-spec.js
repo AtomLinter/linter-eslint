@@ -31,8 +31,7 @@ const fixtures = {
 }
 
 const paths = Object.keys(fixtures)
-  .reduce((accumulator, fixture) => {
-    const acc = accumulator
+  .reduce((acc, fixture) => {
     acc[fixture] = path.join(fixturesDir, ...(fixtures[fixture]))
     return acc
   }, {})

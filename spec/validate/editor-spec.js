@@ -1,7 +1,7 @@
 'use babel'
 
 import { isValidPoint, hasValidScope } from '../../src/validate/editor'
-import makeSpy from '../make-spy'
+import { makeSpy } from '../spec-utils'
 
 // NOTE throwIfInvalidPoint not covered,
 // but it is a simple composition of 2 tested functions.

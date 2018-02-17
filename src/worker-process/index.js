@@ -5,17 +5,23 @@
 import { FindCache } from 'atom-linter'
 import { dirname } from 'path'
 
+import {
+  cdToProjectRoot,
+  getModulesDirAndRefresh,
+  isDirectory
+} from '../file-system'
+
+import {
+  eslintDirType,
+  findEslintDir,
+  getEslintInstance
+} from './eslint-utils'
+
 import getCLIEngineOptions from './cli-engine-options'
 import { isLintDisabled } from '../eslint-config-inspector'
 import { diffCachedMap } from '../f-utils'
-import {
-  cdToProjectRoot,
-  findCachedDir,
-  findEslintDirCurried,
-  getEslintInstance,
-  getModulesDirAndRefresh
-} from '../file-system'
 import { fromCliEngine as rulesFromEngine } from '../rules'
+
 
 process.title = 'linter-eslint helper'
 
@@ -63,7 +69,7 @@ module.exports = async () => {
     filePath,
     projectPath,
     rules,
-    type,
+    jobType,
     config: {
       advancedLocalNodeModules,
       disableFSCache,
@@ -82,18 +88,7 @@ module.exports = async () => {
         FindCache.clear()
       }
 
-      const findEslintDir = findEslintDirCurried({
-        projectPath,
-        useGlobalEslint,
-        globalNodePath,
-        advancedLocalNodeModules
-      })
-
       const fileDir = dirname(filePath)
-      const modulesDir = getModulesDirAndRefresh(fileDir)
-      const { path: eslintDir } = findEslintDir(modulesDir)
-
-      const eslint = getEslintInstance(eslintDir)
 
       // TODO This should be moved to worker-manager/send-job.js
       // to avoid sending useless jobs to worker.
@@ -102,8 +97,35 @@ module.exports = async () => {
         return
       }
 
+      const modulesDir = getModulesDirAndRefresh(fileDir)
+      const eslintType = eslintDirType({
+        useGlobalEslint,
+        advancedLocalNodeModules
+      })
+
+      const eslintDir = findEslintDir(eslintType)({
+        advancedLocalNodeModules,
+        globalNodePath,
+        modulesDir,
+        projectPath
+      })
+
+      if (jobType === 'debug') {
+        emit('success', {
+          jobId,
+          response: { eslintType, eslintDir }
+        })
+        return
+      }
+
+      if (eslintType !== 'local project' && !isDirectory(eslintDir)) {
+        throw new Error('Invalid directory path for ESLint')
+      }
+
+      const eslint = getEslintInstance(eslintDir)
+
       const cliEngineOptions = getCLIEngineOptions({
-        type,
+        jobType,
         rules,
         fileDir,
         disableEslintIgnore,
@@ -115,21 +137,17 @@ module.exports = async () => {
       //  sure it does that search from the correct working directory
       cdToProjectRoot({ disableEslintIgnore, projectPath, fileDir })
 
-      const responses = {
+      const response = {
         lint: () => lintJob({ cliEngineOptions, contents, eslint, filePath }),
-
         fix: () => lintJob({
           cliEngineOptions,
           contents,
           eslint,
           filePath,
           toFix
-        }),
+        })
+      }[jobType]()
 
-        debug: () =>
-          findEslintDir(findCachedDir(fileDir, 'node_modules/eslint'))
-      }
-      const response = responses[type]()
       emit('success', { jobId, response })
     } catch (error) {
       const { message, stack } = error

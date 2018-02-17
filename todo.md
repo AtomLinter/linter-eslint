@@ -24,8 +24,6 @@ Except for deprecated specs, these functions should be mostly covered by the exi
 * `getRelativePath` - Function deprecated. Inspect tests for lost code coverage [Reference](reference)
 * `cdToProjectRoot` Simple composition, but an integration test would still be nice to have.
 * Memoizers - Need specs
-* ignoredRulesWhenModified - No specs that use this list.
-* ignoredRulesWhileTyping - Needs specs (derived config, testing this will also cover ignoredRulesWhenModified above).
 
 ### Reference
 ```js

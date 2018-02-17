@@ -1,6 +1,9 @@
 'use babel'
 
-import { Rules } from '../src/rules'
+import {
+  Rules,
+  fromCliEngine
+} from '../src/rules'
 
 describe('The Rules class', () => {
   describe('replaceRules', () => {
@@ -50,5 +53,28 @@ describe('The Rules class', () => {
       const url = 'https://github.com/jfmengels/eslint-rule-documentation/blob/master/contributing.md'
       expect(rules.getRuleUrl('foo/bar')).toBe(url)
     })
+  })
+})
+
+describe('rules.fromCliEngine', () => {
+  it('works with the getRules function introduced in ESLint v4.15.0', () => {
+    const cliEngine = {
+      getRules: () => 'foo'
+    }
+    expect(fromCliEngine(cliEngine)).toBe('foo')
+  })
+
+  it('works with the hidden linter in ESLint v4 before v4.15.0', () => {
+    const cliEngine = {
+      linter: {
+        getRules: () => 'foo'
+      }
+    }
+    expect(fromCliEngine(cliEngine)).toBe('foo')
+  })
+
+  it('returns an empty Map for old ESLint versions', () => {
+    const cliEngine = {}
+    expect(fromCliEngine(cliEngine)).toEqual(new Map())
   })
 })

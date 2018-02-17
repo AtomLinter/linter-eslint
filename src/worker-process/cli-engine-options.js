@@ -5,7 +5,7 @@ import { findCached } from 'atom-linter'
 import { cleanPath, getConfigPath, getIgnoreFile } from '../file-system'
 
 const getCLIEngineOptions = ({
-  type,
+  jobType,
   rules,
   fileDir,
   disableEslintIgnore,
@@ -15,7 +15,7 @@ const getCLIEngineOptions = ({
   const cliEngineConfig = {
     rules,
     ignore: !disableEslintIgnore,
-    fix: type === 'fix'
+    fix: jobType === 'fix'
   }
 
   const ignoreFile = getIgnoreFile({ disableEslintIgnore, fileDir })

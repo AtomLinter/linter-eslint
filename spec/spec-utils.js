@@ -1,6 +1,10 @@
 'use babel'
 
-export default (returnValue) => {
+import { join } from 'path'
+
+export const fixturesPath = (...names) => join(__dirname, 'fixtures', ...names)
+
+export const makeSpy = (returnValue) => {
   // This will be a 2d array: list of param lists
   // for each time it was called.
   const calledWith = []

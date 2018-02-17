@@ -45,8 +45,9 @@ const makeCompositeDisposable = () => {
   }
 }
 
+const unlessSpec = f => (...xs) => !atom.inSpecMode() && f(...xs)
 
-module.exports = {
+const linterEslint = {
   activate() {
     const {
       atomConfig,
@@ -54,7 +55,6 @@ module.exports = {
       subscribe: configSubscribe
     } = require('./atom-config')
 
-    const unlessSpec = f => () => !atom.inSpecMode() && f()
 
     const idleTasks = [
       // Migrate any outdated config settings
@@ -141,10 +141,7 @@ module.exports = {
   },
 
   deactivate() {
-    const { task } = require('./worker-manager')
-    if (task) {
-      task.kill(true)
-    }
+    require('./worker-manager').task.kill()
     this.subscriptions.dispose()
   },
 
@@ -190,12 +187,12 @@ module.exports = {
 
         try {
           const response = await sendJob({
-            type: 'lint',
+            jobType: 'lint',
             contents: text,
             config: jobConfig(),
             rules: ignored,
             filePath,
-            projectPath: atom.project.relativizePath(filePath)[0] || ''
+            projectPath: atom.project.relativizePath(filePath)[0]
           })
           return processJobResponse({
             text,
@@ -241,7 +238,6 @@ module.exports = {
 
     const filePath = textEditor.getPath()
     const fileDir = dirname(filePath)
-    const projectPath = atom.project.relativizePath(filePath)[0]
 
     // Get the text from the editor, so we can use executeOnText
     const text = textEditor.getText()
@@ -256,12 +252,12 @@ module.exports = {
 
     try {
       const { messages, rulesDiff } = await sendJob({
-        type: 'fix',
+        jobType: 'fix',
         config: jobConfig(),
         contents: text,
         rules: ignoredRulesWhenFixing,
         filePath,
-        projectPath
+        projectPath: atom.project.relativizePath(filePath)[0]
       })
 
       rules().updateRules(rulesDiff)
@@ -274,3 +270,5 @@ module.exports = {
     }
   },
 }
+
+module.exports = linterEslint

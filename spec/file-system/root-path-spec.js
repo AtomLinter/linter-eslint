@@ -1,6 +1,6 @@
 'use babel'
 
-import makeSpy from '../make-spy'
+import { makeSpy } from '../spec-utils'
 import { makeGetRootPaths } from '../../src/file-system/root-path'
 
 

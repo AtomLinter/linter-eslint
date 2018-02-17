@@ -1,7 +1,7 @@
 'use babel'
 
 import { join } from 'path'
-import makeSpy from '../make-spy'
+import { makeSpy } from '../spec-utils'
 import {
   makeMaybeDirname,
   cdToFirstTruthy
