@@ -119,7 +119,9 @@ module.exports = {
         command: 'linter-eslint:fix-file',
         shouldDisplay: (evt) => {
           const activeEditor = atom.workspace.getActiveTextEditor()
-          if (!activeEditor) return false
+          if (!activeEditor) {
+            return false
+          }
 
           // Some scary voodoo black magic! Atom v1.19.0+
           // Compare private component property of active TextEditor to the
@@ -128,10 +130,10 @@ module.exports = {
             (elem.component && activeEditor.component
               && elem.component === activeEditor.component))
 
-          // Only show if it was the active editor and it is a valid scope
           const { scopes } = atomConfig
           const { hasValidScope } = require('./validate/editor')
 
+          // Only show if it was the active editor and it is a valid scope
           return evtIsActiveEditor && hasValidScope(activeEditor, scopes)
         }
       }]
@@ -140,7 +142,9 @@ module.exports = {
 
   deactivate() {
     const { task } = require('./worker-manager')
-    if (task) task.kill(true)
+    if (task) {
+      task.kill(true)
+    }
     this.subscriptions.dispose()
   },
 
@@ -154,7 +158,6 @@ module.exports = {
       processJobResponse,
       simple: simpleMessage
     } = require('./linter-message')
-    const { default: rules } = require('./rules')
     const { sendJob } = require('./worker-manager')
 
     return {
@@ -181,17 +184,9 @@ module.exports = {
 
         const text = textEditor.getText()
 
-        let ignored
-        if (textEditor.isModified()) {
-          const {
-            ignoredRulesWhenModified,
-            ignoreFixableRulesWhileTyping
-          } = atomConfig
-
-          ignored = ignoreFixableRulesWhileTyping
-            ? rules().getIgnoredRules(ignoredRulesWhenModified)
-            : rules().toIgnored(ignoredRulesWhenModified)
-        }
+        const ignored = textEditor.isModified()
+          ? atomConfig.ignoredRulesWhileTyping
+          : undefined
 
         try {
           const response = await sendJob({
