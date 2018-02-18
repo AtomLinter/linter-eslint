@@ -66,6 +66,18 @@ The path to the local node_modules folder can be a path relative to the project 
 
 If there is no local installation Atom will use the built-in ESLint in the linter-eslint package itself.
 
+## Common Problems
+
+#### Linter not starting when you open a file?
+
+If the linter is not starting when opening a file, it's likely the atom editor is not recognizing the filetype scope, which then won't select to use
+the linter-eslint package. To find out, try running `Editor: Log Cursor Scopes` in your command pallate. If you see something
+along the lines of `text-plain.null-grammar`, your editor is not recognizing filetype extension or language and applying the 
+correct scope, so you'll need to install the correct language. A common example is for JSX, where you will need
+[language-javascript-jsx](https://atom.io/packages/language-javascript-jsx) to allow Atom to recognize the JSX language, and 
+run the linter on those files. In short, check your cursor scopes if the linter isn't working.
+It's likely you have a language issue.
+
 ## Contributing
 
 See the [contributing guidelines](./CONTRIBUTING.md) to get started
