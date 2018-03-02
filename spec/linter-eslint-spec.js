@@ -192,12 +192,12 @@ describe('The eslint provider for Linter', () => {
       const editor = await atom.workspace.open(paths.badImport)
       const messages = await lint(editor)
       const expected = "Unable to resolve path to module '../nonexistent'. (import/no-unresolved)"
-      const expectedUrl = 'https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md'
+      const expectedUrlRegEx = /https[\S]+eslint-plugin-import[\S]+no-unresolved.md/
 
       expect(messages.length).toBe(1)
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected)
-      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].url).toMatch(expectedUrlRegEx)
       expect(messages[0].location.file).toBe(paths.badImport)
       expect(messages[0].location.position).toEqual([[0, 24], [0, 40]])
       expect(messages[0].solutions).not.toBeDefined()
@@ -455,7 +455,8 @@ describe('The eslint provider for Linter', () => {
       const messages = await lint(editor)
       expect(messages.length).toBe(1)
       expect(messages[0].severity).toBe('error')
-      expect(messages[0].excerpt).toBe('Expected empty line after import statement not followed by another import. (import/newline-after-import)')
+      expect(messages[0].excerpt).toBe('Expected 1 empty line after import ' +
+        'statement not followed by another import. (import/newline-after-import)')
 
       // Enable the option under test
       // NOTE: Depends on mport/newline-after-import rule being marked as fixable
@@ -655,7 +656,7 @@ describe('The eslint provider for Linter', () => {
   })
 
   describe('handles the Show Rule ID in Messages option', () => {
-    const expectedUrl = 'https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-unresolved.md'
+    const expectedUrlRegEx = /https[\S]+eslint-plugin-import[\S]+no-unresolved.md/
 
     it('shows the rule ID when enabled', async () => {
       atom.config.set('linter-eslint.advanced.showRuleIdInMessage', true)
@@ -666,7 +667,7 @@ describe('The eslint provider for Linter', () => {
       expect(messages.length).toBe(1)
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected)
-      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].url).toMatch(expectedUrlRegEx)
       expect(messages[0].location.file).toBe(paths.badImport)
       expect(messages[0].location.position).toEqual([[0, 24], [0, 40]])
       expect(messages[0].solutions).not.toBeDefined()
@@ -681,7 +682,7 @@ describe('The eslint provider for Linter', () => {
       expect(messages.length).toBe(1)
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(expected)
-      expect(messages[0].url).toBe(expectedUrl)
+      expect(messages[0].url).toMatch(expectedUrlRegEx)
       expect(messages[0].location.file).toBe(paths.badImport)
       expect(messages[0].location.position).toEqual([[0, 24], [0, 40]])
       expect(messages[0].solutions).not.toBeDefined()
