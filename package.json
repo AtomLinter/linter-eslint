@@ -183,6 +183,8 @@
     "eslint-plugin-import": "2.15.0",
     "husky": "1.3.1",
     "jasmine-fix": "1.3.1",
+    "@semantic-release/apm-config": "^2.0.1",
+    "semantic-release": "^15.1.7",
     "rimraf": "2.6.3"
   },
   "package-deps": [
@@ -266,6 +268,14 @@
   "renovate": {
     "extends": [
       "config:base"
+    ]
+  },
+  "release": {
+    "extends": "@semantic-release/apm-config"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   },
   "husky": {
