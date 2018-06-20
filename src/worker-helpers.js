@@ -67,7 +67,9 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
   // otherwise look in the default location
     locationType = 'local project'
     eslintDir = Path.join(modulesDir || '', 'eslint')
-  } else {
+  }
+
+  if (!isDirectory(eslintDir)) {
     // global fallback
     locationType = 'global'
     const configGlobal = cleanPath(globalNodePath)
