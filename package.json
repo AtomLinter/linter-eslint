@@ -69,7 +69,7 @@
       "title": "Global ESLint",
       "properties": {
         "useGlobalEslint": {
-          "title": "Use global ESLint installation",
+          "title": "Always use global ESLint installation",
           "description": "Make sure you have it in your $PATH",
           "type": "boolean",
           "default": false,
