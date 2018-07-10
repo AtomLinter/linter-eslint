@@ -49,27 +49,27 @@ function isDirectory(dirPath) {
 }
 
 export function findESLintDirectory(modulesDir, config, projectPath) {
-  const {localNodeModules} = config.advanced;
-  const {useGlobalEslint, globalNodePath} = config.global;
+  const { localNodeModules } = config.advanced
+  const { useGlobalEslint, globalNodePath } = config.global
+  const { disableWhenNoEslintConfig } = config.disabling
 
   let eslintDir = null
   let locationType = null
 
-  if (localNodeModules && !useGlobalEslint) {
+  if (localNodeModules) {
     // look for local eslint in dir provided by user
-    locationType = 'advanced specified';
+    locationType = 'advanced specified'
     // account for absolute path, if one was specified
     eslintDir = Path.isAbsolute(cleanPath(localNodeModules))
       ? Path.join(cleanPath(localNodeModules), 'eslint')
       : Path.join(projectPath || '', cleanPath(localNodeModules), 'eslint')
-    ;
   } else if (!useGlobalEslint) {
   // otherwise look in the default location
     locationType = 'local project'
     eslintDir = Path.join(modulesDir || '', 'eslint')
   }
 
-  if (!isDirectory(eslintDir)) {
+  if (!isDirectory(eslintDir) && useGlobalEslint) {
     // global fallback
     locationType = 'global'
     const configGlobal = cleanPath(globalNodePath)
@@ -87,8 +87,9 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
       path: eslintDir,
       type: locationType,
     }
-  } else {
-    throw new Error('ESLint not found, please add a local eslint to this project or ensure the global Node path is set correctly.')
+  }
+  if (!disableWhenNoEslintConfig && !isDirectory(eslintDir)) {
+    throw new Error('ESLint not found, please add a local eslint to this project or ensure the global Node path is set correctly and turned on')
   }
   return {
     path: Cache.ESLINT_LOCAL_PATH,

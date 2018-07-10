@@ -530,9 +530,9 @@ describe('The eslint provider for Linter', () => {
 
     it('errors when no config file is found', async () => {
       const messages = await lint(editor)
-      const expected = 'Error while running ESLint: No ESLint configuration found..'
+      const expected = 'Error while running ESLint: ESLint not found, please add a local eslint to this project or ensure the global Node path is set correctly and turned on.'
       const description = `<div style="white-space: pre-wrap">No ESLint configuration found.
-<hr />Error: No ESLint configuration found.
+<hr />Error: ESLint not found, please add a local eslint to this project or ensure the global Node path is set correctly and turned on.
     at Config.getLocalConfigHierarchy`
       // The rest of the description includes paths specific to the computer running it
       expect(messages.length).toBe(1)
