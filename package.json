@@ -169,7 +169,7 @@
     "babel-preset-env": "^1.6.1",
     "consistent-path": "^2.0.1",
     "crypto-random-string": "^1.0.0",
-    "eslint": "^4.9.0",
+    "eslint": "^5.0.0",
     "eslint-rule-documentation": "^1.0.18",
     "fs-plus": "^3.0.1",
     "resolve-env": "^1.0.0",
