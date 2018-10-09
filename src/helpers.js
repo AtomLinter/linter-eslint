@@ -229,8 +229,8 @@ const generateInvalidTrace = async ({
 
   return {
     severity: 'error',
-    excerpt: `${titleText}. See the description for details. ` +
-      'Click the URL to open a new issue!',
+    excerpt: `${titleText}. See the description for details. `
+      + 'Click the URL to open a new issue!',
     url: newIssueURL,
     location,
     description: `${rangeText}\nOriginal message: ${message}`

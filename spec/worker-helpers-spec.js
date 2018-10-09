@@ -8,9 +8,9 @@ import { copyFileToTempDir } from './linter-eslint-spec'
 const getFixturesPath = path => Path.join(__dirname, 'fixtures', path)
 
 
-const globalNodePath = process.platform === 'win32' ?
-  Path.join(getFixturesPath('global-eslint'), 'lib') :
-  getFixturesPath('global-eslint')
+const globalNodePath = process.platform === 'win32'
+  ? Path.join(getFixturesPath('global-eslint'), 'lib')
+  : getFixturesPath('global-eslint')
 
 function createConfig(overrides = {}) {
   return Object.assign(
@@ -196,8 +196,7 @@ describe('Worker Helpers', () => {
       const config = createConfig({
         advanced: { disableEslintIgnore: true }
       })
-      const relativePath =
-        Helpers.getRelativePath(fixtureDir, fixtureFile, config)
+      const relativePath = Helpers.getRelativePath(fixtureDir, fixtureFile, config)
       expect(relativePath).toBe('ignored.js')
     })
 

@@ -455,8 +455,8 @@ describe('The eslint provider for Linter', () => {
       const messages = await lint(editor)
       expect(messages.length).toBe(1)
       expect(messages[0].severity).toBe('error')
-      expect(messages[0].excerpt).toBe('Expected 1 empty line after import ' +
-        'statement not followed by another import. (import/newline-after-import)')
+      expect(messages[0].excerpt).toBe('Expected 1 empty line after import '
+        + 'statement not followed by another import. (import/newline-after-import)')
 
       // Enable the option under test
       // NOTE: Depends on mport/newline-after-import rule being marked as fixable
@@ -692,15 +692,17 @@ describe('The eslint provider for Linter', () => {
   describe("registers an 'ESLint Fix' right click menu command", () => {
     // NOTE: Reaches into the private data of the ContextMenuManager, there is
     // no public method to check this though so...
-    expect(atom.contextMenu.itemSets.some(itemSet =>
+    expect(atom.contextMenu.itemSets.some(itemSet => (
       // Matching selector...
-      itemSet.selector === 'atom-text-editor:not(.mini), .overlayer' &&
-      itemSet.items.some(item =>
+      itemSet.selector === 'atom-text-editor:not(.mini), .overlayer'
+      && itemSet.items.some(item => (
         // Matching command...
-        item.command === 'linter-eslint:fix-file' &&
+        item.command === 'linter-eslint:fix-file'
         // Matching label
-        item.label === 'ESLint Fix' &&
+        && item.label === 'ESLint Fix'
         // And has a function controlling display
-        typeof item.shouldDisplay === 'function')))
+        && typeof item.shouldDisplay === 'function'
+      ))
+    )))
   })
 })

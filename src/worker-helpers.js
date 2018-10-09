@@ -25,13 +25,12 @@ export function getNodePrefixPath() {
   if (Cache.NODE_PREFIX_PATH === null) {
     const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
     try {
-      Cache.NODE_PREFIX_PATH =
-        ChildProcess.spawnSync(npmCommand, ['get', 'prefix'], {
-          env: Object.assign(Object.assign({}, process.env), { PATH: getPath() })
-        }).output[1].toString().trim()
+      Cache.NODE_PREFIX_PATH = ChildProcess.spawnSync(npmCommand, ['get', 'prefix'], {
+        env: Object.assign(Object.assign({}, process.env), { PATH: getPath() })
+      }).output[1].toString().trim()
     } catch (e) {
-      const errMsg = 'Unable to execute `npm get prefix`. Please make sure ' +
-        'Atom is getting $PATH correctly.'
+      const errMsg = 'Unable to execute `npm get prefix`. Please make sure '
+        + 'Atom is getting $PATH correctly.'
       throw new Error(errMsg)
     }
   }
@@ -71,14 +70,18 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
     locationType = 'advanced specified'
     eslintDir = Path.join(projectPath || '', cleanPath(config.advanced.localNodeModules), 'eslint')
   }
+
   if (isDirectory(eslintDir)) {
     return {
       path: eslintDir,
       type: locationType,
     }
-  } else if (config.global.useGlobalEslint) {
+  }
+
+  if (config.global.useGlobalEslint) {
     throw new Error('ESLint not found, please ensure the global Node path is set correctly.')
   }
+
   return {
     path: Cache.ESLINT_LOCAL_PATH,
     type: 'bundled fallback',
@@ -115,10 +118,9 @@ export function getESLintInstance(fileDir, config, projectPath) {
 }
 
 export function getConfigPath(fileDir) {
-  const configFile =
-    findCached(fileDir, [
-      '.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc', 'package.json'
-    ])
+  const configFile = findCached(fileDir, [
+    '.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc', 'package.json'
+  ])
   if (configFile) {
     if (Path.basename(configFile) === 'package.json') {
       // eslint-disable-next-line import/no-dynamic-require
@@ -218,6 +220,6 @@ export function getRules(cliEngine) {
  * @return {boolean}             Whether or not there were changes
  */
 export function didRulesChange(currentRules, newRules) {
-  return !(currentRules.size === newRules.size &&
-    Array.from(currentRules.keys()).every(ruleId => newRules.has(ruleId)))
+  return !(currentRules.size === newRules.size
+    && Array.from(currentRules.keys()).every(ruleId => newRules.has(ruleId)))
 }
