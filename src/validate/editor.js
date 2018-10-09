@@ -9,11 +9,11 @@ export const isValidPoint = (textBuffer, line, column) => {
   return validPoint.isEqual([line, column])
 }
 
-export const throwIfInvalidPoint = (textBuffer, line, column) =>
+export const throwIfInvalidPoint = (textBuffer, line, column) => (
   throwIfFail(
     `${line}:${column} isn't a valid point!`,
     isValidPoint(textBuffer, line, column)
-  )
+  ))
 
 export const hasValidScope = (editor, validScopes) => editor.getCursors()
   .some(cursor => cursor.getScopeDescriptor()

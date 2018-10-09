@@ -74,12 +74,12 @@ let ignoreFixableRulesWhileTyping
  * @param  {[iterable]} ruleIds Iterable containing ruleIds to ignore
  * @return {Object}             Object containing properties for each rule to ignore
  */
-const idsToIgnoredRules = ruleIds =>
+const idsToIgnoredRules = ruleIds => (
   Array.from(ruleIds).reduce(
     // 0 is the severity to turn off a rule
-    (ids, id) => Object.assign(ids, { [id]: 0 })
-    , {}
-  )
+    (ids, id) => Object.assign(ids, { [id]: 0 }),
+    {}
+  ))
 
 
 module.exports = {
@@ -180,10 +180,10 @@ module.exports = {
           // Black magic!
           // Compares the private component property of the active TextEditor
           //   against the components of the elements
-          const evtIsActiveEditor = evt.path.some(elem =>
+          const evtIsActiveEditor = evt.path.some(elem => (
             // Atom v1.19.0+
-            (elem.component && activeEditor.component &&
-              elem.component === activeEditor.component))
+            elem.component && activeEditor.component
+              && elem.component === activeEditor.component))
           // Only show if it was the active editor and it is a valid scope
           return evtIsActiveEditor && hasValidScope(activeEditor, scopes)
         }
