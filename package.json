@@ -258,5 +258,10 @@
         ]
       }
     }
-  ]
+  ],
+  "renovate": {
+    "extends": [
+      "config:base"
+    ]
+  }
 }
