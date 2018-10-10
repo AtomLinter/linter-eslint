@@ -162,17 +162,17 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "atom-babel6-transpiler": "^1.1.3",
-    "atom-linter": "^10.0.0",
-    "atom-package-deps": "^4.6.0",
-    "babel-preset-env": "^1.6.1",
-    "consistent-path": "^2.0.1",
-    "crypto-random-string": "^1.0.0",
-    "eslint": "^4.9.0",
-    "eslint-rule-documentation": "^1.0.18",
-    "fs-plus": "^3.0.1",
-    "resolve-env": "^1.0.0",
-    "user-home": "^2.0.0"
+    "atom-babel6-transpiler": "1.2.0",
+    "atom-linter": "10.0.0",
+    "atom-package-deps": "4.6.2",
+    "babel-preset-env": "1.7.0",
+    "consistent-path": "2.0.3",
+    "crypto-random-string": "1.0.0",
+    "eslint": "4.19.1",
+    "eslint-rule-documentation": "1.0.21",
+    "fs-plus": "3.0.2",
+    "resolve-env": "1.0.0",
+    "user-home": "2.0.0"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "13.1.0",
