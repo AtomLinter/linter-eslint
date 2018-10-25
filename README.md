@@ -27,6 +27,8 @@ installed
 for you. If you are using an alternative `linter-*` consumer feel free
 to disable the `linter` package.
 
+> **Important!** If you wish to lint other files besides JavaScript files (f.e. `.js`), you need to add them to `List of scopes to run ESLint on` option in linter-eslint settings. For example, to lint TypeScript files, you'll need to add `source.ts` to the list.
+
 ## Use with plugins
 
 You have two options:
