@@ -16,6 +16,7 @@
         "source.js",
         "source.jsx",
         "source.js.jsx",
+        "source.flow",
         "source.babel",
         "source.js-semantic"
       ],
