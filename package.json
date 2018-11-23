@@ -175,7 +175,9 @@
     "crypto-random-string": "3.3.1",
     "eslint": "4.19.1",
     "eslint-rule-documentation": "1.0.23",
+    "fast-deep-equal": "^2.0.1",
     "fs-plus": "3.1.1",
+    "ramda": "^0.26.0",
     "resolve-env": "1.0.0",
     "user-home": "2.0.0"
   },
