@@ -2,7 +2,7 @@
 
 import diff from '../../src/f-utils/deep-strict-diff'
 
-describe('deepDiff', () => {
+describe('deepStrictDiff', () => {
   it('finds added props', () => {
     const A = { prop1: { prop: 'value' } }
     const B = {
