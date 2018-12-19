@@ -171,7 +171,7 @@
     "crypto-random-string": "1.0.0",
     "eslint": "4.19.1",
     "eslint-rule-documentation": "1.0.21",
-    "fs-plus": "3.0.2",
+    "fs-plus": "3.1.1",
     "resolve-env": "1.0.0",
     "user-home": "2.0.0"
   },
