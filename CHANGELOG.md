@@ -1,5 +1,16 @@
 # Changelog
 
+## v8.5.0
+*  Organize configuration options ([#1042][])
+*  Add source.flow to default scopes ([#1194][])
+*  Upgrade dependencies (various)
+*  Migrate to CircleCi 2.0
+*  Add Renovate for dependency management
+*  Add commitlint
+
+[#1042]: https://github.com/AtomLinter/linter-eslint/pull/1042
+[#1194]: https://github.com/AtomLinter/linter-eslint/pull/1194
+
 ## v8.4.1
 
 *   Support [`CLIEngine#getRules`][] and [`rule.meta.docs.url`][] ([#1067][])
