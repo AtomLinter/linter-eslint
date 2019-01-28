@@ -1,3 +1,12 @@
+## [8.4.2](https://github.com/AtomLinter/linter-eslint/compare/v8.4.1...v8.4.2) (2019-01-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency atom-package-deps to v5 ([9007292](https://github.com/AtomLinter/linter-eslint/commit/9007292))
+* **deps:** update dependency eslint-rule-documentation to v1.0.22 ([57e29a4](https://github.com/AtomLinter/linter-eslint/commit/57e29a4))
+* **deps:** update dependency fs-plus to v3.1.1 ([5c5d412](https://github.com/AtomLinter/linter-eslint/commit/5c5d412))
+
 # Changelog
 
 ## v8.5.0
