@@ -1,8 +1,8 @@
 ### Project specific config ###
+os: linux
 language: node_js
 node_js: lts/*
 install: skip
-os: linux
 
 jobs:
   include:
@@ -18,11 +18,23 @@ jobs:
 
     # Check the commit messages and run the extra lint script
     - stage: test
+      before_script: skip
       install:
         - npm install
-      before_script: skip
       script:
         - commitlint-travis
+
+    - stage: release
+      # Since the deploy needs APM, currently the simplest method is to run
+      # build-package.sh, which requires the specs to pass, so this must run in
+      # the main language instead of Node.js.
+      before_script:
+        - export PATH=${PATH}:${HOME}/atom/usr/bin/
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script:
+          - npx semantic-release
 
 ### Generic setup follows ###
 script:
@@ -43,9 +55,9 @@ branches:
 git:
   depth: 10
 
-dist: trusty
-
 sudo: false
+
+dist: trusty
 
 addons:
   apt:
@@ -57,15 +69,5 @@ addons:
 
 stages:
   - test
-
-node_js: lts/*
-
-after_success:
-  # Add apm to the PATH
-  - export PATH=${PATH}:${HOME}/atom/usr/bin/
-
-deploy:
-  provider: script
-  skip_cleanup: true
-  script:
-    - npx semantic-release
+  - name: release
+    if: (NOT type = pull_request) AND branch = master
