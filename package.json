@@ -176,16 +176,16 @@
     "user-home": "2.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "7.2.1",
-    "@commitlint/config-conventional": "7.1.2",
-    "@commitlint/travis-cli": "7.2.1",
+    "@commitlint/cli": "7.4.0",
+    "@commitlint/config-conventional": "7.3.1",
+    "@commitlint/travis-cli": "7.4.0",
+    "@semantic-release/apm-config": "6.0.1",
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-plugin-import": "2.15.0",
     "husky": "1.3.1",
     "jasmine-fix": "1.3.1",
-    "@semantic-release/apm-config": "^2.0.1",
-    "semantic-release": "^15.1.7",
-    "rimraf": "2.6.3"
+    "rimraf": "2.6.3",
+    "semantic-release": "15.13.3"
   },
   "package-deps": [
     "linter:2.0.0"
