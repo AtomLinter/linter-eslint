@@ -1,3 +1,12 @@
+## [8.5.1](https://github.com/AtomLinter/linter-eslint/compare/v8.5.0...v8.5.1) (2019-01-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency atom-package-deps to v5 ([9007292](https://github.com/AtomLinter/linter-eslint/commit/9007292))
+* **deps:** update dependency eslint-rule-documentation to v1.0.22 ([57e29a4](https://github.com/AtomLinter/linter-eslint/commit/57e29a4))
+* remove v8.4.2 from the changelog ([878361c](https://github.com/AtomLinter/linter-eslint/commit/878361c))
+
 ## v8.5.0
 *  Organize configuration options ([#1042][])
 *  Add source.flow to default scopes ([#1194][])
