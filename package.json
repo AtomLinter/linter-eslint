@@ -176,7 +176,7 @@
     "user-home": "2.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "7.4.0",
+    "@commitlint/cli": "7.5.0",
     "@commitlint/config-conventional": "7.3.1",
     "@commitlint/travis-cli": "7.4.0",
     "@semantic-release/apm-config": "6.0.1",
