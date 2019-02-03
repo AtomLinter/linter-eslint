@@ -8,6 +8,8 @@ import rimraf from 'rimraf'
 import { beforeEach, it, fit } from 'jasmine-fix'
 import linterEslint from '../src/main'
 
+import { processESLintMessages } from '../src/helpers'
+
 const fixturesDir = path.join(__dirname, 'fixtures')
 
 const fixtures = {
@@ -704,5 +706,25 @@ describe('The eslint provider for Linter', () => {
         && typeof item.shouldDisplay === 'function'
       ))
     )))
+  })
+})
+
+describe('processESLintMessages', () => {
+  it('handles messages with null endColumn', async () => {
+    // Get a editor instance with at least a single line
+    const editor = await atom.workspace.open(paths.good)
+
+    const result = await processESLintMessages([{
+      column: null,
+      endColumn: null,
+      line: 1,
+      endLine: null,
+      message: 'Test Null endColumn',
+      nodeType: 'Block',
+      ruleId: 'test-null-endcolumn',
+      severity: 2,
+    }], editor, false)
+
+    expect(result[0].excerpt).toBe('Test Null endColumn')
   })
 })
