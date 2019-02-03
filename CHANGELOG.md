@@ -1,3 +1,10 @@
+## [8.5.2](https://github.com/AtomLinter/linter-eslint/compare/v8.5.1...v8.5.2) (2019-02-03)
+
+
+### Bug Fixes
+
+* behavior when endColumn or endLine is null ([40760c6](https://github.com/AtomLinter/linter-eslint/commit/40760c6)), closes [#1197](https://github.com/AtomLinter/linter-eslint/issues/1197) [#1196](https://github.com/AtomLinter/linter-eslint/issues/1196) [#1195](https://github.com/AtomLinter/linter-eslint/issues/1195) [#1192](https://github.com/AtomLinter/linter-eslint/issues/1192)
+
 ## [8.5.1](https://github.com/AtomLinter/linter-eslint/compare/v8.5.0...v8.5.1) (2019-01-28)
 
 
