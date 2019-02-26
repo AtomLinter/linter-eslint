@@ -164,9 +164,9 @@
   },
   "dependencies": {
     "@atom/babel7-transpiler": "1.0.0-1",
+    "@babel/preset-env": "7.3.4",
     "atom-linter": "10.0.0",
     "atom-package-deps": "5.0.0",
-    "babel-preset-env": "1.7.0",
     "consistent-path": "2.0.3",
     "crypto-random-string": "1.0.0",
     "eslint": "4.19.1",
@@ -248,7 +248,7 @@
         "babel": {
           "presets": [
             [
-              "env",
+              "@babel/preset-env",
               {
                 "targets": {
                   "node": "current"
