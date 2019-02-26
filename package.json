@@ -163,7 +163,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "atom-babel6-transpiler": "1.2.0",
+    "@atom/babel7-transpiler": "1.0.0-1",
     "atom-linter": "10.0.0",
     "atom-package-deps": "5.0.0",
     "babel-preset-env": "1.7.0",
@@ -242,7 +242,7 @@
   "atomTranspilers": [
     {
       "glob": "{src,spec}/*.js",
-      "transpiler": "atom-babel6-transpiler",
+      "transpiler": "@atom/babel7-transpiler",
       "options": {
         "setBabelEnv": false,
         "babel": {
