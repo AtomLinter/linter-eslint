@@ -17,15 +17,15 @@ apm install linter-eslint
 use it if it's available. If none is found it will fall back to the version it
 ships with.
 
-Lets say you depend on a specific version of `eslint`, maybe it has unreleased
-features, maybe it's just newer than what `linter-eslint` ships with. If
+Let's say you depend on a specific version of `eslint`. Maybe it has unreleased
+features or maybe it's newer than what `linter-eslint` ships with. If
 `your-project/node_modules/eslint` exists `linter-eslint` will be used.
 This package requires an `eslint` of at least v1.0.0.
 
-Note that if you do not have the `linter` package installed it will be
+If you do not have the `linter` package installed, it will be
 installed
-for you. If you are using an alternative `linter-*` consumer feel free
-to disable the `linter` package.
+for you. If you are using an alternative `linter-*` consumer, 
+the `linter` package can be disabled.
 
 ## Use with plugins
 
@@ -43,7 +43,7 @@ You have two options:
 
 ## Using ESLint
 
-Note that recent versions of ESLint do not use any rules by-default. This
+Note that recent versions of ESLint do not use any rules by default. This
 means you have to specify a configuration file for your project!
 
 To do this in a straightforward way run this:
@@ -62,10 +62,10 @@ If Use Global is on, Atom will use the global ESLint. The path to it is figured 
 
 If Use Global is off, Atom will try to find a local installation in the project folder, look if there's ESLint in `${PROJECT_ROOT}/node_modules` and use it if found.
 
-The path to the local node_modules folder can be a path relative to the project or an absolute path and should end in /node_modules/. This path is used if the other methods of discovery have failed.
+The path to the local node_modules folder can be a path relative to the project or an absolute path and should end in `/node_modules/`. This path is used if the other methods of discovery have failed.
 
 If there is no local installation Atom will use the built-in ESLint in the linter-eslint package itself.
 
 ## Contributing
 
-See the [contributing guidelines](./CONTRIBUTING.md) to get started
+See the [contributing guidelines](./CONTRIBUTING.md) to get started.
