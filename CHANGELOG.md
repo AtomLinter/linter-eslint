@@ -1,3 +1,10 @@
+## [8.5.3](https://github.com/AtomLinter/linter-eslint/compare/v8.5.2...v8.5.3) (2019-04-09)
+
+
+### Bug Fixes
+
+* **deps:** update dependency crypto-random-string to v2 ([56f479d](https://github.com/AtomLinter/linter-eslint/commit/56f479d))
+
 ## [8.5.2](https://github.com/AtomLinter/linter-eslint/compare/v8.5.1...v8.5.2) (2019-02-03)
 
 
