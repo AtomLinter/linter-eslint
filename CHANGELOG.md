@@ -1,3 +1,10 @@
+## [8.5.4](https://github.com/AtomLinter/linter-eslint/compare/v8.5.3...v8.5.4) (2019-04-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency eslint-rule-documentation to v1.0.23 ([06e280c](https://github.com/AtomLinter/linter-eslint/commit/06e280c))
+
 ## [8.5.3](https://github.com/AtomLinter/linter-eslint/compare/v8.5.2...v8.5.3) (2019-04-09)
 
 
