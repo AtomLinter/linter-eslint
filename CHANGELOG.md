@@ -1,3 +1,10 @@
+## [8.5.5](https://github.com/AtomLinter/linter-eslint/compare/v8.5.4...v8.5.5) (2019-04-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency atom-package-deps to v5.1.0 ([d547679](https://github.com/AtomLinter/linter-eslint/commit/d547679))
+
 ## [8.5.4](https://github.com/AtomLinter/linter-eslint/compare/v8.5.3...v8.5.4) (2019-04-12)
 
 
