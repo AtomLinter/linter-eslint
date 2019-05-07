@@ -176,9 +176,9 @@
     "user-home": "2.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "7.5.2",
-    "@commitlint/config-conventional": "7.5.0",
-    "@commitlint/travis-cli": "7.5.2",
+    "@commitlint/cli": "7.6.0",
+    "@commitlint/config-conventional": "7.6.0",
+    "@commitlint/travis-cli": "7.6.0",
     "@semantic-release/apm-config": "6.0.1",
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-plugin-import": "2.17.2",
