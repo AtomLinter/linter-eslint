@@ -21,6 +21,7 @@ const Cache = {
  * @return {string}      The cleaned path
  */
 const cleanPath = path => (path ? resolveEnv(fs.normalize(path)) : '')
+const rootPath = (os.platform === 'win32') ? process.cwd().split(Path.sep)[0] : '/'
 
 export function getNodePrefixPath() {
   if (Cache.NODE_PREFIX_PATH === null) {
@@ -129,8 +130,7 @@ export function getConfigPath(fileDir) {
         return configFile
       }
       // return if we hit root folder and no eslint config found
-      root = (os.platform === "win32") ? process.cwd().split(Path.sep)[0] : "/";
-      if (Path.dirname(configFile).toUpperCase() === root.toUpperCase()) {
+      if (Path.dirname(configFile).toUpperCase() === rootPath.toUpperCase()) {
         return null
       }
       // If we are here, we found a package.json without an eslint config
