@@ -6,6 +6,7 @@ import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
 import getPath from 'consistent-path'
+import os from 'os'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
@@ -126,6 +127,11 @@ export function getConfigPath(fileDir) {
       // eslint-disable-next-line import/no-dynamic-require
       if (require(configFile).eslintConfig) {
         return configFile
+      }
+      // return if we hit root folder and no eslint config found
+      root = (os.platform === "win32") ? process.cwd().split(Path.sep)[0] : "/";
+      if (Path.dirname(configFile).toUpperCase() === root.toUpperCase()) {
+        return null
       }
       // If we are here, we found a package.json without an eslint config
       // in a dir without any other eslint config files
