@@ -182,7 +182,7 @@
     "@semantic-release/apm-config": "6.0.2",
     "eslint-config-airbnb-base": "13.2.0",
     "eslint-plugin-import": "2.18.0",
-    "husky": "4.0.3",
+    "husky": "4.0.6",
     "jasmine-fix": "1.3.1",
     "rimraf": "3.0.0",
     "semantic-release": "15.14.0"
