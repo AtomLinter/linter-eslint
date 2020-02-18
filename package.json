@@ -185,7 +185,7 @@
     "husky": "4.2.3",
     "jasmine-fix": "1.3.1",
     "rimraf": "3.0.2",
-    "semantic-release": "17.0.3"
+    "semantic-release": "17.0.4"
   },
   "package-deps": [
     "linter:2.0.0"
