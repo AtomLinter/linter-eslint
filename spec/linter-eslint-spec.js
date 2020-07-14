@@ -119,8 +119,8 @@ describe('The eslint provider for Linter', () => {
     atom.config.set('linter-eslint.advanced.disableEslintIgnore', true)
 
     // Activate activation hook
-    atom.packages.triggerDeferredActivationHooks();
-    atom.packages.triggerActivationHook('core:loaded-shell-environment');
+    atom.packages.triggerDeferredActivationHooks()
+    atom.packages.triggerActivationHook('core:loaded-shell-environment')
 
     // Activate the JavaScript language so Atom knows what the files are
     await atom.packages.activatePackage('language-javascript')
