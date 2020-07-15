@@ -60,7 +60,7 @@ export async function sendJob(config) {
   // NOTE: Jobs _must_ have a unique ID as they are completely async and results
   // can arrive back in any order.
   // eslint-disable-next-line no-param-reassign
-  config.emitKey = cryptoRandomString(10)
+  config.emitKey = cryptoRandomString({ length: 10 })
 
   return new Promise((resolve, reject) => {
     // All worker errors are caught and re-emitted along with their associated
