@@ -215,6 +215,7 @@
     "core:loaded-shell-environment"
   ],
   "eslintConfig": {
+    "root": true,
     "rules": {
       "no-console": "off",
       "semi": [
@@ -249,7 +250,7 @@
     },
     "extends": "airbnb-base",
     "globals": {
-      "atom": "true"
+      "atom": "readonly"
     },
     "env": {
       "node": true,
