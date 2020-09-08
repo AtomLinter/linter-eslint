@@ -139,6 +139,17 @@ export function getConfigPath(fileDir) {
 }
 
 export function getRelativePath(fileDir, filePath, config, projectPath) {
+  // If a current working directory indicator file is specified, try to find it to determine cwd
+  if (config.advanced.cwdIndicatorFile) {
+    const indicatorFile = findCached(fileDir, config.advanced.cwdIndicatorFile)
+
+    if (indicatorFile) {
+      const indicatorDir = Path.dirname(indicatorFile)
+      process.chdir(indicatorDir)
+      return Path.relative(indicatorDir, filePath)
+    }
+  }
+
   const ignoreFile = config.advanced.disableEslintIgnore ? null : findCached(fileDir, '.eslintignore')
 
   // If we can find an .eslintignore file, we can set cwd there
