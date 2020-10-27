@@ -65,6 +65,7 @@
     },
     "global": {
       "type": "object",
+      "collapsed": true,
       "order": 4,
       "title": "Global ESLint",
       "properties": {
