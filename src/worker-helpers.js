@@ -47,10 +47,10 @@ function isDirectory(dirPath) {
   return isDir
 }
 
-export function findESLintDirectory(modulesDir, config, projectPath, fallback = false) {
+export function findESLintDirectory(modulesDir, config, projectPath) {
   let eslintDir = null
   let locationType = null
-  if (config.global.useGlobalEslint && !fallback) {
+  if (config.global.useGlobalEslint) {
     locationType = 'global'
     const configGlobal = cleanPath(config.global.globalNodePath)
     const prefixPath = configGlobal || getNodePrefixPath()
@@ -79,8 +79,7 @@ export function findESLintDirectory(modulesDir, config, projectPath, fallback = 
   }
 
   if (config.global.useGlobalEslint) {
-    console.warn('ESLint not found, please ensure the global Node path is set correctly. \n Using other methods to find Eslint...')
-    findESLintDirectory(modulesDir, config, projectPath, true)
+    throw new Error('ESLint not found, please ensure the global Node path is set correctly.')
   }
 
   return {
