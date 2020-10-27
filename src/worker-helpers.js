@@ -79,7 +79,7 @@ export function findESLintDirectory(modulesDir, config, projectPath) {
   }
 
   if (config.global.useGlobalEslint) {
-    throw new Error('ESLint not found, please ensure the global Node path is set correctly.')
+    throw new Error('Global ESLint is not found, please ensure the global Node path is set correctly. If you wanted to use a local installation of Eslint, disable Global Eslint option in the linter-eslint config.')
   }
 
   return {
