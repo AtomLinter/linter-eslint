@@ -71,7 +71,7 @@
       "properties": {
         "useGlobalEslint": {
           "title": "Use global ESLint installation",
-          "description": "Make sure you have it in your $PATH",
+          "description": "Make sure you have it in your $PATH. ⚠️ Using the global ESLint install is heavily discouraged. If the installation is not found, linter-eslint will not work.",
           "type": "boolean",
           "default": false,
           "order": 1
