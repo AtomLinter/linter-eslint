@@ -1,3 +1,11 @@
+## [8.5.7](https://github.com/AtomLinter/linter-eslint/compare/v8.5.6...v8.5.7) (2021-03-14)
+
+
+### Bug Fixes
+
+* expected a `length` to be non-negative error ([650f973](https://github.com/AtomLinter/linter-eslint/commit/650f973ba69cc19f899327dd10d4b5baf229ee0a))
+* update crypto-random-string ([2b488eb](https://github.com/AtomLinter/linter-eslint/commit/2b488eb256a9b5743bafea203702be3e21ed3048))
+
 ## [8.5.6](https://github.com/AtomLinter/linter-eslint/compare/v8.5.5...v8.5.6) (2021-03-14)
 
 
