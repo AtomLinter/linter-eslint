@@ -297,12 +297,19 @@ export async function processESLintMessages(messages, textEditor, showRule) {
       ret.url = rules.getRuleUrl(ruleId)
     }
 
+    // HACK for https://github.com/AtomLinter/linter-eslint/issues/1249
+    let fixLineEnding = false
+    if (ruleId === 'prettier/prettier' && (message === 'Delete `␍`')) {
+      fixLineEnding = true
+    }
+
     let range
     try {
       if (eslintFullRange) {
-        const buffer = textEditor.getBuffer()
-        throwIfInvalidPoint(buffer, msgLine, msgCol)
-        throwIfInvalidPoint(buffer, msgEndLine, msgEndCol)
+        if (!fixLineEnding) {
+          throwIfInvalidPoint(textBuffer, msgLine, msgCol)
+          throwIfInvalidPoint(textBuffer, msgEndLine, msgEndCol)
+        }
         range = [[msgLine, msgCol], [msgEndLine, msgEndCol]]
       } else {
         range = generateRange(textEditor, msgLine, msgCol)
