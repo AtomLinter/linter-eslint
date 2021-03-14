@@ -159,8 +159,11 @@
     }
   },
   "scripts": {
-    "test": "apm test",
-    "lint": "eslint ."
+    "format": "prettier --write .",
+    "test.format": "prettier . --check",
+    "lint": "eslint . --fix",
+    "test.lint": "eslint .",
+    "test": "apm test"
   },
   "dependencies": {
     "atom-babel6-transpiler": "1.2.0",
