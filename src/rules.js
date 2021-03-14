@@ -6,22 +6,23 @@ import ruleURI from 'eslint-rule-documentation'
 export default class Rules {
   /**
    * Instantiates a Rules object, optionally with an existing list of rules
-   * @param {Array<Array<string, any>} newRules Array of Arrays of the rule and properties
+   * @param {Array<Array<string, any> | undefined} newRules Array of Arrays of the rule and properties
    */
   constructor(newRules) {
+    // TODO we should not accept undefined newRules.
     this.replaceRules(newRules)
   }
 
   /**
    * Process the updated rules into the local Map and call further update functions
-   * @param  {Array<Array<string, any>} newRules Array of Arrays of the rule and properties
+   * @param  {Array<Array<string, any> | undefined} newRules Array of Arrays of the rule and properties
    */
   replaceRules(newRules) {
     if (this.rules !== undefined) {
       this.rules.clear()
     }
 
-    /** @type {Map<string, any>} */
+    /** @type {Map<string, any>} if newRules is {undefined} an empty Map is created */
     this.rules = new Map(newRules)
   }
 
