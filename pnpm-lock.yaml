@@ -4,7 +4,7 @@ dependencies:
   atom-package-deps: 5.1.0
   babel-preset-env: 1.7.0
   consistent-path: 2.0.3
-  crypto-random-string: 2.0.0
+  crypto-random-string: 3.3.1
   eslint: 4.19.1
   eslint-rule-documentation: 1.0.23
   fs-plus: 3.1.1
@@ -1613,10 +1613,19 @@ packages:
     resolution:
       integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==
   /crypto-random-string/2.0.0:
+    dev: true
     engines:
       node: '>=8'
     resolution:
       integrity: sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
+  /crypto-random-string/3.3.1:
+    dependencies:
+      type-fest: 0.8.1
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-5j88ECEn6h17UePrLi6pn1JcLtAiANa3KExyr9y9Z5vo2mv56Gh3I4Aja/B9P9uyMwyxNHAHWv+nE72f30T5Dg==
   /currently-unhandled/0.4.1:
     dependencies:
       array-find-index: 1.0.2
@@ -4573,7 +4582,6 @@ packages:
     resolution:
       integrity: sha512-q+MB8nYR1KDLrgr4G5yemftpMC7/QLqVndBmEEdqzmNj5dcFOO4Oo8qlwZE3ULT3+Zim1F8Kq4cBnikNhlCMlg==
   /type-fest/0.8.1:
-    dev: true
     engines:
       node: '>=8'
     resolution:
@@ -4786,7 +4794,7 @@ specifiers:
   atom-package-deps: 5.1.0
   babel-preset-env: 1.7.0
   consistent-path: 2.0.3
-  crypto-random-string: 2.0.0
+  crypto-random-string: 3.3.1
   eslint: 4.19.1
   eslint-config-airbnb-base: 13.2.0
   eslint-plugin-import: 2.20.1
