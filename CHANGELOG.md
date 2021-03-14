@@ -1,3 +1,10 @@
+## [8.6.2](https://github.com/AtomLinter/linter-eslint/compare/v8.6.1...v8.6.2) (2021-03-14)
+
+
+### Bug Fixes
+
+* skip checking for the valid range if it is a line-ending issue ([7262ac6](https://github.com/AtomLinter/linter-eslint/commit/7262ac697c5b671f36890a176c8bef71ebe1ee3e))
+
 ## [8.6.1](https://github.com/AtomLinter/linter-eslint/compare/v8.6.0...v8.6.1) (2021-03-14)
 
 
