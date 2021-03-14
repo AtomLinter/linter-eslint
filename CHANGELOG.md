@@ -1,3 +1,10 @@
+## [8.5.9](https://github.com/AtomLinter/linter-eslint/compare/v8.5.8...v8.5.9) (2021-03-14)
+
+
+### Bug Fixes
+
+* require an up to date linter ([c4462de](https://github.com/AtomLinter/linter-eslint/commit/c4462dedade0b12948943101094bd8b489242b75))
+
 ## [8.5.8](https://github.com/AtomLinter/linter-eslint/compare/v8.5.7...v8.5.8) (2021-03-14)
 
 
