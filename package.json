@@ -197,6 +197,9 @@
       }
     }
   },
+  "activationHooks": [
+    "core:loaded-shell-environment"
+  ],
   "eslintConfig": {
     "rules": {
       "no-console": "off",
