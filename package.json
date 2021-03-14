@@ -185,8 +185,8 @@
     "@commitlint/travis-cli": "8.3.5",
     "@semantic-release/apm-config": "8.0.0",
     "eslint-config-airbnb-base": "13.2.0",
-    "eslint-plugin-import": "2.20.1",
-    "husky": "4.2.3",
+    "eslint-plugin-import": "2.22.1",
+    "husky": "4.3.8",
     "jasmine-fix": "1.3.1",
     "rimraf": "3.0.2",
     "semantic-release": "17.0.4"
