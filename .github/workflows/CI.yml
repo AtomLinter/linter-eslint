@@ -41,7 +41,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Commit lint ✨
-        uses: wagoid/commitlint-github-action@v2
+        uses: wagoid/commitlint-github-action@v3
 
       - uses: UziTech/action-setup-atom@v1
       - name: Setup PNPM
