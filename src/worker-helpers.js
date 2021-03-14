@@ -6,7 +6,6 @@ import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
 import { findCached } from 'atom-linter'
 import getPath from 'consistent-path'
-import os from 'os'
 
 const Cache = {
   ESLINT_LOCAL_PATH: Path.normalize(Path.join(__dirname, '..', 'node_modules', 'eslint')),
@@ -21,7 +20,7 @@ const Cache = {
  * @return {string}      The cleaned path
  */
 const cleanPath = path => (path ? resolveEnv(fs.normalize(path)) : '')
-const rootPath = (os.platform === 'win32') ? process.cwd().split(Path.sep)[0] : '/'
+const rootPath = (process.platform === 'win32') ? process.cwd().split(Path.sep)[0] : '/'
 
 export function getNodePrefixPath() {
   if (Cache.NODE_PREFIX_PATH === null) {
