@@ -1,4 +1,5 @@
 {
+  "schedule": ["every weekend"],
   "labels": ["dependencies"],
   "packageRules": [
     {
