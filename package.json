@@ -169,7 +169,7 @@
   "dependencies": {
     "atom-babel6-transpiler": "1.2.0",
     "atom-linter": "10.0.0",
-    "atom-package-deps": "5.1.0",
+    "atom-package-deps": "7.2.2",
     "babel-preset-env": "1.7.0",
     "consistent-path": "2.0.3",
     "crypto-random-string": "3.3.1",
@@ -186,7 +186,10 @@
     "rimraf": "3.0.2"
   },
   "package-deps": [
-    "linter:2.0.0"
+    {
+      "name": "linter",
+      "minimumVersion": "2.0.0"
+    }
   ],
   "providedServices": {
     "linter": {
