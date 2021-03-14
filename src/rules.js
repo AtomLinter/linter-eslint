@@ -1,15 +1,12 @@
 import ruleURI from 'eslint-rule-documentation'
 
-// Private properties
-const rules = Symbol('rules')
-
 /**
  * Stores a list of rules from ESLint
  */
 export default class Rules {
   /**
    * Instantiates a Rules object, optionally with an existing list of rules
-   * @param {Array} newRules Array of Arrays of the rule and properties
+   * @param {Array<Array<string, any>} newRules Array of Arrays of the rule and properties
    */
   constructor(newRules) {
     this.replaceRules(newRules)
@@ -17,34 +14,41 @@ export default class Rules {
 
   /**
    * Process the updated rules into the local Map and call further update functions
-   * @param  {Array} newRules Array of Arrays of the rule and properties
+   * @param  {Array<Array<string, any>} newRules Array of Arrays of the rule and properties
    */
   replaceRules(newRules) {
-    this[rules] = new Map(newRules)
+    if (this.rules !== undefined) {
+      this.rules.clear()
+    }
+
+    /** @type {Map<string, any>} */
+    this.rules = new Map(newRules)
   }
 
   /**
    * [getFixableRules description]
-   * @return {Array} The ruleIds of the currently known fixable rules
+   * @return {Array<string>} The ruleIds of the currently known fixable rules
    */
   getFixableRules() {
-    return Array.from(this[rules]).reduce((fixable, [rule, props]) => {
-      if (props && props.meta && props.meta.fixable) {
-        return [...fixable, rule]
+    const ruleIds = []
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [ruleId, ruleProps] of this.rules) {
+      if (ruleProps && ruleProps.meta && ruleProps.meta.fixable) {
+        ruleIds.push(ruleId)
       }
-      return fixable
-    }, [])
+    }
+    return ruleIds
   }
 
   /**
    * Get the URL of the documentation for a rule, either from the rule's own
    * metadata, from eslint-rule-documentation's known rules, or the fallback URL
    * on how to add it to eslint-rule-documentation.
-   * @param  {String} ruleId The rule ID to get the documentation URL for
-   * @return {String}        URL of the rule documentation
+   * @param  {string} ruleId The rule ID to get the documentation URL for
+   * @return {string}        URL of the rule documentation
    */
   getRuleUrl(ruleId) {
-    const props = this[rules].get(ruleId)
+    const props = this.rules.get(ruleId)
     if (props && props.meta && props.meta.docs && props.meta.docs.url) {
       // The rule has a documentation URL specified in its metadata
       return props.meta.docs.url
@@ -57,9 +61,9 @@ export default class Rules {
 
   /**
    * Return the known rules.
-   * @return {Map} The currently known rules
+   * @return {Map<string, any>} The currently known rules
    */
   getRules() {
-    return new Map(this[rules])
+    return this.rules
   }
 }
