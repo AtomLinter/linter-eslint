@@ -27,6 +27,11 @@ installed
 for you. If you are using an alternative `linter-*` consumer, 
 the `linter` package can be disabled.
 
+If you wish to lint files in JavaScript-derivative languages (like Typescript,
+Flow) with ESLint, you must add the scope name for that grammar to the
+`List of scopes to run ESLint on` option in `linter-eslint` Settings. For
+example, to lint TypeScript files, add `source.ts` to the list.
+
 ## Use with plugins
 
 You have two options:
