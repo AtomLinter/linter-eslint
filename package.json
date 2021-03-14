@@ -1,7 +1,7 @@
 {
   "name": "linter-eslint",
   "main": "./src/main.js",
-  "version": "8.5.5",
+  "version": "8.5.7",
   "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
@@ -65,12 +65,13 @@
     },
     "global": {
       "type": "object",
+      "collapsed": true,
       "order": 4,
       "title": "Global ESLint",
       "properties": {
         "useGlobalEslint": {
           "title": "Use global ESLint installation",
-          "description": "Make sure you have it in your $PATH",
+          "description": "Make sure you have it in your $PATH. ⚠️ Using the global ESLint install is heavily discouraged. If the installation is not found, linter-eslint will not work.",
           "type": "boolean",
           "default": false,
           "order": 1
@@ -159,8 +160,11 @@
     }
   },
   "scripts": {
-    "test": "apm test",
-    "lint": "eslint ."
+    "format": "prettier --write .",
+    "test.format": "prettier . --check",
+    "lint": "eslint . --fix",
+    "test.lint": "eslint .",
+    "test": "apm test"
   },
   "dependencies": {
     "atom-babel6-transpiler": "1.2.0",
@@ -168,7 +172,7 @@
     "atom-package-deps": "5.1.0",
     "babel-preset-env": "1.7.0",
     "consistent-path": "2.0.3",
-    "crypto-random-string": "2.0.0",
+    "crypto-random-string": "3.3.1",
     "eslint": "4.19.1",
     "eslint-rule-documentation": "1.0.23",
     "fs-plus": "3.1.1",
@@ -197,6 +201,9 @@
       }
     }
   },
+  "activationHooks": [
+    "core:loaded-shell-environment"
+  ],
   "eslintConfig": {
     "rules": {
       "no-console": "off",

@@ -1,6 +1,6 @@
 # linter-eslint
 
-[![Build Status](https://travis-ci.org/AtomLinter/linter-eslint.svg)](https://travis-ci.org/AtomLinter/linter-eslint)
+[![CI](https://github.com/AtomLinter/linter-eslint/actions/workflows/CI.yml/badge.svg)](https://github.com/AtomLinter/linter-eslint/actions/workflows/CI.yml)
 [![Dependency Status](https://david-dm.org/AtomLinter/linter-eslint.svg)](https://david-dm.org/AtomLinter/linter-eslint)
 
 This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides

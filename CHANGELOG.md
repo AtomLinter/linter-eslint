@@ -1,3 +1,28 @@
+## [8.5.7](https://github.com/AtomLinter/linter-eslint/compare/v8.5.6...v8.5.7) (2021-03-14)
+
+
+### Bug Fixes
+
+* expected a `length` to be non-negative error ([650f973](https://github.com/AtomLinter/linter-eslint/commit/650f973ba69cc19f899327dd10d4b5baf229ee0a))
+* update crypto-random-string ([2b488eb](https://github.com/AtomLinter/linter-eslint/commit/2b488eb256a9b5743bafea203702be3e21ed3048))
+
+## [8.5.6](https://github.com/AtomLinter/linter-eslint/compare/v8.5.5...v8.5.6) (2021-03-14)
+
+
+### Bug Fixes
+
+* add activation hook ([d70a462](https://github.com/AtomLinter/linter-eslint/commit/d70a46236bba6b8a9b7c35d9376a98e5f0db6328))
+* add fallback for the global eslint ([d1babbb](https://github.com/AtomLinter/linter-eslint/commit/d1babbbc4c63fd4b0b962466931c6dc37496e4ff))
+* add warning for using Global ESLint option ([2f98b0f](https://github.com/AtomLinter/linter-eslint/commit/2f98b0f5280362f9aa014607b9ecb4542035b214))
+* fallback to other methods when global Eslint is not found ([4dd6500](https://github.com/AtomLinter/linter-eslint/commit/4dd65004eee476e814bbf4cfd126580d2aa5aed8))
+* improve Global Eslint message ([2be0935](https://github.com/AtomLinter/linter-eslint/commit/2be09357ae4aa1f87c37bb8224c743cda6c3c454))
+* make Global Eslint config collapsed ([265557d](https://github.com/AtomLinter/linter-eslint/commit/265557dd14b2d6848dcdd2f87878af6971b272d2))
+
+
+### Reverts
+
+* Revert "fix: fallback to other methods when global Eslint is not found" ([c6494e0](https://github.com/AtomLinter/linter-eslint/commit/c6494e05dec943d875ca52dcca36eb4621ced0b2))
+
 ## [8.5.5](https://github.com/AtomLinter/linter-eslint/compare/v8.5.4...v8.5.5) (2019-04-22)
 
 
