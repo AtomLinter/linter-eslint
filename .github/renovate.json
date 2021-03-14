@@ -5,12 +5,15 @@
     {
       "matchDepTypes": ["devDependencies"],
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest", "lockFileMaintenance", "rollback", "bump"],
-      "groupName": "devDependencies"
+      "groupName": "devDependencies",
+      "semanticCommitType": "chore",
+      "automerge": true
     },
     {
       "matchDepTypes": ["dependencies"],
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest", "lockFileMaintenance", "rollback", "bump"],
-      "groupName": "dependencies"
+      "groupName": "dependencies",
+      "semanticCommitType": "fix"
     }
   ]
 }
