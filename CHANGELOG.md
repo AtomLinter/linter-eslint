@@ -1,3 +1,10 @@
+## [8.6.1](https://github.com/AtomLinter/linter-eslint/compare/v8.6.0...v8.6.1) (2021-03-14)
+
+
+### Bug Fixes
+
+* fix stackoverflow + push fallbackForGlobal error ([9a142ae](https://github.com/AtomLinter/linter-eslint/commit/9a142ae8c3600d842a3c979fade5d4b4f2d67cf1))
+
 # [8.6.0](https://github.com/AtomLinter/linter-eslint/compare/v8.5.9...v8.6.0) (2021-03-14)
 
 
