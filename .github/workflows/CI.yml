@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           apm install
-          ./node_modules/.bin/atom-package-deps .
+          # ./node_modules/.bin/atom-package-deps .
 
       - name: Run tests 👩🏾‍💻
         run: npm run test
@@ -52,8 +52,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Format ✨
-        run: pnpm test.format
+      # - name: Format ✨
+      #   run: pnpm test.format
 
       - name: Lint ✨
         run: pnpm test.lint
