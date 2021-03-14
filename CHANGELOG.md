@@ -1,3 +1,10 @@
+# [8.6.0](https://github.com/AtomLinter/linter-eslint/compare/v8.5.9...v8.6.0) (2021-03-14)
+
+
+### Features
+
+* use getConfigForFile to handle configurations ([fe8adf0](https://github.com/AtomLinter/linter-eslint/commit/fe8adf0b1d7f6fa3b40b725725319c22d5657348))
+
 ## [8.5.9](https://github.com/AtomLinter/linter-eslint/compare/v8.5.8...v8.5.9) (2021-03-14)
 
 
