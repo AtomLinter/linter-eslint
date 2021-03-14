@@ -218,6 +218,7 @@
     "root": true,
     "rules": {
       "no-console": "off",
+      "max-len": [1, { "code": 130 }],
       "semi": [
         "error",
         "never"
