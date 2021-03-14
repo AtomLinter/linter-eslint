@@ -127,8 +127,9 @@ describe('Worker Helpers', () => {
       })
       spyOn(console, 'error')
       Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
-      expect(console.error).toHaveBeenCalledWith(`Global ESLint is not found, please ensure the global Node path is set correctly.
-    If you wanted to use a local installation of Eslint, disable Global Eslint option in the linter-eslint config.`)
+      expect(console.error).toHaveBeenCalledWith(`Global ESLint is not found, falling back to other Eslint installations...
+        Please ensure the global Node path is set correctly.
+        If you wanted to use a local installation of Eslint, disable Global Eslint option in the linter-eslint config.`)
     })
 
     it('tries to find a local eslint with nested node_modules', () => {

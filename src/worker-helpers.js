@@ -47,10 +47,12 @@ function isDirectory(dirPath) {
   return isDir
 }
 
-export function findESLintDirectory(modulesDir, config, projectPath, fallback = false) {
+let fallbackForGlobalErrorThrown = false
+
+export function findESLintDirectory(modulesDir, config, projectPath, fallbackForGlobal = false) {
   let eslintDir = null
   let locationType = null
-  if (config.global.useGlobalEslint && !fallback) {
+  if (config.global.useGlobalEslint && !fallbackForGlobal) {
     locationType = 'global'
     const configGlobal = cleanPath(config.global.globalNodePath)
     const prefixPath = configGlobal || getNodePrefixPath()
@@ -78,11 +80,15 @@ export function findESLintDirectory(modulesDir, config, projectPath, fallback = 
     }
   }
 
-  if (config.global.useGlobalEslint) {
-    // TODO push the error to the user
-    console.error(`Global ESLint is not found, please ensure the global Node path is set correctly.
-    If you wanted to use a local installation of Eslint, disable Global Eslint option in the linter-eslint config.`)
-    findESLintDirectory(modulesDir, config, projectPath, true)
+  if (config.global.useGlobalEslint && !fallbackForGlobal) {
+    if (!fallbackForGlobalErrorThrown) {
+      // Throw the error only once to prevent performance issues
+      fallbackForGlobalErrorThrown = true
+      console.error(`Global ESLint is not found, falling back to other Eslint installations...
+        Please ensure the global Node path is set correctly.
+        If you wanted to use a local installation of Eslint, disable Global Eslint option in the linter-eslint config.`)
+    }
+    return findESLintDirectory(modulesDir, config, projectPath, true)
   }
 
   return {
