@@ -157,10 +157,13 @@ export function getESLintInstance(fileDir, config, projectPath) {
  * @param {import("eslint")} eslint
  * @param {string} filePath
  */
-export function getConfigForFile(eslint, filePath) {
-  const cli = new eslint.CLIEngine()
+export async function getConfigForFile(eslint, filePath) {
+  const configFinder = ('ESLint' in eslint && 'calculateConfigForFile' in eslint.ESLint)
+    ? new eslint.ESLint().calculateConfigForFile
+    // Support old Eslint by falling back to cliEngine
+    : new eslint.CLIEngine().getConfigForFile
   try {
-    return cli.getConfigForFile(filePath)
+    return configFinder(filePath)
   } catch (e) {
     // No configuration was found
     return null

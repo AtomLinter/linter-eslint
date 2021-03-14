@@ -143,9 +143,9 @@ describe('Worker Helpers', () => {
     const eslint = require('eslint')
     const fixtureFile = getFixturesPath(Path.join('configs', 'js', 'foo.js'))
 
-    it('uses ESLint to determine the configuration', () => {
+    it('uses ESLint to determine the configuration', async () => {
       const filePath = fixtureFile
-      const foundConfig = Helpers.getConfigForFile(eslint, filePath)
+      const foundConfig = await Helpers.getConfigForFile(eslint, filePath)
       expect(foundConfig.rules.semi).toEqual([2, 'never'])
     })
 
@@ -154,7 +154,7 @@ describe('Worker Helpers', () => {
       const filePath = await copyFileToTempDir(fixtureFile)
       const tempDir = Path.dirname(filePath)
 
-      const foundConfig = Helpers.getConfigForFile(eslint, filePath)
+      const foundConfig = await Helpers.getConfigForFile(eslint, filePath)
       expect(foundConfig).toBeNull()
 
       // Remove the temporary directory

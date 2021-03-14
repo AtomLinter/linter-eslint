@@ -34,7 +34,7 @@ function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
 }
 
 module.exports = async () => {
-  process.on('message', (jobConfig) => {
+  process.on('message', async (jobConfig) => {
     // We catch all worker errors so that we can create a separate error emitter
     // for each emitKey, rather than adding multiple listeners for `task:error`
     const {
@@ -48,7 +48,7 @@ module.exports = async () => {
       const fileDir = Path.dirname(filePath)
       const eslint = Helpers.getESLintInstance(fileDir, config, projectPath)
 
-      const fileConfig = Helpers.getConfigForFile(eslint, filePath)
+      const fileConfig = await Helpers.getConfigForFile(eslint, filePath)
       if (fileConfig === null && config.disabling.disableWhenNoEslintConfig) {
         emit(emitKey, { messages: [] })
         return
