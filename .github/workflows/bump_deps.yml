@@ -32,8 +32,8 @@ jobs:
       - uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ steps.generate-token.outputs.token }}
-          commit-message: "chore: Update Dependencies"
-          title: "fix: Update Dependencies"
+          commit-message: "fix: update dependencies"
+          title: "fix: update dependencies"
           labels: Dependencies
           branch: "Bump_Dependencies"
 
@@ -64,7 +64,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ steps.generate-token.outputs.token }}
-          commit-message: "chore: Update devDependencies"
-          title: "chore: Update devDependencies"
+          commit-message: "chore: update devDependencies"
+          title: "chore: update devDependencies"
           labels: Dependencies
           branch: "Bump_devDependencies"
