@@ -1,7 +1,7 @@
 dependencies:
   atom-babel6-transpiler: 1.2.0
   atom-linter: 10.0.0
-  atom-package-deps: 5.1.0
+  atom-package-deps: 7.2.2
   babel-preset-env: 1.7.0
   consistent-path: 2.0.3
   crypto-random-string: 3.3.1
@@ -133,13 +133,11 @@ packages:
     dev: false
     resolution:
       integrity: sha1-0nu3Tl+PCKdKQL6ynuGlDZdUPIk=
-  /atom-package-deps/5.1.0:
-    dependencies:
-      sb-fs: 4.0.0
-      semver: 6.3.0
+  /atom-package-deps/7.2.2:
     dev: false
+    hasBin: true
     resolution:
-      integrity: sha512-RGktH8NSFBJ5rdwuta3M7DbFdDr1EgrXo7uW7DQR/+lWJZcrfH2yxobnSdb/g1JM1tTvLyRYmZYOeRJGqQ9UGw==
+      integrity: sha512-xV4l1Ll987zluBjMiYGtDbZbdM5PF/hOECgaI2mv2+dNzbuugd2M+A2liw1JUenuGrngGw/wcpPqXpAVMGFeDw==
   /babel-code-frame/6.26.0:
     dependencies:
       chalk: 1.1.3
@@ -1332,10 +1330,6 @@ packages:
       node: '>= 0.4'
     resolution:
       integrity: sha512-OwijhaRSgqvhm/0ZdAcXNZt9lYdKFpcRDT5ULUuYXPoT794UNOdU+gpT6Rzo7b4V2HUl/op6GqY894AZwv9faQ==
-  /is-utf8/0.2.1:
-    dev: false
-    resolution:
-      integrity: sha1-Sw2hRCEE0bM2NA6AeX6GXPOffXI=
   /isarray/1.0.0:
     resolution:
       integrity: sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=
@@ -1847,14 +1841,6 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha1-RnR/DfFiYmwW6/D+pCJFrRqoWco=
-  /sb-fs/4.0.0:
-    dependencies:
-      strip-bom-buf: 1.0.0
-    dev: false
-    engines:
-      node: '>= 8'
-    resolution:
-      integrity: sha512-UjjIHC4uahPWvKYqgknvFCCJ11S0oDahz+nsmyTCAmARKto31aoE+Lu7GGGK0nogengJEKGzFdh46ho5+IL88Q==
   /sb-memoize/1.0.2:
     deprecated: No longer maintained - Use lodash probably
     dev: false
@@ -1875,11 +1861,6 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
-  /semver/6.3.0:
-    dev: false
-    hasBin: true
-    resolution:
-      integrity: sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
   /shebang-command/1.2.0:
     dependencies:
       shebang-regex: 1.0.0
@@ -1995,14 +1976,6 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha1-qEeQIusaw2iocTibY1JixQXuNo8=
-  /strip-bom-buf/1.0.0:
-    dependencies:
-      is-utf8: 0.2.1
-    dev: false
-    engines:
-      node: '>=4'
-    resolution:
-      integrity: sha1-HLRar1dTD0yvhsf3UXnSyaUd1XI=
   /strip-bom/3.0.0:
     dev: true
     engines:
@@ -2165,7 +2138,7 @@ packages:
 specifiers:
   atom-babel6-transpiler: 1.2.0
   atom-linter: 10.0.0
-  atom-package-deps: 5.1.0
+  atom-package-deps: 7.2.2
   babel-preset-env: 1.7.0
   consistent-path: 2.0.3
   crypto-random-string: 3.3.1
