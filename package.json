@@ -188,7 +188,7 @@
   "package-deps": [
     {
       "name": "linter",
-      "minimumVersion": "2.0.0"
+      "minimumVersion": "3.3.0"
     }
   ],
   "providedServices": {
