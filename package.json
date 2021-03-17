@@ -13,7 +13,7 @@
       "title": "List of scopes to run ESLint on, run `Editor: Log Cursor Scope` to determine the scopes for a file.",
       "type": "array",
       "default": [
-        "source.jst",
+        "source.js",
         "source.jsx",
         "source.js.jsx",
         "source.flow",
