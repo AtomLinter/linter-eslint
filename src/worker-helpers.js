@@ -131,13 +131,13 @@ export function getConfigForFile(eslint, filePath) {
   try {
     return cli.getConfigForFile(filePath)
   } catch (e) {
-    // No configuration was found
-    return null
+    console.error('No configuration was found by eslint.CLIEngine, falling back to linter-eslint method.', e)
+    // eslint-disable-next-line no-use-before-define
+    return getConfigPath(Path.dirname(filePath))
   }
 }
 
-// Unused function
-export function getConfigPath(fileDir) {
+function getConfigPath(fileDir) {
   const configFile = findCached(fileDir, [
     '.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc', 'package.json'
   ])
