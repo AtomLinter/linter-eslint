@@ -77,8 +77,8 @@
           "order": 1
         },
         "eslintrcPath": {
-          "title": ".eslintrc Absolute Path",
-          "description": "The absolute path to eslint config file that is used when there's no config file in project",
+          "title": ".eslintrc Path",
+          "description": "It will only be used when there's no config file in project",
           "type": "string",
           "default": "",
           "order": 4
