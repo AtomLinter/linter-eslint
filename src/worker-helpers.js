@@ -139,7 +139,7 @@ export function getConfigForFile(eslint, filePath) {
 
 function getConfigPath(fileDir) {
   const configFile = findCached(fileDir, [
-    '.eslintrc.js', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc', 'package.json'
+    '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.mjs', '.eslintrc.yaml', '.eslintrc.yml', '.eslintrc.json', '.eslintrc', 'package.json'
   ])
   if (configFile) {
     if (Path.basename(configFile) === 'package.json') {
