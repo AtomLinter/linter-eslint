@@ -78,7 +78,7 @@
         },
         "eslintrcPath": {
           "title": ".eslintrc Path",
-          "description": "It will only be used when there's no config file in project",
+          "description": "It will only be used when there's no config file in project (if using a relative path, the file should be present in all your projects).",
           "type": "string",
           "default": "",
           "order": 4
