@@ -12,32 +12,25 @@ import { processESLintMessages } from '../dist/helpers'
 
 const fixturesDir = path.join(__dirname, 'fixtures')
 
-const fixtures = {
-  good: ['files', 'good.js'],
-  bad: ['files', 'bad.js'],
-  badInline: ['files', 'badInline.js'],
-  empty: ['files', 'empty.js'],
-  fix: ['files', 'fix.js'],
-  cache: ['files', '.eslintcache'],
-  config: ['configs', '.eslintrc.yml'],
-  ignored: ['eslintignore', 'ignored.js'],
-  endRange: ['end-range', 'no-unreachable.js'],
-  badCache: ['badCache'],
-  modifiedIgnore: ['modified-ignore-rule', 'foo.js'],
-  modifiedIgnoreSpace: ['modified-ignore-rule', 'foo-space.js'],
-  importing: ['import-resolution', 'nested', 'importing.js'],
-  badImport: ['import-resolution', 'nested', 'badImport.js'],
-  fixablePlugin: ['plugin-import', 'life.js'],
-  eslintignoreDir: ['eslintignore'],
-  eslintIgnoreKeyDir: ['configs', 'eslintignorekey']
+const paths = {
+  good: path.join(fixturesDir, 'files', 'good.js'),
+  bad: path.join(fixturesDir, 'files', 'bad.js'),
+  badInline: path.join(fixturesDir, 'files', 'badInline.js'),
+  empty: path.join(fixturesDir, 'files', 'empty.js'),
+  fix: path.join(fixturesDir, 'files', 'fix.js'),
+  cache: path.join(fixturesDir, 'files', '.eslintcache'),
+  config: path.join(fixturesDir, 'configs', '.eslintrc.yml'),
+  ignored: path.join(fixturesDir, 'eslintignore', 'ignored.js'),
+  endRange: path.join(fixturesDir, 'end-range', 'no-unreachable.js'),
+  badCache: path.join(fixturesDir, 'badCache'),
+  modifiedIgnore: path.join(fixturesDir, 'modified-ignore-rule', 'foo.js'),
+  modifiedIgnoreSpace: path.join(fixturesDir, 'modified-ignore-rule', 'foo-space.js'),
+  importing: path.join(fixturesDir, 'import-resolution', 'nested', 'importing.js'),
+  badImport: path.join(fixturesDir, 'import-resolution', 'nested', 'badImport.js'),
+  fixablePlugin: path.join(fixturesDir, 'plugin-import', 'life.js'),
+  eslintignoreDir: path.join(fixturesDir, 'eslintignore'),
+  eslintIgnoreKeyDir: path.join(fixturesDir, 'configs', 'eslintignorekey')
 }
-
-const paths = Object.keys(fixtures)
-  .reduce((accumulator, fixture) => {
-    const acc = accumulator
-    acc[fixture] = path.join(fixturesDir, ...(fixtures[fixture]))
-    return acc
-  }, {})
 
 /**
  * Async helper to copy a file from one place to another on the filesystem.
