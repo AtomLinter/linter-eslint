@@ -1,3 +1,10 @@
+## [8.6.3](https://github.com/AtomLinter/linter-eslint/compare/v8.6.2...v8.6.3) (2021-03-23)
+
+
+### Bug Fixes
+
+* update atom-package-deps ([5db9722](https://github.com/AtomLinter/linter-eslint/commit/5db97221e16a8c1bafbd798650f0fd885d6d4a55))
+
 ## [8.6.2](https://github.com/AtomLinter/linter-eslint/compare/v8.6.1...v8.6.2) (2021-03-14)
 
 
