@@ -4,8 +4,6 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { tmpdir } from 'os'
 import rimraf from 'rimraf'
-// eslint-disable-next-line no-unused-vars
-import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix'
 import linterEslint from '../dist/main'
 
 import { processESLintMessages } from '../dist/helpers'
