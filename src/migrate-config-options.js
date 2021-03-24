@@ -1,5 +1,3 @@
-'use babel'
-
 /*
  * These migrations can take one of two forms, a direct move or a general function.
  *
@@ -103,4 +101,4 @@ function migrateConfigOptions(migrations = activeMigrations) {
   }
 }
 
-module.exports = migrateConfigOptions
+exports.migrateConfigOptions = migrateConfigOptions

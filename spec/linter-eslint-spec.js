@@ -6,9 +6,9 @@ import { tmpdir } from 'os'
 import rimraf from 'rimraf'
 // eslint-disable-next-line no-unused-vars
 import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix'
-import linterEslint from '../src/main'
+import linterEslint from '../dist/main'
 
-import { processESLintMessages } from '../src/helpers'
+import { processESLintMessages } from '../dist/helpers'
 
 const fixturesDir = path.join(__dirname, 'fixtures')
 

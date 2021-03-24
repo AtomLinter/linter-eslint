@@ -1,6 +1,6 @@
 {
   "name": "linter-eslint",
-  "main": "./src/main.js",
+  "main": "./dist/main.js",
   "version": "8.6.3",
   "description": "Lint JavaScript on the fly, using ESLint",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
@@ -163,11 +163,15 @@
     "format": "prettier --write .",
     "test.format": "prettier . --check",
     "lint": "eslint . --fix",
-    "test.lint": "eslint .",
-    "test": "apm test"
+    "test.lint": "npm run babel && eslint .",
+    "test": "npm run babel && atom --test spec",
+    "clean": "shx rm -rf dist",
+    "babel": "cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=false babel src --out-dir dist --delete-dir-on-start",
+    "dev": "npm run babel && cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=true rollup -c -w",
+    "build": "npm run babel && cross-env NODE_ENV=production cross-env BABEL_KEEP_MODULES=true rollup -c ",
+    "prepare": "npm run build"
   },
   "dependencies": {
-    "atom-babel6-transpiler": "1.2.0",
     "atom-linter": "10.0.0",
     "atom-package-deps": "7.2.3",
     "babel-preset-env": "1.7.0",
@@ -179,10 +183,18 @@
     "resolve-env": "1.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "babel-preset-atomic": "^3.0.3",
+    "build-commit": "^0.1.4",
+    "cross-env": "^7.0.3",
     "eslint-config-airbnb-base": "13.2.0",
     "eslint-plugin-import": "2.20.1",
     "jasmine-fix": "1.3.1",
-    "rimraf": "3.0.2"
+    "rimraf": "3.0.2",
+    "rollup": "^2.42.4",
+    "rollup-plugin-atomic": "^2.1.1",
+    "shx": "^0.3.3"
   },
   "package-deps": [
     {
@@ -241,31 +253,5 @@
       "node": true,
       "browser": true
     }
-  },
-  "atomTranspilers": [
-    {
-      "glob": "{src,spec}/*.js",
-      "transpiler": "atom-babel6-transpiler",
-      "options": {
-        "setBabelEnv": false,
-        "babel": {
-          "presets": [
-            [
-              "env",
-              {
-                "targets": {
-                  "node": "current"
-                }
-              }
-            ]
-          ],
-          "sourceMaps": "inline",
-          "babelrc": false
-        },
-        "cacheKeyFiles": [
-          "package.json"
-        ]
-      }
-    }
-  ]
+  }
 }

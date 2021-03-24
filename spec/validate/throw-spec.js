@@ -1,6 +1,6 @@
 'use babel'
 
-import throwIfFail from '../../src/validate/throw'
+import throwIfFail from '../../dist/validate/throw'
 
 describe('throwIfFail', () => {
   it('throws an error when given falsey value', () => {
