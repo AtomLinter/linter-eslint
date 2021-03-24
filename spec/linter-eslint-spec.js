@@ -224,7 +224,7 @@ describe('The eslint provider for Linter', () => {
     })
   })
 
-  describe('when a file is not specified in .eslintignore file', async () => {
+  describe('when a file is not specified in .eslintignore file', () => {
     it('will give warnings when linting the file', async () => {
       const tempPath = await copyFileToTempDir(path.join(paths.eslintignoreDir, 'ignored.js'))
       const tempDir = path.dirname(tempPath)
@@ -686,7 +686,7 @@ describe('The eslint provider for Linter', () => {
     })
   })
 
-  describe("registers an 'ESLint Fix' right click menu command", () => {
+  it("registers an 'ESLint Fix' right click menu command", () => {
     // NOTE: Reaches into the private data of the ContextMenuManager, there is
     // no public method to check this though so...
     expect(atom.contextMenu.itemSets.some(itemSet => (
