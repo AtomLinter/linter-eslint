@@ -1,5 +1,3 @@
-'use babel'
-
 /* global emit */
 
 import Path from 'path'

@@ -164,8 +164,9 @@
     "test.format": "prettier . --check",
     "lint": "eslint . --fix",
     "test.lint": "eslint .",
-    "test": "apm test",
+    "test": "npm run babel && atom --test spec",
     "clean": "shx rm -rf dist",
+    "babel": "cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=false babel src --out-dir dist --delete-dir-on-start",
     "dev": "npm run clean && cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=true rollup -c -w",
     "build": "npm run clean && cross-env NODE_ENV=production cross-env BABEL_KEEP_MODULES=true rollup -c ",
     "prepare": "npm run build"
@@ -182,6 +183,7 @@
     "resolve-env": "1.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.13.10",
     "@babel/core": "^7.13.10",
     "babel-preset-atomic": "^3.0.3",
     "build-commit": "^0.1.4",

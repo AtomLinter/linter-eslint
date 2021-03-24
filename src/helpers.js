@@ -1,5 +1,3 @@
-'use babel'
-
 import { join } from 'path'
 import { generateRange } from 'atom-linter'
 import cryptoRandomString from 'crypto-random-string'

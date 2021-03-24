@@ -4,7 +4,7 @@ import * as Path from 'path'
 import rimraf from 'rimraf'
 // eslint-disable-next-line no-unused-vars
 import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix'
-import * as Helpers from '../src/worker-helpers'
+import * as Helpers from '../dist/worker-helpers'
 import { copyFileToTempDir } from './linter-eslint-spec'
 
 const getFixturesPath = path => Path.join(__dirname, 'fixtures', path)

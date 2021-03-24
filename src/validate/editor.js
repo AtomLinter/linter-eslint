@@ -1,5 +1,3 @@
-'use babel'
-
 import throwIfFail from './throw'
 
 export const isValidPoint = (textBuffer, line, column) => {

@@ -1,5 +1,3 @@
-'use babel'
-
 import Path from 'path'
 import fs from 'fs-plus'
 import ChildProcess from 'child_process'
