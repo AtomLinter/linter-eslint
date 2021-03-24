@@ -169,7 +169,8 @@
     "babel": "cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=false babel src --out-dir dist --delete-dir-on-start",
     "dev": "npm run babel && cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=true rollup -c -w",
     "build": "npm run babel && cross-env NODE_ENV=production cross-env BABEL_KEEP_MODULES=true rollup -c ",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "build-commit": "build-commit -o dist"
   },
   "dependencies": {
     "atom-linter": "10.0.0",
