@@ -101,4 +101,4 @@ function migrateConfigOptions(migrations = activeMigrations) {
   }
 }
 
-module.exports = migrateConfigOptions
+exports.migrateConfigOptions = migrateConfigOptions

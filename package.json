@@ -167,8 +167,8 @@
     "test": "npm run babel && atom --test spec",
     "clean": "shx rm -rf dist",
     "babel": "cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=false babel src --out-dir dist --delete-dir-on-start",
-    "dev": "npm run clean && cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=true rollup -c -w",
-    "build": "npm run clean && cross-env NODE_ENV=production cross-env BABEL_KEEP_MODULES=true rollup -c ",
+    "dev": "npm run babel && cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=true rollup -c -w",
+    "build": "npm run babel && cross-env NODE_ENV=production cross-env BABEL_KEEP_MODULES=true rollup -c ",
     "prepare": "npm run build"
   },
   "dependencies": {

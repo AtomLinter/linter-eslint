@@ -1,6 +1,6 @@
 'use babel'
 
-import migrateConfigOptions from '../dist/migrate-config-options'
+import { migrateConfigOptions } from '../dist/migrate-config-options'
 import makeSpy from './make-spy'
 
 describe('migrateConfigOptions()', () => {

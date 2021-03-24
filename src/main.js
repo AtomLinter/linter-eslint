@@ -1,21 +1,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { CompositeDisposable } from 'atom'
 import { hasValidScope } from './validate/editor'
+import * as helpers from './helpers'
+import { migrateConfigOptions } from './migrate-config-options'
 
 // Internal variables
 const idleCallbacks = new Set()
-
-// Dependencies
-// NOTE: We are not directly requiring these in order to reduce the time it
-// takes to require this file as that causes delays in Atom loading this package
-let helpers
-let migrateConfigOptions
-
-const loadDeps = () => {
-  if (!helpers) {
-    helpers = require('./helpers')
-  }
-}
 
 const makeIdleCallback = (work) => {
   let callbackId
@@ -31,15 +21,12 @@ const scheduleIdleTasks = () => {
   const linterEslintInstallPeerPackages = () => {
     require('atom-package-deps').install('linter-eslint')
   }
-  const linterEslintLoadDependencies = loadDeps
   const linterEslintStartWorker = () => {
-    loadDeps()
     helpers.startWorker()
   }
 
   if (!atom.inSpecMode()) {
     makeIdleCallback(linterEslintInstallPeerPackages)
-    makeIdleCallback(linterEslintLoadDependencies)
     makeIdleCallback(linterEslintStartWorker)
   }
 }
@@ -71,9 +58,6 @@ module.exports = {
   activate() {
     this.subscriptions = new CompositeDisposable()
 
-    if (!migrateConfigOptions) {
-      migrateConfigOptions = require('./migrate-config-options')
-    }
     migrateConfigOptions()
 
     const embeddedScope = 'source.js.embedded.html'
@@ -115,7 +99,6 @@ module.exports = {
 
     this.subscriptions.add(atom.commands.add('atom-text-editor', {
       'linter-eslint:debug': async () => {
-        loadDeps()
         const debugString = await helpers.generateDebugString()
         const notificationOptions = { detail: debugString, dismissable: true }
         atom.notifications.addInfo('linter-eslint debugging information', notificationOptions)
@@ -203,7 +186,6 @@ module.exports = {
           return null
         }
 
-        loadDeps()
 
         if (filePath.includes('://')) {
           // If the path is a URL (Nuclide remote file) return a message
@@ -261,8 +243,6 @@ module.exports = {
       // Silently return if the TextEditor is invalid
       return
     }
-
-    loadDeps()
 
     if (textEditor.isModified()) {
       // Abort for invalid or unsaved text editors
