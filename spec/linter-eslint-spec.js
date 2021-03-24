@@ -34,7 +34,7 @@ const paths = {
  * Async helper to copy a file from one place to another on the filesystem.
  * @param  {string} fileToCopyPath  Path of the file to be copied
  * @param  {string} destinationDir  Directory to paste the file into
- * @return {string}                 Full path of the file in copy destination
+ * @return {Promise<string>}        path of the file in copy destination
  */
 function copyFileToDir(fileToCopyPath, destinationDir) {
   return new Promise((resolve) => {
@@ -49,7 +49,7 @@ function copyFileToDir(fileToCopyPath, destinationDir) {
  * Utility helper to copy a file into the OS temp directory.
  *
  * @param  {string} fileToCopyPath  Path of the file to be copied
- * @return {string}                 Full path of the file in copy destination
+ * @return {Promise<string>}        path of the file in copy destination
  */
 // eslint-disable-next-line import/prefer-default-export
 export async function copyFileToTempDir(fileToCopyPath) {

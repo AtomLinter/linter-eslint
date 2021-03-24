@@ -186,6 +186,7 @@
   "devDependencies": {
     "@types/atom": "^1.40.10",
     "@types/jasmine": "^3.6.7",
+    "@types/rimraf": "^3.0.0",
     "@babel/cli": "^7.13.10",
     "@babel/core": "^7.13.10",
     "atom-jasmine3-test-runner": "^5.2.2",
