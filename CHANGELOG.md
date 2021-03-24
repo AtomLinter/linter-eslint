@@ -1,3 +1,10 @@
+## [8.6.4](https://github.com/AtomLinter/linter-eslint/compare/v8.6.3...v8.6.4) (2021-03-24)
+
+
+### Bug Fixes
+
+* remove loading workarounds ([23f20af](https://github.com/AtomLinter/linter-eslint/commit/23f20af3ea5b9c930d6dd49f8acfd99b6afcd46c))
+
 ## [8.6.3](https://github.com/AtomLinter/linter-eslint/compare/v8.6.2...v8.6.3) (2021-03-23)
 
 
