@@ -79,8 +79,8 @@ jobs:
           node-version: "12.x"
       - name: NPM install
         run: npm install
-      # - name: Build and Commit
-      #   run: npm run build-commit
+      - name: Build and Commit
+        run: npm run build-commit
       - name: Release 🎉
         uses: cycjimmy/semantic-release-action@v2
         with:
