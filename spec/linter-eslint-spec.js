@@ -95,7 +95,7 @@ async function makeFixes(textEditor) {
 
   // Subscriptions now active for Editor Reload and Message Notification
   // Send off a fix request.
-  atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
+  await atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
 
   const notification = await notificationPromise
   expect(notification.getMessage()).toBe(expectedMessage)
@@ -221,7 +221,7 @@ describe('The eslint provider for Linter', () => {
       const editor = await atom.workspace.open(paths.ignored)
       const expectedMessage = 'Linter-ESLint: Fix complete.'
       const notificationPromise = getNotification(expectedMessage)
-      atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:fix-file')
+      await atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:fix-file')
       const notification = await notificationPromise
 
       expect(notification.getMessage()).toBe(expectedMessage)
@@ -481,7 +481,7 @@ describe('The eslint provider for Linter', () => {
 
     it('shows an info notification', async () => {
       const notificationPromise = getNotification(expectedMessage)
-      atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
+      await atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
       const notification = await notificationPromise
 
       expect(notification.getMessage()).toBe(expectedMessage)
@@ -490,7 +490,7 @@ describe('The eslint provider for Linter', () => {
 
     it('includes debugging information in the details', async () => {
       const notificationPromise = getNotification(expectedMessage)
-      atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
+      await atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
       const notification = await notificationPromise
       const detail = notification.getDetail()
 
