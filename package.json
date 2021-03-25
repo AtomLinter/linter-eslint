@@ -163,14 +163,11 @@
     "format": "prettier --write .",
     "test.format": "prettier . --check",
     "lint": "eslint . --fix",
-    "test.lint": "npm run babel && eslint .",
-    "test.unit": "npm run babel && atom --test spec",
-    "test.bundle": "npm run build && atom --test ./spec/linter-eslint-spec.js",
-    "test": "npm run test.unit && npm run test.bundle",
-    "clean": "shx rm -rf dist",
-    "babel": "cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=false babel src --out-dir dist --delete-dir-on-start",
-    "dev": "npm run clean && cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=true rollup -c -w",
-    "build": "npm run clean && cross-env NODE_ENV=production cross-env BABEL_KEEP_MODULES=true rollup -c ",
+    "test.lint": "npm run build && eslint .",
+    "test": "npm run build && atom --test spec",
+    "clean": "rimraf dist",
+    "dev": "npm run build -- --watch",
+    "build": "cross-env NODE_ENV=development cross-env BABEL_KEEP_MODULES=false babel src --out-dir dist --delete-dir-on-start",
     "prepare": "npm run build",
     "build-commit": "build-commit -o dist"
   },
@@ -194,10 +191,7 @@
     "eslint-config-airbnb-base": "13.2.0",
     "eslint-plugin-import": "2.20.1",
     "jasmine-fix": "1.3.1",
-    "rimraf": "3.0.2",
-    "rollup": "^2.42.4",
-    "rollup-plugin-atomic": "^2.1.1",
-    "shx": "^0.3.3"
+    "rimraf": "3.0.2"
   },
   "package-deps": [
     {
