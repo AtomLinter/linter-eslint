@@ -1,3 +1,10 @@
+## [8.6.5](https://github.com/AtomLinter/linter-eslint/compare/v8.6.4...v8.6.5) (2021-03-25)
+
+
+### Bug Fixes
+
+* fix dynamic require errors ([6d8a3c2](https://github.com/AtomLinter/linter-eslint/commit/6d8a3c209f885427636f30cc2c7a229998c7ccb1))
+
 ## [8.6.4](https://github.com/AtomLinter/linter-eslint/compare/v8.6.3...v8.6.4) (2021-03-24)
 
 
