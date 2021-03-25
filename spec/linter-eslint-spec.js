@@ -4,46 +4,37 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { tmpdir } from 'os'
 import rimraf from 'rimraf'
-// eslint-disable-next-line no-unused-vars
-import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix'
-import linterEslint from '../dist/main'
+import * as linterEslint from '../dist/main'
 
 import { processESLintMessages } from '../dist/helpers'
 
 const fixturesDir = path.join(__dirname, 'fixtures')
 
-const fixtures = {
-  good: ['files', 'good.js'],
-  bad: ['files', 'bad.js'],
-  badInline: ['files', 'badInline.js'],
-  empty: ['files', 'empty.js'],
-  fix: ['files', 'fix.js'],
-  cache: ['files', '.eslintcache'],
-  config: ['configs', '.eslintrc.yml'],
-  ignored: ['eslintignore', 'ignored.js'],
-  endRange: ['end-range', 'no-unreachable.js'],
-  badCache: ['badCache'],
-  modifiedIgnore: ['modified-ignore-rule', 'foo.js'],
-  modifiedIgnoreSpace: ['modified-ignore-rule', 'foo-space.js'],
-  importing: ['import-resolution', 'nested', 'importing.js'],
-  badImport: ['import-resolution', 'nested', 'badImport.js'],
-  fixablePlugin: ['plugin-import', 'life.js'],
-  eslintignoreDir: ['eslintignore'],
-  eslintIgnoreKeyDir: ['configs', 'eslintignorekey']
+const paths = {
+  good: path.join(fixturesDir, 'files', 'with-config', 'good.js'),
+  bad: path.join(fixturesDir, 'files', 'with-config', 'bad.js'),
+  badInline: path.join(fixturesDir, 'files', 'inline', 'badInline.js'),
+  empty: path.join(fixturesDir, 'files', 'with-config', 'empty.js'),
+  fix: path.join(fixturesDir, 'files', 'with-config', 'fix.js'),
+  cache: path.join(fixturesDir, 'files', 'with-config', '.eslintcache'),
+  config: path.join(fixturesDir, 'configs', '.eslintrc.yml'),
+  ignored: path.join(fixturesDir, 'eslintignore', 'ignored.js'),
+  endRange: path.join(fixturesDir, 'end-range', 'no-unreachable.js'),
+  badCache: path.join(fixturesDir, 'badCache'),
+  modifiedIgnore: path.join(fixturesDir, 'modified-ignore-rule', 'foo.js'),
+  modifiedIgnoreSpace: path.join(fixturesDir, 'modified-ignore-rule', 'foo-space.js'),
+  importing: path.join(fixturesDir, 'import-resolution', 'nested', 'importing.js'),
+  badImport: path.join(fixturesDir, 'import-resolution', 'nested', 'badImport.js'),
+  fixablePlugin: path.join(fixturesDir, 'plugin-import', 'life.js'),
+  eslintignoreDir: path.join(fixturesDir, 'eslintignore'),
+  eslintIgnoreKeyDir: path.join(fixturesDir, 'configs', 'eslintignorekey')
 }
-
-const paths = Object.keys(fixtures)
-  .reduce((accumulator, fixture) => {
-    const acc = accumulator
-    acc[fixture] = path.join(fixturesDir, ...(fixtures[fixture]))
-    return acc
-  }, {})
 
 /**
  * Async helper to copy a file from one place to another on the filesystem.
  * @param  {string} fileToCopyPath  Path of the file to be copied
  * @param  {string} destinationDir  Directory to paste the file into
- * @return {string}                 Full path of the file in copy destination
+ * @return {Promise<string>}        path of the file in copy destination
  */
 function copyFileToDir(fileToCopyPath, destinationDir) {
   return new Promise((resolve) => {
@@ -58,7 +49,7 @@ function copyFileToDir(fileToCopyPath, destinationDir) {
  * Utility helper to copy a file into the OS temp directory.
  *
  * @param  {string} fileToCopyPath  Path of the file to be copied
- * @return {string}                 Full path of the file in copy destination
+ * @return {Promise<string>}        path of the file in copy destination
  */
 // eslint-disable-next-line import/prefer-default-export
 export async function copyFileToTempDir(fileToCopyPath) {
@@ -66,9 +57,17 @@ export async function copyFileToTempDir(fileToCopyPath) {
   return copyFileToDir(fileToCopyPath, tempFixtureDir)
 }
 
-async function getNotification(expectedMessage) {
-  return new Promise((resolve) => {
+/**
+ * @param {string} expectedMessage
+ * @returns {Promise<import("atom").Notification>}
+ */
+function getNotification(expectedMessage) {
+  return new Promise((resolve, reject) => {
+    /** @type {import("atom").Disposable | undefined} */
     let notificationSub
+    /**
+    * @param {Promise<import("atom").Notification>} notification
+    */
     const newNotification = (notification) => {
       if (notification.getMessage() !== expectedMessage) {
         // As the specs execute asynchronously, it's possible a notification
@@ -77,18 +76,28 @@ async function getNotification(expectedMessage) {
         return
       }
       // Dispose of the notification subscription
-      notificationSub.dispose()
-      resolve(notification)
+      if (notificationSub !== undefined) {
+        notificationSub.dispose()
+        resolve(notification)
+      } else {
+        reject()
+      }
     }
     // Subscribe to Atom's notifications
     notificationSub = atom.notifications.onDidAddNotification(newNotification)
   })
 }
 
+/**
+ * @param {import("atom").TextEditor} textEditor
+ * @returns {Promise<void>}
+ */
 async function makeFixes(textEditor) {
+  const buffer = textEditor.getBuffer()
+  /** @type {Promise<void>} */
   const editorReloadPromise = new Promise((resolve) => {
     // Subscribe to file reload events
-    const editorReloadSubscription = textEditor.getBuffer().onDidReload(() => {
+    const editorReloadSubscription = buffer.onDidReload(() => {
       editorReloadSubscription.dispose()
       resolve()
     })
@@ -100,13 +109,14 @@ async function makeFixes(textEditor) {
 
   // Subscriptions now active for Editor Reload and Message Notification
   // Send off a fix request.
-  atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
+  await atom.commands.dispatch(atom.views.getView(textEditor), 'linter-eslint:fix-file')
 
   const notification = await notificationPromise
   expect(notification.getMessage()).toBe(expectedMessage)
   expect(notification.getType()).toBe('success')
 
   // After editor reloads, it should be safe for consuming test to resume.
+  buffer.reload()
   return editorReloadPromise
 }
 
@@ -226,14 +236,14 @@ describe('The eslint provider for Linter', () => {
       const editor = await atom.workspace.open(paths.ignored)
       const expectedMessage = 'Linter-ESLint: Fix complete.'
       const notificationPromise = getNotification(expectedMessage)
-      atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:fix-file')
+      await atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:fix-file')
       const notification = await notificationPromise
 
       expect(notification.getMessage()).toBe(expectedMessage)
     })
   })
 
-  describe('when a file is not specified in .eslintignore file', async () => {
+  describe('when a file is not specified in .eslintignore file', () => {
     it('will give warnings when linting the file', async () => {
       const tempPath = await copyFileToTempDir(path.join(paths.eslintignoreDir, 'ignored.js'))
       const tempDir = path.dirname(tempPath)
@@ -289,6 +299,10 @@ describe('The eslint provider for Linter', () => {
       rimraf.sync(tempDir)
     })
 
+    /**
+     * @param {import("atom").TextEditor} textEditor
+     * @returns {Promise<void>}
+     */
     async function firstLint(textEditor) {
       const messages = await lint(textEditor)
       // The original file has two errors
@@ -299,7 +313,6 @@ describe('The eslint provider for Linter', () => {
       await firstLint(editor)
       await makeFixes(editor)
       const messagesAfterFixing = await lint(editor)
-
       expect(messagesAfterFixing.length).toBe(0)
     })
 
@@ -483,7 +496,7 @@ describe('The eslint provider for Linter', () => {
 
     it('shows an info notification', async () => {
       const notificationPromise = getNotification(expectedMessage)
-      atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
+      await atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
       const notification = await notificationPromise
 
       expect(notification.getMessage()).toBe(expectedMessage)
@@ -492,7 +505,7 @@ describe('The eslint provider for Linter', () => {
 
     it('includes debugging information in the details', async () => {
       const notificationPromise = getNotification(expectedMessage)
-      atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
+      await atom.commands.dispatch(atom.views.getView(editor), 'linter-eslint:debug')
       const notification = await notificationPromise
       const detail = notification.getDetail()
 
@@ -695,7 +708,7 @@ describe('The eslint provider for Linter', () => {
     })
   })
 
-  describe("registers an 'ESLint Fix' right click menu command", () => {
+  it("registers an 'ESLint Fix' right click menu command", () => {
     // NOTE: Reaches into the private data of the ContextMenuManager, there is
     // no public method to check this though so...
     expect(atom.contextMenu.itemSets.some(itemSet => (

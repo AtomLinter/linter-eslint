@@ -171,6 +171,7 @@
     "prepare": "npm run build",
     "build-commit": "build-commit -o dist"
   },
+  "atomTestRunner": "./spec/runner",
   "dependencies": {
     "atom-linter": "10.0.0",
     "atom-package-deps": "7.2.3",
@@ -183,8 +184,12 @@
     "resolve-env": "1.0.0"
   },
   "devDependencies": {
+    "@types/atom": "^1.40.10",
+    "@types/jasmine": "^3.6.7",
+    "@types/rimraf": "^3.0.0",
     "@babel/cli": "^7.13.10",
     "@babel/core": "^7.13.10",
+    "atom-jasmine3-test-runner": "^5.2.2",
     "babel-preset-atomic": "^3.0.3",
     "build-commit": "^0.1.4",
     "cross-env": "^7.0.3",

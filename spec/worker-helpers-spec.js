@@ -2,8 +2,6 @@
 
 import * as Path from 'path'
 import rimraf from 'rimraf'
-// eslint-disable-next-line no-unused-vars
-import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix'
 import * as Helpers from '../dist/worker-helpers'
 import { copyFileToTempDir } from './linter-eslint-spec'
 
@@ -185,7 +183,7 @@ describe('Worker Helpers', () => {
     })
 
     it('returns the path relative to the project dir if provided when no ignore file is found', async () => {
-      const fixtureFile = getFixturesPath(Path.join('files', 'good.js'))
+      const fixtureFile = getFixturesPath(Path.join('files', 'with-config', 'good.js'))
       // Copy the file to a temporary folder
       const filePath = await copyFileToTempDir(fixtureFile)
       const tempDir = Path.dirname(filePath)
@@ -202,7 +200,7 @@ describe('Worker Helpers', () => {
     })
 
     it('returns just the file being linted if no ignore file is found and no project dir is provided', async () => {
-      const fixtureFile = getFixturesPath(Path.join('files', 'good.js'))
+      const fixtureFile = getFixturesPath(Path.join('files', 'with-config', 'good.js'))
       // Copy the file to a temporary folder
       const filePath = await copyFileToTempDir(fixtureFile)
       const tempDir = Path.dirname(filePath)
