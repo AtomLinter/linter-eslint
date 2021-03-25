@@ -183,7 +183,7 @@ describe('Worker Helpers', () => {
     })
 
     it('returns the path relative to the project dir if provided when no ignore file is found', async () => {
-      const fixtureFile = getFixturesPath(Path.join('files', 'good.js'))
+      const fixtureFile = getFixturesPath(Path.join('files', 'with-config', 'good.js'))
       // Copy the file to a temporary folder
       const filePath = await copyFileToTempDir(fixtureFile)
       const tempDir = Path.dirname(filePath)
@@ -200,7 +200,7 @@ describe('Worker Helpers', () => {
     })
 
     it('returns just the file being linted if no ignore file is found and no project dir is provided', async () => {
-      const fixtureFile = getFixturesPath(Path.join('files', 'good.js'))
+      const fixtureFile = getFixturesPath(Path.join('files', 'with-config', 'good.js'))
       // Copy the file to a temporary folder
       const filePath = await copyFileToTempDir(fixtureFile)
       const tempDir = Path.dirname(filePath)

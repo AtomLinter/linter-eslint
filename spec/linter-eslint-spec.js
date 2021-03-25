@@ -11,12 +11,12 @@ import { processESLintMessages } from '../dist/helpers'
 const fixturesDir = path.join(__dirname, 'fixtures')
 
 const paths = {
-  good: path.join(fixturesDir, 'files', 'good.js'),
-  bad: path.join(fixturesDir, 'files', 'bad.js'),
-  badInline: path.join(fixturesDir, 'files', 'badInline.js'),
-  empty: path.join(fixturesDir, 'files', 'empty.js'),
-  fix: path.join(fixturesDir, 'files', 'fix.js'),
-  cache: path.join(fixturesDir, 'files', '.eslintcache'),
+  good: path.join(fixturesDir, 'files', 'with-config', 'good.js'),
+  bad: path.join(fixturesDir, 'files', 'with-config', 'bad.js'),
+  badInline: path.join(fixturesDir, 'files', 'inline', 'badInline.js'),
+  empty: path.join(fixturesDir, 'files', 'with-config', 'empty.js'),
+  fix: path.join(fixturesDir, 'files', 'with-config', 'fix.js'),
+  cache: path.join(fixturesDir, 'files', 'with-config', '.eslintcache'),
   config: path.join(fixturesDir, 'configs', '.eslintrc.yml'),
   ignored: path.join(fixturesDir, 'eslintignore', 'ignored.js'),
   endRange: path.join(fixturesDir, 'end-range', 'no-unreachable.js'),
