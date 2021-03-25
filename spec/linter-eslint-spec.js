@@ -57,9 +57,17 @@ export async function copyFileToTempDir(fileToCopyPath) {
   return copyFileToDir(fileToCopyPath, tempFixtureDir)
 }
 
-async function getNotification(expectedMessage) {
-  return new Promise((resolve) => {
+/**
+ * @param {string} expectedMessage
+ * @returns {Promise<import("atom").Notification>}
+ */
+function getNotification(expectedMessage) {
+  return new Promise((resolve, reject) => {
+    /** @type {import("atom").Disposable | undefined} */
     let notificationSub
+    /**
+    * @param {Promise<import("atom").Notification>} notification
+    */
     const newNotification = (notification) => {
       if (notification.getMessage() !== expectedMessage) {
         // As the specs execute asynchronously, it's possible a notification
@@ -68,8 +76,12 @@ async function getNotification(expectedMessage) {
         return
       }
       // Dispose of the notification subscription
-      notificationSub.dispose()
-      resolve(notification)
+      if (notificationSub !== undefined) {
+        notificationSub.dispose()
+        resolve(notification)
+      } else {
+        reject()
+      }
     }
     // Subscribe to Atom's notifications
     notificationSub = atom.notifications.onDidAddNotification(newNotification)
@@ -81,6 +93,7 @@ async function getNotification(expectedMessage) {
  * @returns {Promise<void>}
  */
 async function makeFixes(textEditor) {
+  /** @type {Promise<void>} */
   const editorReloadPromise = new Promise((resolve) => {
     // Subscribe to file reload events
     const editorReloadSubscription = textEditor.getBuffer().onDidReload(() => {
