@@ -4,7 +4,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { tmpdir } from 'os'
 import rimraf from 'rimraf'
-import linterEslint from '../dist/main'
+import * as linterEslint from '../dist/main'
 
 import { processESLintMessages } from '../dist/helpers'
 
@@ -76,6 +76,10 @@ async function getNotification(expectedMessage) {
   })
 }
 
+/**
+ * @param {import("atom").TextEditor} textEditor
+ * @returns {Promise<void>}
+ */
 async function makeFixes(textEditor) {
   const editorReloadPromise = new Promise((resolve) => {
     // Subscribe to file reload events
@@ -280,6 +284,10 @@ describe('The eslint provider for Linter', () => {
       rimraf.sync(tempDir)
     })
 
+    /**
+     * @param {import("atom").TextEditor} textEditor
+     * @returns {Promise<void>}
+     */
     async function firstLint(textEditor) {
       const messages = await lint(textEditor)
       // The original file has two errors
@@ -290,7 +298,6 @@ describe('The eslint provider for Linter', () => {
       await firstLint(editor)
       await makeFixes(editor)
       const messagesAfterFixing = await lint(editor)
-
       expect(messagesAfterFixing.length).toBe(0)
     })
 

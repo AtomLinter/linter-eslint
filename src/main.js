@@ -173,6 +173,10 @@ module.exports = {
       grammarScopes: scopes,
       scope: 'file',
       lintsOnChange: true,
+      /**
+       * @param {import("atom").TextEditor} textEditor
+       * @returns {Promise<import("atom/linter").Message[]>}
+       */
       lint: async (textEditor) => {
         if (!atom.workspace.isTextEditor(textEditor)) {
           // If we somehow get fed an invalid TextEditor just immediately return

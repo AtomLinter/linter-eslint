@@ -160,7 +160,7 @@ export async function generateDebugString() {
  * @param  {string} [options.severity='error'] Can be one of: 'error', 'warning', 'info'
  * @param  {string} [options.excerpt=''] Short text to use in the message
  * @param  {string|Function} [options.description] Used to provide additional information
- * @return {Array}            Message to user generated from the parameters
+ * @return {import("atom/linter").Message[]} Message to user generated from the parameters
  */
 export function generateUserMessage(textEditor, options) {
   const {
@@ -182,9 +182,9 @@ export function generateUserMessage(textEditor, options) {
 /**
  * Generates a message to the user in order to nicely display the Error being
  * thrown instead of depending on generic error handling.
- * @param  {TextEditor} textEditor The TextEditor to use to build the message
+ * @param  {import("atom").TextEditor} textEditor The TextEditor to use to build the message
  * @param  {Error} error      Error to generate a message for
- * @return {Array}            Message to user generated from the Error
+ * @return {import("atom/linter").Message[]} Message to user generated from the Error
  */
 export function handleError(textEditor, error) {
   const { stack, message } = error
