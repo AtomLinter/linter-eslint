@@ -93,10 +93,11 @@ function getNotification(expectedMessage) {
  * @returns {Promise<void>}
  */
 async function makeFixes(textEditor) {
+  const buffer = textEditor.getBuffer()
   /** @type {Promise<void>} */
   const editorReloadPromise = new Promise((resolve) => {
     // Subscribe to file reload events
-    const editorReloadSubscription = textEditor.getBuffer().onDidReload(() => {
+    const editorReloadSubscription = buffer.onDidReload(() => {
       editorReloadSubscription.dispose()
       resolve()
     })
@@ -115,6 +116,7 @@ async function makeFixes(textEditor) {
   expect(notification.getType()).toBe('success')
 
   // After editor reloads, it should be safe for consuming test to resume.
+  buffer.reload()
   return editorReloadPromise
 }
 
