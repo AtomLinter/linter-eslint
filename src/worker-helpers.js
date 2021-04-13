@@ -185,8 +185,7 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileConfig) {
  */
 export function getRules(cliEngine) {
   // Pull the list of rules used directly from the CLIEngine
-  // Added in https://github.com/eslint/eslint/pull/9782
-  if (Object.prototype.hasOwnProperty.call(cliEngine, 'getRules')) {
+  if (typeof cliEngine.getRules === 'function') {
     return cliEngine.getRules()
   }
 
