@@ -1,3 +1,10 @@
+## [8.6.6](https://github.com/AtomLinter/linter-eslint/compare/v8.6.5...v8.6.6) (2021-04-13)
+
+
+### Bug Fixes
+
+* getting rules for ignoreFixableRulesWhileTyping ([212b0f1](https://github.com/AtomLinter/linter-eslint/commit/212b0f15bb262d2bb1f5bb2ad34939785a282734))
+
 ## [8.6.5](https://github.com/AtomLinter/linter-eslint/compare/v8.6.4...v8.6.5) (2021-03-25)
 
 
