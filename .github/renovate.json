@@ -17,8 +17,7 @@
       "semanticCommitType": "fix"
     }
   ],
-  "postUpgradeTasks": {
-    "commands": ["pnpm install"],
-    "fileFilters": ["pnpm-lock.yaml"]
+  "constraints": {
+    "pnpm": "5"
   }
 }
