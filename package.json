@@ -184,11 +184,13 @@
     "resolve-env": "1.0.0"
   },
   "devDependencies": {
-    "@types/atom": "^1.40.10",
-    "@types/jasmine": "^3.7.7",
-    "@types/rimraf": "^3.0.0",
     "@babel/cli": "^7.14.5",
     "@babel/core": "^7.14.6",
+    "@types/atom": "^1.40.10",
+    "@types/eslint": "4",
+    "@types/jasmine": "^3.7.7",
+    "@types/node": "^14.14.35",
+    "@types/rimraf": "^3.0.0",
     "atom-jasmine3-test-runner": "^5.2.6",
     "babel-preset-atomic": "^3.2.1",
     "build-commit": "^0.1.4",
@@ -218,7 +220,12 @@
     "root": true,
     "rules": {
       "no-console": "off",
-      "max-len": [1, { "code": 130 }],
+      "max-len": [
+        1,
+        {
+          "code": 130
+        }
+      ],
       "semi": [
         "error",
         "never"
