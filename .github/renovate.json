@@ -16,8 +16,5 @@
       "groupName": "dependencies",
       "semanticCommitType": "fix"
     }
-  ],
-  "constraints": {
-    "pnpm": "5"
-  }
+  ]
 }
