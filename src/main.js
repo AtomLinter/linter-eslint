@@ -46,13 +46,12 @@ let ignoreFixableRulesWhileTyping
  * @param  {[iterable]} ruleIds Iterable containing ruleIds to ignore
  * @return {Object}             Object containing properties for each rule to ignore
  */
-const idsToIgnoredRules = ruleIds => (
+const idsToIgnoredRules = (ruleIds) => (
   Array.from(ruleIds).reduce(
     // 0 is the severity to turn off a rule
     (ids, id) => Object.assign(ids, { [id]: 0 }),
     {}
   ))
-
 
 module.exports = {
   activate() {
@@ -143,7 +142,7 @@ module.exports = {
           // Black magic!
           // Compares the private component property of the active TextEditor
           //   against the components of the elements
-          const evtIsActiveEditor = evt.path.some(elem => (
+          const evtIsActiveEditor = evt.path.some((elem) => (
             // Atom v1.19.0+
             elem.component && activeEditor.component
               && elem.component === activeEditor.component))
@@ -157,7 +156,7 @@ module.exports = {
   },
 
   deactivate() {
-    idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
+    idleCallbacks.forEach((callbackID) => window.cancelIdleCallback(callbackID))
     idleCallbacks.clear()
     if (helpers) {
       // If the helpers module hasn't been loaded then there was no chance a
@@ -190,7 +189,6 @@ module.exports = {
           return null
         }
 
-
         if (filePath.includes('://')) {
           // If the path is a URL (Nuclide remote file) return a message
           // telling the user we are unable to work on remote files.
@@ -207,7 +205,7 @@ module.exports = {
           if (ignoreFixableRulesWhileTyping) {
             // Note that the fixable rules will only have values after the first lint job
             const ignoredRules = new Set(helpers.rules.getFixableRules())
-            ignoredRulesWhenModified.forEach(ruleId => ignoredRules.add(ruleId))
+            ignoredRulesWhenModified.forEach((ruleId) => ignoredRules.add(ruleId))
             rules = idsToIgnoredRules(ignoredRules)
           } else {
             rules = idsToIgnoredRules(ignoredRulesWhenModified)

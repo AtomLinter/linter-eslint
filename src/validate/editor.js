@@ -14,6 +14,6 @@ export const throwIfInvalidPoint = (textBuffer, line, column) => (
   ))
 
 export const hasValidScope = (editor, validScopes) => editor.getCursors()
-  .some(cursor => cursor.getScopeDescriptor()
+  .some((cursor) => cursor.getScopeDescriptor()
     .getScopesArray()
-    .some(scope => validScopes.includes(scope)))
+    .some((scope) => validScopes.includes(scope)))
