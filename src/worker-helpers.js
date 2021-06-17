@@ -87,7 +87,7 @@ export function findESLintDirectory(modulesDir, config, projectPath, fallbackFor
 
   if (isDirectory(eslintDir)) {
     return {
-      path: eslintDir,
+      path: eslintDir.replace(/\\/g, "/"),
       type: locationType,
     }
   }
@@ -104,7 +104,7 @@ export function findESLintDirectory(modulesDir, config, projectPath, fallbackFor
   }
 
   return {
-    path: Cache.ESLINT_LOCAL_PATH,
+    path: Cache.ESLINT_LOCAL_PATH.replace(/\\/g, "/"),
     type: 'bundled fallback',
   }
 }
@@ -117,9 +117,12 @@ export function findESLintDirectory(modulesDir, config, projectPath, fallbackFor
  */
 export function getESLintFromDirectory(modulesDir, config, projectPath) {
   const { path: ESLintDirectory } = findESLintDirectory(modulesDir, config, projectPath)
+  console.log(ESLintDirectory)
   try {
     // eslint-disable-next-line import/no-dynamic-require
-    return require(ESLintDirectory)
+    const x = require(ESLintDirectory)
+    console.log(x)
+    return x
   } catch (e) {
     if (config.global.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
       throw new Error('ESLint not found, try restarting Atom to clear caches.')
