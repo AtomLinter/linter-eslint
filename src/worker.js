@@ -1,6 +1,6 @@
 /* global emit */
 
-import Path from 'path'
+import * as Path from 'path'
 import { FindCache, findCached } from 'atom-linter'
 import * as Helpers from './worker-helpers'
 
@@ -9,7 +9,23 @@ process.title = 'linter-eslint helper'
 const rulesMetadata = new Map()
 let shouldSendRules = false
 
-function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
+/**
+ * The return of {getCLIEngineOptions} function
+ * @typedef {object} CliEngineOptions
+ * @property {string[]} rules
+ * @property {boolean} ignore
+ * @property {boolean} fix
+ * @property {string[]} rulePaths
+ * @property {string | undefined} configFile
+ */
+
+/**
+ * @param {CliEngineOptions} cliEngineOptions
+ * @param {string} contents
+ * @param {import("eslint")} eslint
+ * @param {string} filePath
+ */
+function lintJob(cliEngineOptions, contents, eslint, filePath) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
   const rules = Helpers.getRules(cliEngine)
@@ -22,8 +38,14 @@ function lintJob({ cliEngineOptions, contents, eslint, filePath }) {
   return report
 }
 
-function fixJob({ cliEngineOptions, contents, eslint, filePath }) {
-  const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
+/**
+ * @param {CliEngineOptions} cliEngineOptions
+ * @param {string} contents
+ * @param {string} filePath
+ * @param {import("eslint")} eslint
+ */
+function fixJob(cliEngineOptions, contents, eslint, filePath) {
+  const report = lintJob(cliEngineOptions, contents, eslint, filePath)
 
   eslint.CLIEngine.outputFixes(report)
 
@@ -61,7 +83,7 @@ module.exports = async () => {
 
       let response
       if (type === 'lint') {
-        const report = lintJob({ cliEngineOptions, contents, eslint, filePath })
+        const report = lintJob(cliEngineOptions, contents, eslint, filePath)
         response = {
           messages: report.results.length ? report.results[0].messages : []
         }
@@ -70,7 +92,7 @@ module.exports = async () => {
           response.updatedRules = Array.from(rulesMetadata)
         }
       } else if (type === 'fix') {
-        response = fixJob({ cliEngineOptions, contents, eslint, filePath })
+        response = fixJob(cliEngineOptions, contents, eslint, filePath)
       } else if (type === 'debug') {
         const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
         response = Helpers.findESLintDirectory(modulesDir, config, projectPath)
