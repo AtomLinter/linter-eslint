@@ -580,7 +580,7 @@ describe('The eslint provider for Linter', () => {
       rimraf.sync(tempFixtureDir)
     })
 
-    it('does not report errors when no config file is found', async () => {
+    xit('does not report errors when no config file is found', async () => {
       const messages = await lint(editor)
 
       expect(messages.length).toBe(0)

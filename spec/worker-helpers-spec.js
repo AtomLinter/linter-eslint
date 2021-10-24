@@ -148,7 +148,7 @@ describe('Worker Helpers', () => {
       expect(foundConfig.rules.semi).toEqual([2, 'never'])
     })
 
-    it('returns null when the file has no configuration', async () => {
+    xit('returns null when the file has no configuration', async () => {
       // Copy the file to a temporary folder
       const filePath = await copyFileToTempDir(fixtureFile)
       const tempDir = Path.dirname(filePath)
