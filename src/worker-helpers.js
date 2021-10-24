@@ -1,4 +1,7 @@
+/* global emit */
+
 import Path from 'path'
+import Util from 'util'
 import fs from 'fs-plus'
 import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
@@ -151,6 +154,23 @@ export function getESLintInstance(fileDir, config, projectPath) {
   const modulesDir = Path.dirname(findCached(fileDir, 'node_modules/eslint') || '')
   refreshModulesPath(modulesDir)
   return getESLintFromDirectory(modulesDir, config, projectPath)
+}
+
+/**
+ * console.log
+ * @param  {any} args
+ * @return {void}
+ */
+export function log(...args) {
+  const obj = args.length === 1 ? args[0] : args
+  let str
+  try {
+    str = JSON.stringify(obj)
+  } catch (e) {
+    str = Util.inspect(obj)
+  }
+
+  emit('log', str)
 }
 
 /**
