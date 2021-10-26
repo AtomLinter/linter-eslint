@@ -177,14 +177,23 @@ export function log(...args) {
  * @param {import("eslint")} eslint
  * @param {string} filePath
  */
-export function getConfigForFile(eslint, filePath) {
-  const cli = new eslint.CLIEngine()
+export async function getConfigForFile(eslint, filePath) {
   try {
+    const cli = new eslint.ESLint()
+    return cli.calculateConfigForFile(filePath)
+  } catch (e) {
+    // eslint >= 7: config not found
+  }
+
+  try {
+    const cli = new eslint.CLIEngine()
     return cli.getConfigForFile(filePath)
   } catch (e) {
-    // No configuration was found
-    return null
+    // eslint <= 7: config not found
   }
+
+  // No configuration was found
+  return null
 }
 
 /**
@@ -215,6 +224,22 @@ export function getRelativePath(fileDir, filePath, config, projectPath) {
 }
 
 /**
+ * @param {object} config
+ * @param {string} filePath
+ */
+function getRulePaths(config, filePath) {
+  return config.advanced.eslintRulesDirs
+    .map((path) => {
+      const rulesDir = cleanPath(path)
+      if (!Path.isAbsolute(rulesDir)) {
+        return findCached(Path.dirname(filePath), rulesDir)
+      }
+      return rulesDir
+    })
+    .filter((path) => path)
+}
+
+/**
  * @param {string} type
  * @param {string[]} rules
  * @param {object} config
@@ -224,17 +249,10 @@ export function getRelativePath(fileDir, filePath, config, projectPath) {
 export function getCLIEngineOptions(type, config, rules, filePath, fileConfig) {
   const cliEngineConfig = {
     rules,
+    rulePaths: getRulePaths(config, filePath),
     ignore: !config.advanced.disableEslintIgnore,
     fix: type === 'fix'
   }
-
-  cliEngineConfig.rulePaths = config.advanced.eslintRulesDirs.map((path) => {
-    const rulesDir = cleanPath(path)
-    if (!Path.isAbsolute(rulesDir)) {
-      return findCached(Path.dirname(filePath), rulesDir)
-    }
-    return rulesDir
-  }).filter((path) => path)
 
   if (fileConfig === null && config.global.eslintrcPath) {
     // If we didn't find a configuration use the fallback from the settings
@@ -245,22 +263,51 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileConfig) {
 }
 
 /**
+ * @param {string} type
+ * @param {string[]} rules
+ * @param {object} config
+ * @param {string} filePath
+ * @param {object} fileConfig
+ */
+export function getESLintOptions(type, config, rules, filePath, fileConfig) {
+  const eslintConfig = {
+    overrideConfig: { rules },
+    rulePaths: getRulePaths(config, filePath),
+    ignore: !config.advanced.disableEslintIgnore,
+    fix: type === 'fix'
+  }
+
+  if (fileConfig === null && config.global.eslintrcPath) {
+    // If we didn't find a configuration use the fallback from the settings
+    eslintConfig.overrideConfigFile = cleanPath(config.global.eslintrcPath)
+  }
+
+  return eslintConfig
+}
+
+/**
  * Gets the list of rules used for a lint job
- * @param  {import("eslint").CLIEngine} cliEngine The CLIEngine instance used for the lint job
+ * @param  {import("eslint").CLIEngine | import("eslint").ESLint} engine The CLIEngine instance used for the lint job
  * @return {Map}              A Map of the rules used, rule names as keys, rule
  *                            properties as the contents.
  */
-export function getRules(cliEngine) {
-  // Pull the list of rules used directly from the CLIEngine
-  if (typeof cliEngine.getRules === 'function') {
-    return cliEngine.getRules()
+export function getRules(engine, results) {
+  // eslint >= 7: Pull the list of rules used directly from the ESLint
+  if (typeof engine.getRulesMetaForResults === 'function') {
+    const resultRules = engine.getRulesMetaForResults(results)
+    return new Map(Object.entries(resultRules))
+  }
+
+  // eslint <= 7: Pull the list of rules used directly from the CLIEngine
+  if (typeof engine.getRules === 'function') {
+    return engine.getRules()
   }
 
   // Attempt to use the internal (undocumented) `linter` instance attached to
   // the CLIEngine to get the loaded rules (including plugin rules).
   // Added in ESLint v4
-  if (Object.prototype.hasOwnProperty.call(cliEngine, 'linter')) {
-    return cliEngine.linter.getRules()
+  if (Object.prototype.hasOwnProperty.call(engine, 'linter')) {
+    return engine.linter.getRules()
   }
 
   // Older versions of ESLint don't (easily) support getting a list of rules
