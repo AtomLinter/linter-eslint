@@ -1,11 +1,13 @@
 import { join } from 'path'
 import { generateRange } from 'atom-linter'
-import cryptoRandomString from 'crypto-random-string'
+import { randomBytes } from 'crypto'
+import { promisify } from 'util'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Range, Task } from 'atom'
 import Rules from './rules'
 import { throwIfInvalidPoint } from './validate/editor'
 
+const asyncRandomBytes = promisify(randomBytes)
 export const rules = new Rules()
 let worker = null
 
@@ -66,7 +68,7 @@ export async function sendJob(config) {
   // NOTE: Jobs _must_ have a unique ID as they are completely async and results
   // can arrive back in any order.
   // eslint-disable-next-line no-param-reassign
-  config.emitKey = cryptoRandomString({ length: 10 })
+  config.emitKey = (await asyncRandomBytes(5)).toString('hex') // 5 bytes = 10 hex characters
 
   return new Promise((resolve, reject) => {
     // All worker errors are caught and re-emitted along with their associated
