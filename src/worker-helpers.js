@@ -1,4 +1,7 @@
+/* global emit */
+
 import Path from 'path'
+import Util from 'util'
 import fs from 'fs-plus'
 import ChildProcess from 'child_process'
 import resolveEnv from 'resolve-env'
@@ -17,7 +20,7 @@ const Cache = {
  * @param  {string} path The path to remove "strangeness" from
  * @return {string}      The cleaned path
  */
-const cleanPath = path => (path ? resolveEnv(fs.normalize(path)) : '')
+const cleanPath = (path) => (path ? resolveEnv(fs.normalize(path)) : '')
 
 /**
  * @returns {string}
@@ -27,7 +30,7 @@ export function getNodePrefixPath() {
     const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
     try {
       Cache.NODE_PREFIX_PATH = ChildProcess.spawnSync(npmCommand, ['get', 'prefix'], {
-        env: Object.assign(Object.assign({}, process.env), { PATH: getPath() })
+        env: { ...process.env, PATH: getPath() }
       }).output[1].toString().trim()
     } catch (e) {
       const errMsg = 'Unable to execute `npm get prefix`. Please make sure '
@@ -154,6 +157,23 @@ export function getESLintInstance(fileDir, config, projectPath) {
 }
 
 /**
+ * console.log
+ * @param  {any} args
+ * @return {void}
+ */
+export function log(...args) {
+  const obj = args.length === 1 ? args[0] : args
+  let str
+  try {
+    str = JSON.stringify(obj)
+  } catch (e) {
+    str = Util.inspect(obj)
+  }
+
+  emit('log', str)
+}
+
+/**
  * @param {import("eslint")} eslint
  * @param {string} filePath
  */
@@ -214,7 +234,7 @@ export function getCLIEngineOptions(type, config, rules, filePath, fileConfig) {
       return findCached(Path.dirname(filePath), rulesDir)
     }
     return rulesDir
-  }).filter(path => path)
+  }).filter((path) => path)
 
   if (fileConfig === null && config.global.eslintrcPath) {
     // If we didn't find a configuration use the fallback from the settings
@@ -258,5 +278,5 @@ export function getRules(cliEngine) {
  */
 export function didRulesChange(currentRules, newRules) {
   return !(currentRules.size === newRules.size
-    && Array.from(currentRules.keys()).every(ruleId => newRules.has(ruleId)))
+    && Array.from(currentRules.keys()).every((ruleId) => newRules.has(ruleId)))
 }

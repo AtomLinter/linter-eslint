@@ -17,6 +17,14 @@ export function startWorker() {
     worker = new Task(require.resolve('./worker.js'))
   }
 
+  worker.on('log', (obj) => {
+    try {
+      console.log(JSON.parse(obj))
+    } catch (ex) {
+      console.log(obj)
+    }
+  })
+
   if (worker.started) {
     // Worker start request has already been sent
     return
