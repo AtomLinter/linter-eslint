@@ -113,7 +113,6 @@ describe('Worker Helpers', () => {
       const config = createConfig({
         global: { useGlobalEslint: true, globalNodePath }
       })
-      console.log({ config })
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
       expect(eslint).toBe('located')
     })
@@ -145,7 +144,6 @@ describe('Worker Helpers', () => {
     it('uses ESLint to determine the configuration', async () => {
       const filePath = fixtureFile
       const foundConfig = await Helpers.getConfigForFile(eslint, filePath)
-      console.log(foundConfig)
       expect(foundConfig.rules.semi).toEqual([2, 'never'])
     })
 
@@ -214,12 +212,12 @@ describe('Worker Helpers', () => {
     })
   })
 
-  describe('getRules', () => {
-    it('works with the getRules function introduced in ESLint v4.15.0', () => {
+  describe('getCLIEngineRules', () => {
+    it('works with the getCLIEngineRules function introduced in ESLint v4.15.0', () => {
       const cliEngine = {
         getRules: () => 'foo'
       }
-      expect(Helpers.getRules(cliEngine)).toBe('foo')
+      expect(Helpers.getCLIEngineRules(cliEngine)).toBe('foo')
     })
 
     it('works with the hidden linter in ESLint v4 before v4.15.0', () => {
@@ -228,12 +226,12 @@ describe('Worker Helpers', () => {
           getRules: () => 'foo'
         }
       }
-      expect(Helpers.getRules(cliEngine)).toBe('foo')
+      expect(Helpers.getCLIEngineRules(cliEngine)).toBe('foo')
     })
 
     it('returns an empty Map for old ESLint versions', () => {
       const cliEngine = {}
-      expect(Helpers.getRules(cliEngine)).toEqual(new Map())
+      expect(Helpers.getCLIEngineRules(cliEngine)).toEqual(new Map())
     })
   })
 

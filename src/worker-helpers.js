@@ -287,17 +287,11 @@ export function getESLintOptions(type, config, rules, filePath, fileConfig) {
 
 /**
  * Gets the list of rules used for a lint job
- * @param  {import("eslint").CLIEngine | import("eslint").ESLint} engine The CLIEngine instance used for the lint job
+ * @param  {import("eslint").CLIEngine} engine The CLIEngine instance used for the lint job
  * @return {Map}              A Map of the rules used, rule names as keys, rule
  *                            properties as the contents.
  */
-export function getRules(engine, results) {
-  // eslint >= 7: Pull the list of rules used directly from the ESLint
-  if (typeof engine.getRulesMetaForResults === 'function') {
-    const resultRules = engine.getRulesMetaForResults(results)
-    return new Map(Object.entries(resultRules))
-  }
-
+export function getCLIEngineRules(engine) {
   // eslint <= 7: Pull the list of rules used directly from the CLIEngine
   if (typeof engine.getRules === 'function') {
     return engine.getRules()
@@ -312,6 +306,18 @@ export function getRules(engine, results) {
 
   // Older versions of ESLint don't (easily) support getting a list of rules
   return new Map()
+}
+
+/**
+ * Gets the list of rules used for a lint job
+ * @param  {import("eslint").ESLint} engine The ESLint instance used for the lint job
+ * @return {Promise<Map>}              A Map of the rules used, rule names as keys, rule
+ *                            properties as the contents.
+ */
+export async function getESLintRules(engine, { filePath }) {
+  const response = await engine.calculateConfigForFile(filePath)
+
+  return new Map(Object.entries(response.rules))
 }
 
 /**

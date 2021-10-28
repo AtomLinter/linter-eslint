@@ -28,7 +28,8 @@ let shouldSendRules = false
 function lintJobCLIEngine(eslint, cliEngineOptions, contents, filePath) {
   const cliEngine = new eslint.CLIEngine(cliEngineOptions)
   const report = cliEngine.executeOnText(contents, filePath)
-  const rules = Helpers.getRules(cliEngine)
+  const rules = Helpers.getCLIEngineRules(cliEngine)
+
   shouldSendRules = Helpers.didRulesChange(rulesMetadata, rules)
   if (shouldSendRules) {
     // Rebuild rulesMetadata
@@ -98,7 +99,8 @@ function executeCLIEngine(type, eslint, cliEngineOptions, contents, filePath) {
 async function lintJobESLint(eslint, eslintOptions, contents, filePath) {
   const linter = new eslint.ESLint(eslintOptions)
   const report = await linter.lintText(contents, { filePath })
-  const rules = Helpers.getRules(linter, report)
+  const rules = await Helpers.getESLintRules(linter, { filePath })
+
   shouldSendRules = Helpers.didRulesChange(rulesMetadata, rules)
   if (shouldSendRules) {
     // Rebuild rulesMetadata

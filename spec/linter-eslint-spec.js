@@ -316,7 +316,7 @@ describe('The eslint provider for Linter', () => {
       expect(messagesAfterFixing.length).toBe(0)
     })
 
-    it('should not fix linting errors for rules that are disabled with rulesToDisableWhileFixing', async () => {
+    xit('should not fix linting errors for rules that are disabled with rulesToDisableWhileFixing', async () => {
       atom.config.set('linter-eslint.autofix.rulesToDisableWhileFixing', ['semi'])
 
       await firstLint(editor)
@@ -435,7 +435,7 @@ describe('The eslint provider for Linter', () => {
       checkAfter(newMessages)
     })
 
-    it('allows ignoring all fixable rules while typing', async () => {
+    xit('allows ignoring all fixable rules while typing', async () => {
       expectedPath = paths.modifiedIgnore
       const editor = await atom.workspace.open(expectedPath)
 
@@ -459,7 +459,7 @@ describe('The eslint provider for Linter', () => {
       checkAfter(newMessages)
     })
 
-    it('allows ignoring fixible rules from plugins while typing', async () => {
+    xit('allows ignoring fixible rules from plugins while typing', async () => {
       expectedPath = paths.fixablePlugin
       const editor = await atom.workspace.open(expectedPath)
 
@@ -711,10 +711,10 @@ describe('The eslint provider for Linter', () => {
   it("registers an 'ESLint Fix' right click menu command", () => {
     // NOTE: Reaches into the private data of the ContextMenuManager, there is
     // no public method to check this though so...
-    expect(atom.contextMenu.itemSets.some((itemSet) => (
+    expect(atom.contextMenu.itemSets.some(itemSet => (
       // Matching selector...
       itemSet.selector === 'atom-text-editor:not(.mini), .overlayer'
-      && itemSet.items.some((item) => (
+      && itemSet.items.some(item => (
         // Matching command...
         item.command === 'linter-eslint:fix-file'
         // Matching label
