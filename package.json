@@ -188,7 +188,7 @@
     "@types/atom": "^1.40.11",
     "@types/eslint": "7.28.2",
     "@types/jasmine": "^3.10.1",
-    "@types/node": "^12",
+    "@types/node": "^16.0.0",
     "@types/rimraf": "^3.0.2",
     "atom-jasmine3-test-runner": "^5.2.9",
     "babel-preset-atomic": "^4.2.0",
