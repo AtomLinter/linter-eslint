@@ -6,7 +6,7 @@ specifiers:
   '@types/atom': ^1.40.11
   '@types/eslint': 7.28.2
   '@types/jasmine': ^3.10.1
-  '@types/node': ^12
+  '@types/node': ^16.0.0
   '@types/rimraf': ^3.0.2
   atom-jasmine3-test-runner: ^5.2.9
   atom-linter: 10.0.0
@@ -41,7 +41,7 @@ devDependencies:
   '@types/atom': 1.40.11
   '@types/eslint': 7.28.2
   '@types/jasmine': 3.10.1
-  '@types/node': 12.20.36
+  '@types/node': 16.11.6
   '@types/rimraf': 3.0.2
   atom-jasmine3-test-runner: 5.2.9
   babel-preset-atomic: 4.2.0
@@ -1568,7 +1568,7 @@ packages:
   /@types/atom/1.40.11:
     resolution: {integrity: sha512-TsPltugw2wKtR5p6ICv73t9kxdx59fTfdcD8Xe/0EEjF5vHBz99Z7Kj/rPRpyM/4ZcY1GrkQh8hgOw/OJRCs0g==}
     dependencies:
-      '@types/node': 14.17.3
+      '@types/node': 16.11.6
     dev: true
 
   /@types/eslint/7.28.2:
@@ -1586,7 +1586,7 @@ packages:
     resolution: {integrity: sha512-SEYeGAIQIQX8NN6LDKprLjbrd5dARM5EXsd8GI/A5l0apYI1fGMWgPHSe4ZKL4eozlAyI+doUE9XbYS4xCkQ1w==}
     dependencies:
       '@types/minimatch': 3.0.3
-      '@types/node': 14.17.3
+      '@types/node': 16.11.6
     dev: true
 
   /@types/jasmine/3.10.1:
@@ -1605,12 +1605,8 @@ packages:
     resolution: {integrity: sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==}
     dev: true
 
-  /@types/node/12.20.36:
-    resolution: {integrity: sha512-+5haRZ9uzI7rYqzDznXgkuacqb6LJhAti8mzZKWxIXn/WEtvB+GHVJ7AuMwcN1HMvXOSJcrvA6PPoYHYOYYebA==}
-    dev: true
-
-  /@types/node/14.17.3:
-    resolution: {integrity: sha512-e6ZowgGJmTuXa3GyaPbTGxX17tnThl2aSSizrFthQ7m9uLGZBXiGhgE55cjRZTF5kjZvYn9EOPOMljdjwbflxw==}
+  /@types/node/16.11.6:
+    resolution: {integrity: sha512-ua7PgUoeQFjmWPcoo9khiPum3Pd60k4/2ZGXt18sm2Slk0W0xZTqt5Y0Ny1NyBiN1EVQ/+FaF9NcY4Qe6rwk5w==}
     dev: true
 
   /@types/parse-json/4.0.0:
@@ -1621,7 +1617,7 @@ packages:
     resolution: {integrity: sha512-F3OznnSLAUxFrCEu/L5PY8+ny8DtcFRjx7fZZ9bycvXRi3KPTRS9HOitGZwvPg0juRhXFWIeKX58cnX5YqLohQ==}
     dependencies:
       '@types/glob': 7.1.3
-      '@types/node': 14.17.3
+      '@types/node': 16.11.6
     dev: true
 
   /acorn-jsx/5.3.2_acorn@7.4.1:
@@ -2416,6 +2412,7 @@ packages:
   /chokidar/3.5.1:
     resolution: {integrity: sha512-9+s+Od+W0VJJzawDma/gvBNQqkTiqYTWLuZoyAsivsI4AaWTCzHG06/TMjsf1cYe9Cb97UCEhjz7HvnPk2p/tw==}
     engines: {node: '>= 8.10.0'}
+    requiresBuild: true
     dependencies:
       anymatch: 3.1.1
       braces: 3.0.2
@@ -2941,6 +2938,7 @@ packages:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+    requiresBuild: true
     dev: true
     optional: true
 
