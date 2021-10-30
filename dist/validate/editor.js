@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.hasValidScope = exports.throwIfInvalidPoint = exports.isValidPoint = void 0;
+exports.throwIfInvalidPoint = exports.isValidPoint = exports.hasValidScope = void 0;
 
 var _throw = _interopRequireDefault(require("./throw"));
 

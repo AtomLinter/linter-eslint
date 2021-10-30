@@ -1,3 +1,16 @@
+# [9.0.0](https://github.com/AtomLinter/linter-eslint/compare/v8.6.6...v9.0.0) (2021-10-30)
+
+
+### Bug Fixes
+
+* update all deps ([099e533](https://github.com/AtomLinter/linter-eslint/commit/099e533977cb75eb785c6daa75737043aa91d406))
+* update eslint to v7 ([#1441](https://github.com/AtomLinter/linter-eslint/issues/1441)) ([3b8b67c](https://github.com/AtomLinter/linter-eslint/commit/3b8b67c25e138cbd027ef24929eb30e88f87a9a7))
+
+
+### BREAKING CHANGES
+
+* update eslint to v7
+
 ## [8.6.6](https://github.com/AtomLinter/linter-eslint/compare/v8.6.5...v8.6.6) (2021-04-13)
 
 
