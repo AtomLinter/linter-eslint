@@ -183,19 +183,19 @@
     "resolve-env": "1.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.15.7",
-    "@babel/core": "^7.15.8",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
     "@types/atom": "^1.40.11",
-    "@types/eslint": "7.28.2",
-    "@types/jasmine": "^3.10.1",
-    "@types/node": "^16.0.0",
+    "@types/eslint": "8.2.0",
+    "@types/jasmine": "^3.10.2",
+    "@types/node": "^16.11.7",
     "@types/rimraf": "^3.0.2",
     "atom-jasmine3-test-runner": "^5.2.9",
-    "babel-preset-atomic": "^4.2.0",
+    "babel-preset-atomic": "^4.2.1",
     "build-commit": "^0.1.4",
     "cross-env": "^7.0.3",
-    "eslint-config-airbnb-base": "14.2.1",
-    "eslint-plugin-import": "2.25.2",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-plugin-import": "2.25.3",
     "jasmine-fix": "1.3.1",
     "rimraf": "3.0.2"
   },
@@ -231,6 +231,7 @@
       ],
       "comma-dangle": "off",
       "global-require": "off",
+      "import/no-import-module-exports": "off",
       "import/no-unresolved": [
         "error",
         {
