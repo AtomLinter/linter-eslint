@@ -2,7 +2,7 @@
   "name": "linter-eslint",
   "main": "./dist/main.js",
   "version": "9.0.0",
-  "description": "Lint JavaScript on the fly, using ESLint",
+  "description": "Lint JavaScript on the fly, using ESLint (v7 or older)",
   "repository": "https://github.com/AtomLinter/linter-eslint.git",
   "license": "MIT",
   "engines": {
