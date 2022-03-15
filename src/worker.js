@@ -99,7 +99,11 @@ module.exports = async () => {
       }
       emit(emitKey, response)
     } catch (workerErr) {
-      emit(`workerError:${emitKey}`, { msg: workerErr.message, stack: workerErr.stack })
+      emit(`workerError:${emitKey}`, {
+        msg: workerErr.message,
+        stack: workerErr.stack,
+        name: workerErr.name
+      })
     }
   })
 }

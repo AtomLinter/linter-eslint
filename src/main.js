@@ -280,6 +280,9 @@ module.exports = {
         atom.notifications.addSuccess(response)
       }
     } catch (err) {
+      if (err.name === 'IncompatibleESLintError') {
+        return
+      }
       atom.notifications.addWarning(err.message)
     }
   },
