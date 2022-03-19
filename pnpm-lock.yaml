@@ -5,7 +5,7 @@ specifiers:
   '@babel/core': ^7.16.0
   '@types/atom': ^1.40.11
   '@types/eslint': 8.4.1
-  '@types/jasmine': ^3.10.2
+  '@types/jasmine': ^4.0.0
   '@types/node': ^17.0.0
   '@types/rimraf': ^3.0.2
   atom-jasmine3-test-runner: ^5.2.9
@@ -40,7 +40,7 @@ devDependencies:
   '@babel/core': 7.16.0
   '@types/atom': 1.40.11
   '@types/eslint': 8.4.1
-  '@types/jasmine': 3.10.2
+  '@types/jasmine': 4.0.0
   '@types/node': 17.0.0
   '@types/rimraf': 3.0.2
   atom-jasmine3-test-runner: 5.2.9
@@ -1567,6 +1567,12 @@ packages:
 
   /@types/jasmine/3.10.2:
     resolution: {integrity: sha512-qs4xjVm4V/XjM6owGm/x6TNmhGl5iKX8dkTdsgdgl9oFnqgzxLepnS7rN9Tdo7kDmnFD/VEqKrW57cGD2odbEg==}
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@types/jasmine/4.0.0:
+    resolution: {integrity: sha512-KvhqNz4NaONk7cfp4E9x+uXOUp7x4H2Zeyb4yXnw2vIuxD5YfSi1767x+aF7z54elhZcC0OH9/78/WL6+5jcDg==}
     dev: true
 
   /@types/json-schema/7.0.7:
