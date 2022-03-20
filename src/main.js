@@ -182,6 +182,13 @@ module.exports = {
           return null
         }
 
+        if (helpers.isIncompatibleEslint()) {
+          // The project's version of ESLint doesn't work with this package. Once
+          // this is detected, we won't try to send any jobs until the window is
+          // reloaded.
+          return null
+        }
+
         const filePath = textEditor.getPath()
         if (!filePath) {
           // The editor currently has no path, we can't report messages back to
@@ -243,6 +250,13 @@ module.exports = {
 
     if (!textEditor || !atom.workspace.isTextEditor(textEditor)) {
       // Silently return if the TextEditor is invalid
+      return
+    }
+
+    if (helpers.isIncompatibleEslint()) {
+      // The project's version of ESLint doesn't work with this package. Once
+      // this is detected, we won't try to send any jobs until the window is
+      // reloaded.
       return
     }
 

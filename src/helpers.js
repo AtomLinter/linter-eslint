@@ -12,6 +12,7 @@ import { throwIfInvalidPoint } from './validate/editor'
 const asyncRandomBytes = promisify(randomBytes)
 export const rules = new Rules()
 let worker = null
+let isIncompatibleEslintVersion = false
 let seenIncompatibleVersionNotification = false
 
 /**
@@ -49,6 +50,10 @@ export function killWorker() {
     worker.terminate()
     worker = null
   }
+}
+
+export function isIncompatibleEslint() {
+  return isIncompatibleEslintVersion
 }
 
 /**
@@ -241,6 +246,8 @@ export function handleError(textEditor, error) {
   // We want this specific worker error to show up as a notification so that we
   // can include a button for installing the new package.
   if (name === 'IncompatibleESLintError') {
+    isIncompatibleEslintVersion = true
+    killWorker()
     showIncompatibleVersionNotification(message)
     return
   }
