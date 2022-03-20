@@ -199,9 +199,11 @@ function isNewPackageInstalled() {
 }
 
 function showIncompatibleVersionNotification(message) {
-  if (seenIncompatibleVersionNotification || isNewPackageInstalled()) {
+  const notificationEnabled = atom.config.get('linter-eslint.advanced.showIncompatibleVersionNotification')
+  if (!notificationEnabled || seenIncompatibleVersionNotification || isNewPackageInstalled()) {
     return
   }
+
   // Show this message only once per session.
   seenIncompatibleVersionNotification = true
   atom.notifications.addWarning(
@@ -214,6 +216,12 @@ function showIncompatibleVersionNotification(message) {
           text: 'Install linter-eslint-node',
           onDidClick() {
             shell.openExternal('https://atom.io/packages/linter-eslint-node')
+          }
+        },
+        {
+          text: 'Settings',
+          onDidClick() {
+            atom.workspace.open('atom://config/packages/linter-eslint')
           }
         }
       ]

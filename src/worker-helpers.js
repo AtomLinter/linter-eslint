@@ -17,7 +17,7 @@ const Cache = {
 class IncompatibleESLintError extends Error {
   constructor(version) {
     // eslint-disable-next-line max-len
-    super(`The version of ESLint used in this project is ${version}, which is incompatible with this package. The linter-eslint-node Atom package provides support for ESLint versions 8 and higher.`)
+    super(`The version of ESLint used in this project is ${version}, which is incompatible with this package. The \`linter-eslint-node\` Atom package provides support for ESLint versions 8 and higher.\n\nYou can disable this notice in the linter-eslint package settings under **Uncommon → Notify when incompatible ESLint is detected**.`)
     this.name = 'IncompatibleESLintError'
   }
 }

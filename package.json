@@ -155,6 +155,13 @@
           "type": "string",
           "default": "",
           "order": 5
+        },
+        "showIncompatibleVersionNotification": {
+          "title": "Notify when incompatible ESLint is detected",
+          "description": "When enabled, will show a notification if this package loads inside a project using ESLint version 8 or greater _and_ the user has not already installed the newer `linter-eslint-node` package. Uncheck if you don't want these notifications.",
+          "type": "boolean",
+          "default": true,
+          "order": 6
         }
       }
     }
