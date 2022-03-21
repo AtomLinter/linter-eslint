@@ -1,3 +1,10 @@
+## [9.0.1](https://github.com/AtomLinter/linter-eslint/compare/v9.0.0...v9.0.1) (2022-03-21)
+
+
+### Bug Fixes
+
+* detect ESLint >= 8 and tell the user about linter-eslint-node ([#1464](https://github.com/AtomLinter/linter-eslint/issues/1464)) ([1297ab6](https://github.com/AtomLinter/linter-eslint/commit/1297ab6d91679a68b4c37834dc303a741cd13844))
+
 # [9.0.0](https://github.com/AtomLinter/linter-eslint/compare/v8.6.6...v9.0.0) (2021-10-30)
 
 
