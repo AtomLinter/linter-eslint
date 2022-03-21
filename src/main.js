@@ -182,6 +182,13 @@ module.exports = {
           return null
         }
 
+        if (helpers.isIncompatibleEslint()) {
+          // The project's version of ESLint doesn't work with this package. Once
+          // this is detected, we won't try to send any jobs until the window is
+          // reloaded.
+          return null
+        }
+
         const filePath = textEditor.getPath()
         if (!filePath) {
           // The editor currently has no path, we can't report messages back to
@@ -246,6 +253,13 @@ module.exports = {
       return
     }
 
+    if (helpers.isIncompatibleEslint()) {
+      // The project's version of ESLint doesn't work with this package. Once
+      // this is detected, we won't try to send any jobs until the window is
+      // reloaded.
+      return
+    }
+
     if (textEditor.isModified()) {
       // Abort for invalid or unsaved text editors
       const message = 'Linter-ESLint: Please save before fixing'
@@ -280,6 +294,9 @@ module.exports = {
         atom.notifications.addSuccess(response)
       }
     } catch (err) {
+      if (err.name === 'IncompatibleESLintError') {
+        return
+      }
       atom.notifications.addWarning(err.message)
     }
   },

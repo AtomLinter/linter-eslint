@@ -4,8 +4,10 @@
 [![Dependency Status](https://david-dm.org/AtomLinter/linter-eslint.svg)](https://david-dm.org/AtomLinter/linter-eslint)
 
 This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides
-an interface to [eslint](http://eslint.org). It will be used with files that
+an interface to [eslint](http://eslint.org) versions 7 and below. It will be used with files that
 have the "JavaScript" syntax.
+
+**For linting in projects that use ESLint v8 and above, install [linter-eslint-node](https://atom.io/packages/linter-eslint-node).**
 
 ## Installation
 
@@ -24,7 +26,7 @@ This package requires an `eslint` of at least v1.0.0.
 
 If you do not have the `linter` package installed, it will be
 installed
-for you. If you are using an alternative `linter-*` consumer, 
+for you. If you are using an alternative `linter-*` consumer,
 the `linter` package can be disabled.
 
 If you wish to lint files in JavaScript-derivative languages (like Typescript,

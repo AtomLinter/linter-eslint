@@ -4,12 +4,16 @@ import { randomBytes } from 'crypto'
 import { promisify } from 'util'
 // eslint-disable-next-line import/no-extraneous-dependencies, import/extensions
 import { Range, Task } from 'atom'
+// eslint-disable-next-line import/no-unresolved
+import { shell } from 'electron'
 import Rules from './rules'
 import { throwIfInvalidPoint } from './validate/editor'
 
 const asyncRandomBytes = promisify(randomBytes)
 export const rules = new Rules()
 let worker = null
+let isIncompatibleEslintVersion = false
+let seenIncompatibleVersionNotification = false
 
 /**
  * Start the worker process if it hasn't already been started
@@ -48,6 +52,10 @@ export function killWorker() {
   }
 }
 
+export function isIncompatibleEslint() {
+  return isIncompatibleEslintVersion
+}
+
 /**
  * Send a job to the worker and return the results
  * @param  {Object} config Configuration for the job to send to the worker
@@ -74,11 +82,12 @@ export async function sendJob(config) {
     // All worker errors are caught and re-emitted along with their associated
     // emitKey, so that we do not create multiple listeners for the same
     // 'task:error' event
-    const errSub = worker.on(`workerError:${config.emitKey}`, ({ msg, stack }) => {
+    const errSub = worker.on(`workerError:${config.emitKey}`, ({ msg, stack, name }) => {
       // Re-throw errors from the task
       const error = new Error(msg)
       // Set the stack to the one given to us by the worker
       error.stack = stack
+      error.name = name
       errSub.dispose()
       // eslint-disable-next-line no-use-before-define
       responseSub.dispose()
@@ -189,6 +198,44 @@ export function generateUserMessage(textEditor, options) {
   }]
 }
 
+function isNewPackageInstalled() {
+  return atom.packages.isPackageLoaded('linter-eslint-node')
+   || atom.packages.isPackageDisabled('linter-eslint-node')
+}
+
+function showIncompatibleVersionNotification(message) {
+  const notificationEnabled = atom.config.get('linter-eslint.advanced.showIncompatibleVersionNotification')
+  if (!notificationEnabled || seenIncompatibleVersionNotification || isNewPackageInstalled()) {
+    return
+  }
+
+  // Show this message only once per session.
+  seenIncompatibleVersionNotification = true
+  const notification = atom.notifications.addWarning(
+    'linter-eslint: Incompatible version',
+    {
+      description: message,
+      dismissable: true,
+      buttons: [
+        {
+          text: 'Install linter-eslint-node',
+          onDidClick() {
+            shell.openExternal('https://atom.io/packages/linter-eslint-node')
+            notification.dismiss()
+          }
+        },
+        {
+          text: 'Don\'t show this notification again',
+          onDidClick() {
+            atom.config.set('linter-eslint.advanced.showIncompatibleVersionNotification', false)
+            notification.dismiss()
+          }
+        }
+      ]
+    }
+  )
+}
+
 /**
  * Generates a message to the user in order to nicely display the Error being
  * thrown instead of depending on generic error handling.
@@ -197,10 +244,19 @@ export function generateUserMessage(textEditor, options) {
  * @return {import("atom/linter").Message[]} Message to user generated from the Error
  */
 export function handleError(textEditor, error) {
-  const { stack, message } = error
+  const { stack, message, name } = error
+  // We want this specific worker error to show up as a notification so that we
+  // can include a button for installing the new package.
+  if (name === 'IncompatibleESLintError') {
+    isIncompatibleEslintVersion = true
+    killWorker()
+    showIncompatibleVersionNotification(message)
+    return
+  }
   // Only show the first line of the message as the excerpt
   const excerpt = `Error while running ESLint: ${message.split('\n')[0]}.`
   const description = `<div style="white-space: pre-wrap">${message}\n<hr />${stack}</div>`
+  // eslint-disable-next-line consistent-return
   return generateUserMessage(textEditor, { severity: 'error', excerpt, description })
 }
 

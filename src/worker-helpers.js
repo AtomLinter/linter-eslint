@@ -14,6 +14,14 @@ const Cache = {
   LAST_MODULES_PATH: null
 }
 
+class IncompatibleESLintError extends Error {
+  constructor(version) {
+    // eslint-disable-next-line max-len
+    super(`The version of ESLint used in this project is ${version}, which is incompatible with this package. The \`linter-eslint-node\` Atom package provides support for ESLint versions 8 and higher.\n\nYou can disable this notice in the linter-eslint package settings under **Uncommon → Notify when incompatible ESLint is detected**.`)
+    this.name = 'IncompatibleESLintError'
+  }
+}
+
 /**
  * Takes a path and translates `~` to the user's home directory, and replaces
  * all environment variables with their value.
@@ -112,6 +120,27 @@ export function findESLintDirectory(modulesDir, config, projectPath, fallbackFor
   }
 }
 
+// Given an ESLint module path, checks its version and throws if the version is
+// too new for this package to support.
+function checkForIncompatibleESLint(directory) {
+  let packageMeta
+  try {
+    // eslint-disable-next-line import/no-dynamic-require
+    packageMeta = require(Path.join(directory, 'package.json'))
+    if (!packageMeta || !packageMeta.version) {
+      return
+    }
+  } catch (_) {
+    return
+  }
+  // We don't need sophisticated parsing logic here; we just need to look at
+  // the major version.
+  const m = packageMeta.version.match(/^([\d]+)\./)
+  if (m && Number(m[1]) > 7) {
+    throw new IncompatibleESLintError(packageMeta.version)
+  }
+}
+
 /**
  * @param {string} modulesDir
  * @param {object} config
@@ -120,10 +149,19 @@ export function findESLintDirectory(modulesDir, config, projectPath, fallbackFor
  */
 export function getESLintFromDirectory(modulesDir, config, projectPath) {
   const { path: ESLintDirectory } = findESLintDirectory(modulesDir, config, projectPath)
+  let eslint
   try {
     // eslint-disable-next-line import/no-dynamic-require
-    return require(ESLintDirectory)
+    eslint = require(ESLintDirectory)
+    if (!('CLIEngine' in eslint)) {
+      checkForIncompatibleESLint(ESLintDirectory)
+    }
+    return eslint
   } catch (e) {
+    // If this is the result of an incompatible ESLint, an error will be
+    // thrown; otherwise we should proceed with the local-path fallback.
+    checkForIncompatibleESLint(ESLintDirectory)
+
     if (config.global.useGlobalEslint && e.code === 'MODULE_NOT_FOUND') {
       throw new Error('ESLint not found, try restarting Atom to clear caches.')
     }

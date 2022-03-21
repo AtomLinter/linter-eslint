@@ -81,7 +81,7 @@ describe('Worker Helpers', () => {
         advanced: { localNodeModules: path }
       })
       const eslint = Helpers.getESLintInstance('', config)
-      expect(eslint).toBe('located')
+      expect(eslint.type).toBe('located')
     })
 
     it('tries to find an indirect local eslint using a relative path', () => {
@@ -93,13 +93,13 @@ describe('Worker Helpers', () => {
       })
       const eslint = Helpers.getESLintInstance('', config, projectPath)
 
-      expect(eslint).toBe('located')
+      expect(eslint.type).toBe('located')
     })
 
     it('tries to find a local eslint', () => {
       const config = createConfig()
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
-      expect(eslint).toBe('located')
+      expect(eslint.type).toBe('located')
     })
 
     it('cries if local eslint is not found', () => {
@@ -109,13 +109,20 @@ describe('Worker Helpers', () => {
       }).toThrow()
     })
 
+    it('cries if incompatible eslint is found', () => {
+      expect(() => {
+        const config = createConfig()
+        Helpers.getESLintInstance(getFixturesPath('incompatible-eslint'), config)
+      }).toThrow()
+    })
+
     it('tries to find a global eslint if config is specified', () => {
       const config = createConfig({
         global: { useGlobalEslint: true, globalNodePath }
       })
       console.log({ config })
       const eslint = Helpers.getESLintInstance(getFixturesPath('local-eslint'), config)
-      expect(eslint).toBe('located')
+      expect(eslint.type).toBe('located')
     })
 
     it('cries if global eslint is not found', () => {
@@ -133,7 +140,7 @@ describe('Worker Helpers', () => {
       const fileDir = Path.join(getFixturesPath('local-eslint'), 'lib', 'foo.js')
       const config = createConfig()
       const eslint = Helpers.getESLintInstance(fileDir, config)
-      expect(eslint).toBe('located')
+      expect(eslint.type).toBe('located')
     })
   })
 
