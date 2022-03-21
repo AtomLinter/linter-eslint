@@ -123,12 +123,19 @@ export function findESLintDirectory(modulesDir, config, projectPath, fallbackFor
 // Given an ESLint module path, checks its version and throws if the version is
 // too new for this package to support.
 function checkForIncompatibleESLint(directory) {
-  // eslint-disable-next-line import/no-dynamic-require
-  const packageMeta = require(Path.join(directory, 'package.json'))
-  const { version } = packageMeta
+  let packageMeta
+  try {
+    // eslint-disable-next-line import/no-dynamic-require
+    packageMeta = require(Path.join(directory, 'package.json'))
+    if (!packageMeta || !packageMeta.version) {
+      return
+    }
+  } catch (_) {
+    return
+  }
   // We don't need sophisticated parsing logic here; we just need to look at
   // the major version.
-  const m = version.match(/^([\d]+)\./)
+  const m = packageMeta.version.match(/^([\d]+)\./)
   if (m && Number(m[1]) > 7) {
     throw new IncompatibleESLintError(packageMeta.version)
   }
