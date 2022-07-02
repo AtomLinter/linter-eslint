@@ -198,7 +198,7 @@
     "@types/node": "^18.0.0",
     "@types/rimraf": "^3.0.2",
     "atom-jasmine3-test-runner": "^5.2.9",
-    "babel-preset-atomic": "^4.2.1",
+    "babel-preset-atomic": "^5.0.0",
     "build-commit": "^0.1.4",
     "cross-env": "^7.0.3",
     "eslint-config-airbnb-base": "15.0.0",
