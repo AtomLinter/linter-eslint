@@ -4,7 +4,7 @@ specifiers:
   '@babel/cli': ^7.16.0
   '@babel/core': ^7.16.0
   '@types/atom': ^1.40.11
-  '@types/eslint': 8.4.5
+  '@types/eslint': 8.4.6
   '@types/jasmine': ^4.0.0
   '@types/node': ^18.0.0
   '@types/rimraf': ^3.0.2
@@ -39,7 +39,7 @@ devDependencies:
   '@babel/cli': 7.16.0_@babel+core@7.16.0
   '@babel/core': 7.16.0
   '@types/atom': 1.40.11
-  '@types/eslint': 8.4.5
+  '@types/eslint': 8.4.6
   '@types/jasmine': 4.0.0
   '@types/node': 18.0.0
   '@types/rimraf': 3.0.2
@@ -1723,8 +1723,8 @@ packages:
       '@babel/types': 7.18.7
     dev: true
 
-  /@types/eslint/8.4.5:
-    resolution: {integrity: sha512-dhsC09y1gpJWnK+Ff4SGvCuSnk9DaU0BJZSzOwa6GVSg65XtTugLBITDAAzRU5duGBoXBHpdR/9jHGxJjNflJQ==}
+  /@types/eslint/8.4.6:
+    resolution: {integrity: sha512-/fqTbjxyFUaYNO7VcW5g+4npmqVACz1bB7RTHYuLj+PRjw9hrCwrUXVQFpChUS0JsyEFvMZ7U/PfmvWgxJhI9g==}
     dependencies:
       '@types/estree': 0.0.48
       '@types/json-schema': 7.0.7
