@@ -58,7 +58,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Commit lint ✨
-        uses: wagoid/commitlint-github-action@v4
+        uses: wagoid/commitlint-github-action@v5
 
   Release:
     needs: [Test, CommitLint, Lint]
